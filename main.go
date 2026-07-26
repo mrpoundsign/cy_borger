@@ -300,8 +300,10 @@ func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 		c.Handle = user.Handle
 	}
 
+	_ = r.ParseForm()
 	if gameID := r.FormValue("game_id"); gameID != "" {
 		c.GameID = gameID
+		c.IsSaved = true
 	}
 
 	if err := database.SaveCharacter(&c, ownerID); err != nil {
@@ -323,8 +325,9 @@ func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 }
 
 func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *chargen.Character) {
+	user := getUserFromSession(r)
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
-	canEdit := sessionCode != "" && sessionCode == c.EditCode
+	canEdit := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
 
 	var game *db.Game
 	isGM := false
@@ -601,11 +604,13 @@ func handleViewGame(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	setCookie(w, "last_game_invite", g.InviteCode)
-
-	isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
+	user := getUserFromSession(r)
+	isGM := (getCookie(r, "game_gm_"+g.ID) == g.GMCode) || (user != nil && user.ID != "" && g.OwnerID == user.ID)
 
 	currentUserID := getCookie(r, "cy_user_id")
+	if currentUserID == "" && user != nil {
+		currentUserID = user.ID
+	}
 
 	data := map[string]interface{}{
 		"Game":          g,

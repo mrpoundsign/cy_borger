@@ -7,6 +7,11 @@ async function loginUser(page) {
     await page.goto(BASE_URL + '/');
     await page.waitForLoadState('networkidle');
 
+    if (await page.locator('button:has-text("🚪 LOGOUT")').isVisible()) {
+        await page.locator('button:has-text("🚪 LOGOUT")').click();
+        await page.waitForLoadState('networkidle');
+    }
+
     if (await page.locator('#tab-btn-register').isVisible()) {
         await page.locator('#tab-btn-register').click();
         await page.waitForTimeout(200);
@@ -77,8 +82,8 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await killBtn.click();
         await page.waitForTimeout(300);
 
-        // Submit kill form
-        const killSubmit = page.locator('button:has-text("CONFIRM KILL")').first();
+        // Submit kill form modal
+        const killSubmit = page.locator('#kill-game-edit button[type="submit"]:has-text("💀 FLATLINE"), div[id^="kill-game-"] button[type="submit"]:has-text("💀 FLATLINE")').first();
         await killSubmit.click();
         await page.waitForLoadState('networkidle');
 

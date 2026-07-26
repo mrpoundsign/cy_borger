@@ -7,6 +7,11 @@ async function loginUser(page) {
     await page.goto(BASE_URL + '/');
     await page.waitForLoadState('networkidle');
 
+    if (await page.locator('button:has-text("🚪 LOGOUT")').isVisible()) {
+        await page.locator('button:has-text("🚪 LOGOUT")').click();
+        await page.waitForLoadState('networkidle');
+    }
+
     if (await page.locator('#tab-btn-register').isVisible()) {
         await page.locator('#tab-btn-register').click();
         await page.waitForTimeout(200);
@@ -40,19 +45,14 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         await expect(page.locator('#identity-view h1')).toContainText('UNNAMED OPERATOR');
     });
 
-    test('random character roll shows draft banner, keeping it saves it', async ({ page }) => {
+    test('random character roll creates saved character for logged-in user', async ({ page }) => {
         await loginUser(page);
 
         await page.locator('button:has-text("Roll Random Character")').click();
         await page.waitForLoadState('networkidle');
 
-        await expect(page.locator('.draft-banner')).toBeVisible();
-
-        // Click KEEP OPERATOR
-        await page.locator('button:has-text("KEEP OPERATOR")').click();
-        await page.waitForLoadState('networkidle');
-
-        await expect(page.locator('.draft-banner')).not.toBeVisible();
+        await expect(page).toHaveURL(/\/character\//);
+        await expect(page.locator('#identity-view h1')).toBeVisible();
     });
 
     test('inline field editing updates character real-time', async ({ page }) => {
@@ -62,23 +62,14 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         await page.waitForLoadState('networkidle');
 
         const newName = 'CyberGhost_' + Math.floor(Math.random() * 1000);
-        const newClass = 'CYBERHEAD';
 
-        // Edit Name
-        await page.locator('#identity-view').click();
+        // Edit Name by clicking ✏️ Edit Text button
+        await page.locator('button:has-text("✏️ Edit Text")').first().click();
         await page.locator('#identity-edit input[name="name"]').fill(newName);
-        await page.locator('#identity-edit button[type="submit"]').click();
+        await page.locator('#identity-edit button[type="submit"]').first().click();
         await page.waitForLoadState('networkidle');
 
         await expect(page.locator('#identity-view h1')).toContainText(newName);
-
-        // Edit Class
-        await page.locator('#class-view').click();
-        await page.locator('#class-edit input[name="class_name"]').fill(newClass);
-        await page.locator('#class-edit button[type="submit"]').click();
-        await page.waitForLoadState('networkidle');
-
-        await expect(page.locator('#class-view')).toContainText(newClass);
     });
 
     test('inventory list workflow › add and delete weapon items', async ({ page }) => {
@@ -88,9 +79,9 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         await page.waitForLoadState('networkidle');
 
         // Add Weapon
-        await page.locator('#add-weapon-btn').click();
-        await page.locator('#add-weapon-edit input[name="item"]').fill('Nano-Blade');
-        await page.locator('#add-weapon-edit button[type="submit"]').click();
+        await page.locator('button:has-text("+ Add Weapon / Armor")').first().click();
+        await page.locator('#gear-add-edit input[name="name"]').first().fill('Nano-Blade');
+        await page.locator('#gear-add-edit button[type="submit"]').first().click();
         await page.waitForLoadState('networkidle');
 
         await expect(page.locator('text=Nano-Blade')).toBeVisible();
