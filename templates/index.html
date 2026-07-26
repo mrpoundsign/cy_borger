@@ -144,8 +144,11 @@
         <div class="user-banner">
             <span>OPERATOR HANDLE: <strong id="user-handle-display" style="color:var(--accent-color)"></strong></span>
             <div>
-                <input type="text" id="user-handle-input" style="width:140px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
-                <button onclick="saveHandle()" class="btn" style="padding:4px 10px; font-size:0.8rem; margin:0;">Save</button>
+                <form id="handle-form" hx-post="/user/update" hx-trigger="submit" hx-swap="none" style="display:inline-flex; gap:10px;">
+                    <input type="hidden" name="user_id" id="user-id-input">
+                    <input type="text" name="username" id="user-handle-input" style="width:140px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
+                    <button type="submit" onclick="saveHandle()" class="btn" style="padding:4px 10px; font-size:0.8rem; margin:0;">Save</button>
+                </form>
             </div>
         </div>
 
@@ -176,12 +179,13 @@
             if (input) {
                 cyStore.setUserName(input);
                 document.getElementById("user-handle-display").innerText = input;
-                document.getElementById("user-handle-input").value = "";
             }
         }
 
         document.addEventListener("DOMContentLoaded", function() {
             if (!window.cyStore) return;
+            
+            document.getElementById("user-id-input").value = cyStore.getUserId();
             document.getElementById("user-handle-display").innerText = cyStore.getUserName();
 
             const games = cyStore.getGMGames();

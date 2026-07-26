@@ -38,6 +38,7 @@ func main() {
 
 	// Routes
 	mux.HandleFunc("GET /", handleIndex)
+	mux.HandleFunc("POST /user/update", handleUpdateUser)
 	mux.HandleFunc("POST /character/generate", handleGenerateCharacter)
 	mux.HandleFunc("GET /character/{id}", handleViewCharacter)
 	mux.HandleFunc("POST /character/{id}/auth", handleAuthCharacter)
@@ -95,9 +96,43 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	_ = templates.ExecuteTemplate(w, "index.html", nil)
 }
 
+func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	username := r.FormValue("username")
+
+	if userID == "" || username == "" {
+		http.Error(w, "Missing user_id or username", http.StatusBadRequest)
+		return
+	}
+
+	u := db.User{ID: userID, Username: username}
+	if err := database.SaveUser(&u); err != nil {
+		http.Error(w, "Failed to save user", http.StatusInternalServerError)
+		return
+	}
+
+	setCookie(w, "cy_user_id", userID)
+	setCookie(w, "cy_username", username)
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 	c := chargen.GenerateCharacter()
-	if err := database.SaveCharacter(&c); err != nil {
+
+	ownerID := getCookie(r, "cy_user_id")
+	if ownerID == "" {
+		ownerID = "usr_" + chargen.GenerateRandomID(6)
+		setCookie(w, "cy_user_id", ownerID)
+	}
+
+	// Persist the display name from cookie if available
+	username := getCookie(r, "cy_username")
+	if username != "" {
+		c.Handle = username
+	}
+
+	if err := database.SaveCharacter(&c, ownerID); err != nil {
 		http.Error(w, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
@@ -198,7 +233,9 @@ func handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.GameID = g.ID
-	_ = database.SaveCharacter(c)
+	ownerID := getCookie(r, "cy_user_id")
+
+	_ = database.SaveCharacter(c, ownerID)
 
 	setCookie(w, "last_game_invite", g.InviteCode)
 
@@ -226,7 +263,9 @@ func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	if val, err := strconv.Atoi(maxStr); err == nil {
 		c.HP.Max = val
 	}
-	_ = database.SaveCharacter(c)
+
+	ownerID := getCookie(r, "cy_user_id")
+	_ = database.SaveCharacter(c, ownerID)
 
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
@@ -254,7 +293,9 @@ func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	if val, err := strconv.Atoi(maxStr); err == nil {
 		c.Glitches.Max = val
 	}
-	_ = database.SaveCharacter(c)
+
+	ownerID := getCookie(r, "cy_user_id")
+	_ = database.SaveCharacter(c, ownerID)
 
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
@@ -285,7 +326,9 @@ func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 			stat.Max = val
 		}
 		c.Abilities[statName] = stat
-		_ = database.SaveCharacter(c)
+
+		ownerID := getCookie(r, "cy_user_id")
+		_ = database.SaveCharacter(c, ownerID)
 
 		ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
 		if c.GameID != "" {

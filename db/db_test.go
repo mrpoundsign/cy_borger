@@ -16,9 +16,23 @@ func TestDB(t *testing.T) {
 		t.Fatalf("InitDB failed: %v", err)
 	}
 
+	// 0. Test User
+	u := User{ID: "usr_test123", Username: "Netrunner"}
+	if err := database.SaveUser(&u); err != nil {
+		t.Fatalf("SaveUser failed: %v", err)
+	}
+
+	retrievedUser, err := database.GetUser(u.ID)
+	if err != nil || retrievedUser == nil {
+		t.Fatalf("GetUser failed: %v", err)
+	}
+	if retrievedUser.Username != u.Username {
+		t.Errorf("Expected username %s, got %s", u.Username, retrievedUser.Username)
+	}
+
 	// 1. Test Save & Get Character
 	c := chargen.GenerateCharacter()
-	if err := database.SaveCharacter(&c); err != nil {
+	if err := database.SaveCharacter(&c, u.ID); err != nil {
 		t.Fatalf("SaveCharacter failed: %v", err)
 	}
 
@@ -43,7 +57,7 @@ func TestDB(t *testing.T) {
 
 	// 3. Test Join Game
 	c.GameID = g.ID
-	if err := database.SaveCharacter(&c); err != nil {
+	if err := database.SaveCharacter(&c, u.ID); err != nil {
 		t.Fatalf("SaveCharacter join game failed: %v", err)
 	}
 
