@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game: {{.Game.Name}} - CY_BORG</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-color: #ffe600;
+            --text-color: #ffffff;
+            --muted-color: #aaaaaa;
+            --border-color: #ffe600;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 2.2rem;
+        }
+
+        .invite-box {
+            background: #111;
+            border: 1px dashed var(--accent-color);
+            padding: 10px 15px;
+            color: var(--accent-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .party-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .char-card {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            background: #0a0a0a;
+        }
+
+        .char-name {
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 5px 10px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+    </style>
+    <script>
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = btn.innerText;
+                btn.innerText = "COPIED!";
+                btn.style.borderColor = "#00ff66";
+                btn.style.color = "#00ff66";
+                setTimeout(() => {
+                    btn.innerText = orig;
+                    btn.style.borderColor = "";
+                    btn.style.color = "";
+                }, 2000);
+            });
+        }
+    </script>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>GAME: {{.Game.Name}}</h1>
+            {{if .IsGM}}
+            <span style="color: #00ff66; font-weight: bold;">[GM MODE ACTIVE]</span>
+            <button class="btn-outline" style="font-size:0.8rem; margin-left:10px;" onclick="copyText(window.location.origin + '/game/{{.Game.ID}}?gm_code={{.Game.GMCode}}', this)">Copy GM Link</button>
+            <button class="btn-outline" style="font-size:0.8rem; margin-left:5px;" onclick="copyText('{{.Game.GMCode}}', this)">Copy GM Code</button>
+            {{else}}
+            <span style="color: var(--muted-color)">[PLAYER PARTY VIEW]</span>
+            {{end}}
+        </div>
+        <div class="invite-box">
+            <span>PLAYER INVITE CODE: <strong style="color: #fff">{{.Game.InviteCode}}</strong></span>
+            <button class="btn-outline" style="font-size:0.8rem;" onclick="copyText('{{.Game.InviteCode}}', this)">Copy Code</button>
+        </div>
+    </div>
+
+    {{if not .IsGM}}
+    <div style="margin-bottom: 20px;">
+        <form action="/game/{{.Game.ID}}/auth" method="POST" style="display:inline-flex; gap: 10px;">
+            <input type="text" name="gm_code" placeholder="Enter GM Code" style="background:#111; border:1px solid var(--accent-color); color:#fff; padding:8px;">
+            <button type="submit" class="btn-outline">Unlock GM Controls</button>
+        </form>
+    </div>
+    {{end}}
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+        <h2 style="color: var(--accent-color);">PARTY MEMBERS ({{len .Characters}})</h2>
+        <form action="/character/generate" method="POST" style="display:inline;">
+            <button type="submit" class="btn">🎲 Roll New Character</button>
+        </form>
+    </div>
+
+    <div class="party-grid">
+        {{range .Characters}}
+        <div class="char-card">
+            <div class="char-name">{{.Name}}</div>
+            <div style="color:var(--muted-color); font-size:0.9rem; margin-bottom:10px;">@{{.Handle}} - {{.Class.Name}}</div>
+            <div><strong>HP:</strong> {{.HP.Current}}/{{.HP.Max}} | <strong>Glitches:</strong> {{.Glitches.Current}}/{{.Glitches.Max}}</div>
+            <div style="margin-top:8px;"><strong>Weapons:</strong> {{range .Weapons}}{{.Name}} ({{.Damage}}), {{end}}</div>
+            <div style="margin-top:12px;">
+                <a href="/character/{{.ID}}" class="btn-outline">View Sheet</a>
+            </div>
+        </div>
+        {{else}}
+        <p style="color:var(--muted-color)">No characters have joined this game yet. Share the invite code <strong>{{.Game.InviteCode}}</strong> with players!</p>
+        {{end}}
+    </div>
+
+    <p style="margin-top: 30px;"><a href="/" class="btn-outline">← Back to Main Menu</a></p>
+
+</body>
+</html>

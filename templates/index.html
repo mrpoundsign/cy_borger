@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CY_BORG Character Generator</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-color: #ffe600;
+            --text-color: #ffffff;
+            --muted-color: #888888;
+            --border-color: #ffe600;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid var(--border-color);
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(255, 230, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            color: var(--muted-color);
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .card {
+            border: 1px solid var(--muted-color);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            background: #111;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CY_BORG</h1>
+        <p>KILL THE CORPORATIONS. LIVE FAST. DIE CHROME.</p>
+
+        <form action="/character/generate" method="POST">
+            <button type="submit" class="btn">Generate Character</button>
+        </form>
+
+        <div class="card">
+            <h3 style="color: var(--accent-color); margin-bottom: 15px;">START A GAME</h3>
+            <form action="/game/create" method="POST">
+                <input type="text" name="name" placeholder="Game Name (e.g. Sector 4 Heist)" required><br>
+                <button type="submit" class="btn" style="padding: 10px 20px; font-size: 0.9rem;">Create Game as GM</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

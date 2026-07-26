@@ -1,0 +1,5 @@
+local/
+*.db
+tmp/
+cy_borger
+build-errors.log
