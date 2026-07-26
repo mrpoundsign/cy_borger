@@ -13,3 +13,5 @@
   - Be precise with Playwright selectors and text assertions, especially regarding UI elements with emojis (e.g., `💀 FLATLINE`).
 - **Go Handlers & Forms**:
   - Always call `r.ParseForm()` before accessing values via `r.FormValue()` in POST requests.
+- **Error Handling**:
+  - Never ignore errors using `_ = err` or `_, _ = func()`. Explicitly handle all errors (log them, return HTTP 500s, or handle them gracefully).
