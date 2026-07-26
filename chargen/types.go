@@ -35,6 +35,7 @@ type ClassInfo struct {
 type Character struct {
 	ID        string          `json:"id"`
 	EditCode  string          `json:"edit_code"`
+	IsSaved   bool            `json:"is_saved"`
 	Name      string          `json:"name"`
 	Handle    string          `json:"handle"`
 	Class     ClassInfo       `json:"class"`

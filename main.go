@@ -41,12 +41,17 @@ func main() {
 	mux.HandleFunc("GET /", handleIndex)
 	mux.HandleFunc("POST /user/update", handleUpdateUser)
 	mux.HandleFunc("POST /character/generate", handleGenerateCharacter)
+	mux.HandleFunc("POST /character/create_blank", handleCreateBlankCharacter)
 	mux.HandleFunc("GET /character/{id}", handleViewCharacter)
 	mux.HandleFunc("POST /character/{id}/auth", handleAuthCharacter)
 	mux.HandleFunc("POST /character/{id}/join", handleJoinGame)
+	mux.HandleFunc("POST /character/{id}/keep", handleKeepCharacter)
 	mux.HandleFunc("PUT /character/{id}/update_hp", handleUpdateHP)
 	mux.HandleFunc("PUT /character/{id}/update_glitches", handleUpdateGlitches)
 	mux.HandleFunc("PUT /character/{id}/update_stat", handleUpdateStat)
+	mux.HandleFunc("PUT /character/{id}/update_field", handleUpdateField)
+	mux.HandleFunc("POST /character/{id}/add_item", handleAddListItem)
+	mux.HandleFunc("POST /character/{id}/delete_item", handleDeleteListItem)
 
 	mux.HandleFunc("POST /game/create", handleCreateGame)
 	mux.HandleFunc("GET /game/{id}", handleViewGame)
@@ -483,4 +488,231 @@ func handleWSGame(w http.ResponseWriter, r *http.Request) {
 func handleWSCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	ws.ServeWS(w, r, "char_"+id)
+}
+
+func handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
+	c := chargen.CreateBlankCharacter()
+
+	ownerID := getCookie(r, "cy_user_id")
+	if ownerID == "" {
+		ownerID = "usr_" + chargen.GenerateRandomID(6)
+		setCookie(w, "cy_user_id", ownerID)
+	}
+
+	username := getCookie(r, "cy_username")
+	if username != "" {
+		c.Handle = username
+	}
+
+	if err := database.SaveCharacter(&c, ownerID); err != nil {
+		http.Error(w, "Failed to save character", http.StatusInternalServerError)
+		return
+	}
+
+	setCookie(w, "char_edit_"+c.ID, c.EditCode)
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
+		renderCharacterViewWithChar(w, r, &c)
+		return
+	}
+
+	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+}
+
+func handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+
+	c.IsSaved = true
+	ownerID := getCookie(r, "cy_user_id")
+	_ = database.SaveCharacter(c, ownerID)
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderCharacterViewWithChar(w, r, c)
+		return
+	}
+
+	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+}
+
+func handleUpdateField(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	field := r.FormValue("field")
+	value := r.FormValue("value")
+
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+
+	switch field {
+	case "name":
+		c.Name = value
+	case "handle":
+		c.Handle = value
+	case "style":
+		c.Style = value
+	case "feature":
+		c.Feature = value
+	case "quirk":
+		c.Quirk = value
+	case "obsession":
+		c.Obsession = value
+	case "want":
+		c.Want = value
+	case "debt":
+		c.Debt = value
+	case "class_name":
+		c.Class.Name = value
+	case "class_glitch":
+		c.Class.Glitch = value
+	case "class_description":
+		c.Class.Description = value
+	case "class_origin":
+		c.Class.Origin = value
+	case "class_gift":
+		c.Class.Gift = value
+	case "creds":
+		if val, err := strconv.Atoi(value); err == nil {
+			c.Creds = val
+		}
+	}
+
+	ownerID := getCookie(r, "cy_user_id")
+	_ = database.SaveCharacter(c, ownerID)
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func handleAddListItem(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	listType := r.FormValue("type")
+
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+
+	switch listType {
+	case "weapon":
+		name := r.FormValue("name")
+		if name == "" {
+			name = "New Weapon"
+		}
+		damage := r.FormValue("damage")
+		if damage == "" {
+			damage = "d6"
+		}
+		desc := r.FormValue("description")
+		c.Weapons = append(c.Weapons, chargen.Weapon{Name: name, Damage: damage, Description: desc})
+	case "armor":
+		name := r.FormValue("name")
+		if name == "" {
+			name = "New Armor"
+		}
+		tier := r.FormValue("tier")
+		if tier == "" {
+			tier = "d4"
+		}
+		reduc := r.FormValue("reduction")
+		c.Armor = append(c.Armor, chargen.Armor{Name: name, Tier: tier, Reduction: reduc})
+	case "gear":
+		item := r.FormValue("item")
+		if item != "" {
+			c.Gear = append(c.Gear, item)
+		}
+	case "cybertech":
+		item := r.FormValue("item")
+		if item != "" {
+			c.Cybertech = append(c.Cybertech, item)
+		}
+	case "app":
+		item := r.FormValue("item")
+		if item != "" {
+			c.Apps = append(c.Apps, item)
+		}
+	}
+
+	ownerID := getCookie(r, "cy_user_id")
+	_ = database.SaveCharacter(c, ownerID)
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderCharacterViewWithChar(w, r, c)
+		return
+	}
+
+	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+}
+
+func handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	listType := r.FormValue("type")
+	indexStr := r.FormValue("index")
+	idx, err := strconv.Atoi(indexStr)
+
+	c, getErr := database.GetCharacter(id)
+	if getErr != nil || c == nil || err != nil || idx < 0 {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	switch listType {
+	case "weapon":
+		if idx < len(c.Weapons) {
+			c.Weapons = append(c.Weapons[:idx], c.Weapons[idx+1:]...)
+		}
+	case "armor":
+		if idx < len(c.Armor) {
+			c.Armor = append(c.Armor[:idx], c.Armor[idx+1:]...)
+		}
+	case "gear":
+		if idx < len(c.Gear) {
+			c.Gear = append(c.Gear[:idx], c.Gear[idx+1:]...)
+		}
+	case "cybertech":
+		if idx < len(c.Cybertech) {
+			c.Cybertech = append(c.Cybertech[:idx], c.Cybertech[idx+1:]...)
+		}
+	case "app":
+		if idx < len(c.Apps) {
+			c.Apps = append(c.Apps[:idx], c.Apps[idx+1:]...)
+		}
+	}
+
+	ownerID := getCookie(r, "cy_user_id")
+	_ = database.SaveCharacter(c, ownerID)
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderCharacterViewWithChar(w, r, c)
+		return
+	}
+
+	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }

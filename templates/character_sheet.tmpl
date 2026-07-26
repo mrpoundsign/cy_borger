@@ -144,6 +144,16 @@
         cursor: pointer;
     }
 
+    .btn-danger-small {
+        background: transparent;
+        color: #ff3366;
+        border: 1px solid #ff3366;
+        padding: 2px 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
     input[type="number"] {
         width: 52px;
         background: #000;
@@ -155,9 +165,19 @@
         padding: 4px;
     }
 
-    input[type="number"]:focus {
+    input[type="number"]:focus, input[type="text"]:focus, textarea:focus {
         outline: none;
         box-shadow: 0 0 5px var(--accent-color);
+    }
+
+    .edit-input {
+        background: #000;
+        border: 1px solid #333;
+        color: #fff;
+        padding: 4px 8px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        margin-bottom: 5px;
     }
 
     /* Gear Table */
@@ -195,6 +215,18 @@
 <div style="margin: 10px 0 20px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px;">
     <a href="/" style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️ Back to Home</a>
     <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">CY_BORG Operator Sheet</span>
+</div>
+{{end}}
+
+{{if and .CanEdit (not .Character.IsSaved)}}
+<div style="background: #0d1f12; border: 2px solid #00ff66; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 0 15px rgba(0,255,102,0.2);">
+    <div>
+        <div style="color: #00ff66; font-weight: bold; font-size: 1.1rem; text-transform: uppercase;">⚡ DRAFT CHARACTER PREVIEW</div>
+        <div style="color: #aaa; font-size: 0.85rem; margin-top: 4px;">Reroll as many times as you like. Click "KEEP THIS CHARACTER" to save it permanently!</div>
+    </div>
+    <form action="/character/{{.Character.ID}}/keep" method="POST" hx-post="/character/{{.Character.ID}}/keep" hx-target="body" hx-swap="outerHTML">
+        <button type="submit" class="btn-green" style="font-size: 1rem; padding: 10px 22px;">💾 KEEP THIS CHARACTER</button>
+    </form>
 </div>
 {{end}}
 
@@ -331,7 +363,18 @@
 
     <div class="vitals-item">
         <div class="vitals-title">💰 CREDITS</div>
+        {{if .CanEdit}}
+        <form id="creds-form" style="display:inline-flex; align-items:center; gap:4px;">
+            <input type="number" name="value" value="{{.Character.Creds}}" style="font-size:1.3rem; width:95px;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-include="#creds-form"
+                   hx-trigger="change, input delay:300ms"
+                   hx-vals='{"field": "creds"}'
+                   hx-swap="none"> <span style="font-size:1.3rem; color:var(--accent-color)">¤</span>
+        </form>
+        {{else}}
         <div style="font-size: 1.5rem; font-weight: bold; color:var(--accent-color)">{{.Character.Creds}}¤</div>
+        {{end}}
     </div>
 </div>
 
@@ -339,6 +382,84 @@
 <div class="grid-container">
     <!-- Top Left: Identity -->
     <div class="content-box">
+        {{if .CanEdit}}
+        <div style="margin-bottom: 12px;">
+            <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block; margin-bottom:2px;">NAME</label>
+            <input type="text" value="{{.Character.Name}}" class="edit-input" style="font-size: 1.4rem; font-weight:bold; color:var(--accent-color); width:100%;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "name"}'
+                   hx-swap="none">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="font-size:0.75rem; color:var(--muted-color); font-weight:bold; display:block; margin-bottom:2px;">HANDLE</label>
+            <input type="text" value="{{.Character.Handle}}" class="edit-input" style="width:100%; color:var(--muted-color);"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "handle"}'
+                   hx-swap="none">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+                <label style="font-size:0.75rem; color:#aaa; display:block;">STYLE</label>
+                <input type="text" value="{{.Character.Style}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "style"}'
+                       hx-swap="none">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#aaa; display:block;">FEATURE</label>
+                <input type="text" value="{{.Character.Feature}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "feature"}'
+                       hx-swap="none">
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+                <label style="font-size:0.75rem; color:#aaa; display:block;">WANT</label>
+                <input type="text" value="{{.Character.Want}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "want"}'
+                       hx-swap="none">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#aaa; display:block;">QUIRK</label>
+                <input type="text" value="{{.Character.Quirk}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "quirk"}'
+                       hx-swap="none">
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; color:#aaa; display:block;">OBSESSION</label>
+            <input type="text" value="{{.Character.Obsession}}" class="edit-input" style="width:100%;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "obsession"}'
+                   hx-swap="none">
+        </div>
+        <div>
+            <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">DEBT</label>
+            <input type="text" value="{{.Character.Debt}}" class="edit-input" style="width:100%; color:var(--accent-color);"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "debt"}'
+                   hx-swap="none">
+        </div>
+        {{else}}
         <h1 style="color: var(--accent-color); font-size: 2.2rem; margin-bottom:5px;">YOU ARE {{.Character.Name}}</h1>
         <div class="sub-title">@{{.Character.Handle}}</div>
         <p style="line-height: 1.7; margin-bottom: 15px;">
@@ -348,10 +469,58 @@
         <p style="color: var(--accent-color); font-weight: bold; font-size:1.05rem;">
             {{.Character.Debt}}
         </p>
+        {{end}}
     </div>
 
     <!-- Top Right: Class -->
     <div class="content-box">
+        {{if .CanEdit}}
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">CLASS NAME</label>
+            <input type="text" value="{{.Character.Class.Name}}" class="edit-input" style="font-size:1.4rem; font-weight:bold; color:var(--accent-color); width:100%;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "class_name"}'
+                   hx-swap="none">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; color:var(--accent-color); display:block;">CLASS GLITCH</label>
+            <input type="text" value="{{.Character.Class.Glitch}}" class="edit-input" style="width:100%; color:var(--accent-color);"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "class_glitch"}'
+                   hx-swap="none">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; color:#aaa; display:block;">DESCRIPTION</label>
+            <input type="text" value="{{.Character.Class.Description}}" class="edit-input" style="width:100%;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "class_description"}'
+                   hx-swap="none">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; color:#aaa; display:block;">ORIGIN</label>
+            <input type="text" value="{{.Character.Class.Origin}}" class="edit-input" style="width:100%;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "class_origin"}'
+                   hx-swap="none">
+        </div>
+        <div>
+            <label style="font-size:0.75rem; color:#aaa; display:block;">CLASS GIFT / WEAPON</label>
+            <input type="text" value="{{.Character.Class.Gift}}" class="edit-input" style="width:100%;"
+                   hx-put="/character/{{.Character.ID}}/update_field"
+                   hx-trigger="change, input delay:400ms"
+                   name="value"
+                   hx-vals='{"field": "class_gift"}'
+                   hx-swap="none">
+        </div>
+        {{else}}
         <h2 class="section-title">{{.Character.Class.Name}}</h2>
         <div class="sub-title" style="color: var(--accent-color); font-weight:bold;">{{.Character.Class.Glitch}}</div>
         <p style="line-height: 1.7; font-style: italic; margin-bottom: 15px;">
@@ -362,6 +531,7 @@
         {{end}}
         {{if .Character.Class.Gift}}
         <p style="margin-bottom: 10px; line-height:1.5;"><strong>Class Gift/Weapon:</strong> {{.Character.Class.Gift}}</p>
+        {{end}}
         {{end}}
     </div>
 
@@ -375,53 +545,144 @@
                     <th>ITEM / WEAPON</th>
                     <th>DAMAGE / TIER</th>
                     <th>NOTES & EFFECT</th>
+                    {{if .CanEdit}}<th>ACTIONS</th>{{end}}
                 </tr>
             </thead>
             <tbody>
-                {{range .Character.Weapons}}
+                {{range $i, $w := .Character.Weapons}}
                 <tr>
-                    <td class="highlight">⚔️ {{.Name}}</td>
-                    <td><span class="badge">{{.Damage}}</span></td>
-                    <td>{{.Description}}</td>
+                    <td class="highlight">⚔️ {{$w.Name}}</td>
+                    <td><span class="badge">{{$w.Damage}}</span></td>
+                    <td>{{$w.Description}}</td>
+                    {{if $.CanEdit}}
+                    <td>
+                        <form action="/character/{{$.Character.ID}}/delete_item" method="POST" hx-post="/character/{{$.Character.ID}}/delete_item" hx-target="body" hx-swap="outerHTML" style="display:inline;">
+                            <input type="hidden" name="type" value="weapon">
+                            <input type="hidden" name="index" value="{{$i}}">
+                            <button type="submit" class="btn-danger-small">🗑️ Delete</button>
+                        </form>
+                    </td>
+                    {{end}}
                 </tr>
                 {{end}}
-                {{range .Character.Armor}}
+                {{range $i, $a := .Character.Armor}}
                 <tr>
-                    <td class="highlight">🛡️ {{.Name}}</td>
-                    <td><span class="badge">{{.Tier}}</span></td>
-                    <td>{{.Reduction}}</td>
+                    <td class="highlight">🛡️ {{$a.Name}}</td>
+                    <td><span class="badge">{{$a.Tier}}</span></td>
+                    <td>{{$a.Reduction}}</td>
+                    {{if $.CanEdit}}
+                    <td>
+                        <form action="/character/{{$.Character.ID}}/delete_item" method="POST" hx-post="/character/{{$.Character.ID}}/delete_item" hx-target="body" hx-swap="outerHTML" style="display:inline;">
+                            <input type="hidden" name="type" value="armor">
+                            <input type="hidden" name="index" value="{{$i}}">
+                            <button type="submit" class="btn-danger-small">🗑️ Delete</button>
+                        </form>
+                    </td>
+                    {{end}}
                 </tr>
                 {{end}}
             </tbody>
         </table>
 
+        {{if .CanEdit}}
+        <div style="background:#111; border:1px dashed #333; padding:10px; margin-bottom:15px;">
+            <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD WEAPON</div>
+            <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
+                <input type="hidden" name="type" value="weapon">
+                <input type="text" name="name" placeholder="Weapon Name" style="flex:1; min-width:120px;" class="edit-input" required>
+                <input type="text" name="damage" placeholder="Damage (e.g. d6)" style="width:90px;" class="edit-input">
+                <input type="text" name="description" placeholder="Notes" style="flex:1; min-width:120px;" class="edit-input">
+                <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add</button>
+            </form>
+        </div>
+        <div style="background:#111; border:1px dashed #333; padding:10px; margin-bottom:15px;">
+            <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD ARMOR</div>
+            <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
+                <input type="hidden" name="type" value="armor">
+                <input type="text" name="name" placeholder="Armor Name" style="flex:1; min-width:120px;" class="edit-input" required>
+                <input type="text" name="tier" placeholder="Tier (e.g. d4)" style="width:90px;" class="edit-input">
+                <input type="text" name="reduction" placeholder="Notes/Reduction" style="flex:1; min-width:120px;" class="edit-input">
+                <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add</button>
+            </form>
+        </div>
+        {{end}}
+
         <h3 style="color:var(--accent-color); font-size:1.1rem; margin-top:15px; margin-bottom:8px;">INVENTORY</h3>
         <ul>
-            {{range .Character.Gear}}
-            <li>{{.}}</li>
+            {{range $i, $item := .Character.Gear}}
+            <li style="display:flex; justify-content:space-between; align-items:center;">
+                <span>{{$item}}</span>
+                {{if $.CanEdit}}
+                <form action="/character/{{$.Character.ID}}/delete_item" method="POST" hx-post="/character/{{$.Character.ID}}/delete_item" hx-target="body" hx-swap="outerHTML" style="display:inline;">
+                    <input type="hidden" name="type" value="gear">
+                    <input type="hidden" name="index" value="{{$i}}">
+                    <button type="submit" class="btn-danger-small">🗑️ Delete</button>
+                </form>
+                {{end}}
+            </li>
             {{end}}
         </ul>
+        {{if .CanEdit}}
+        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px;">
+            <input type="hidden" name="type" value="gear">
+            <input type="text" name="item" placeholder="New inventory item..." class="edit-input" style="flex:1;" required>
+            <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add Item</button>
+        </form>
+        {{end}}
     </div>
 
     <!-- Bottom Right: Cybertech & Apps -->
     <div class="content-box">
         <h2 class="section-title">CYBERTECH & APPS</h2>
-        {{if .Character.Cybertech}}
+        
         <h3 style="color:var(--accent-color); font-size:1.1rem; margin-bottom: 8px;">CYBERWARE</h3>
         <ul>
-            {{range .Character.Cybertech}}
-            <li>{{.}}</li>
+            {{range $i, $item := .Character.Cybertech}}
+            <li style="display:flex; justify-content:space-between; align-items:center;">
+                <span>{{$item}}</span>
+                {{if $.CanEdit}}
+                <form action="/character/{{$.Character.ID}}/delete_item" method="POST" hx-post="/character/{{$.Character.ID}}/delete_item" hx-target="body" hx-swap="outerHTML" style="display:inline;">
+                    <input type="hidden" name="type" value="cybertech">
+                    <input type="hidden" name="index" value="{{$i}}">
+                    <button type="submit" class="btn-danger-small">🗑️ Delete</button>
+                </form>
+                {{end}}
+            </li>
+            {{else}}
+            <li style="color:var(--muted-color); list-style:none;">None</li>
             {{end}}
         </ul>
+        {{if .CanEdit}}
+        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px; margin-bottom:15px;">
+            <input type="hidden" name="type" value="cybertech">
+            <input type="text" name="item" placeholder="New Cyberware..." class="edit-input" style="flex:1;" required>
+            <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add Cybertech</button>
+        </form>
         {{end}}
 
-        {{if .Character.Apps}}
         <h3 style="color:var(--accent-color); font-size:1.1rem; margin-top: 20px; margin-bottom: 8px;">NANO & APPS</h3>
         <ul>
-            {{range .Character.Apps}}
-            <li>{{.}}</li>
+            {{range $i, $item := .Character.Apps}}
+            <li style="display:flex; justify-content:space-between; align-items:center;">
+                <span>{{$item}}</span>
+                {{if $.CanEdit}}
+                <form action="/character/{{$.Character.ID}}/delete_item" method="POST" hx-post="/character/{{$.Character.ID}}/delete_item" hx-target="body" hx-swap="outerHTML" style="display:inline;">
+                    <input type="hidden" name="type" value="app">
+                    <input type="hidden" name="index" value="{{$i}}">
+                    <button type="submit" class="btn-danger-small">🗑️ Delete</button>
+                </form>
+                {{end}}
+            </li>
+            {{else}}
+            <li style="color:var(--muted-color); list-style:none;">None</li>
             {{end}}
         </ul>
+        {{if .CanEdit}}
+        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px;">
+            <input type="hidden" name="type" value="app">
+            <input type="text" name="item" placeholder="New Nano/App..." class="edit-input" style="flex:1;" required>
+            <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add Nano/App</button>
+        </form>
         {{end}}
     </div>
 </div>

@@ -240,9 +240,14 @@
             {{end}}
         </div>
 
-        <form action="/character/generate" method="POST">
-            <button type="submit" class="btn">Generate Character</button>
-        </form>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom: 20px;">
+            <form action="/character/generate" method="POST" style="display:inline;">
+                <button type="submit" class="btn">🎲 Roll Random Character</button>
+            </form>
+            <form action="/character/create_blank" method="POST" style="display:inline;">
+                <button type="submit" class="btn" style="background:#00ff66; color:#000;">📝 Create Blank Character</button>
+            </form>
+        </div>
 
         <div class="card">
             <h3 style="color: var(--accent-color); margin-bottom: 15px;">START A GAME</h3>

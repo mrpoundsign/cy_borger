@@ -73,6 +73,7 @@ func GenerateCharacter() Character {
 	return Character{
 		ID:        id,
 		EditCode:  editCode,
+		IsSaved:   false,
 		Name:      pickRandom(FirstNames),
 		Handle:    pickRandom(Handles),
 		Style:     pickRandom(Styles),
@@ -108,6 +109,51 @@ func GenerateCharacter() Character {
 		Cybertech: []string{pickRandom(CybertechList)},
 		Apps:      []string{pickRandom(AppsList)},
 		Creds:     creds,
+	}
+}
+
+// CreateBlankCharacter initializes a blank CY_BORG character ready for custom editing.
+func CreateBlankCharacter() Character {
+	id := GenerateRandomID(8)
+	editCode := GenerateRandomID(6)
+
+	return Character{
+		ID:        id,
+		EditCode:  editCode,
+		IsSaved:   true,
+		Name:      "UNNAMED OPERATOR",
+		Handle:    "operator",
+		Style:     "Chipped",
+		Feature:   "Tattooed with glowing neon ink",
+		Quirk:     "Talks to synthetic pets",
+		Obsession: "Hacking corp servers",
+		Want:      "Wants a clean slate",
+		Debt:      "Owes 5,000¤ to the Syndicate",
+		Class: ClassInfo{
+			Name:        "CYBER-PUNK",
+			Glitch:      "Feedback Loop",
+			Description: "A street runner making their own path in Cy.",
+			Origin:      "Gutter punk",
+			Gift:        "Custom Cyberware",
+		},
+		Abilities: map[string]Stat{
+			"Strength":  {Current: 0, Max: 0},
+			"Agility":   {Current: 0, Max: 0},
+			"Presence":  {Current: 0, Max: 0},
+			"Toughness": {Current: 0, Max: 0},
+			"Knowledge": {Current: 0, Max: 0},
+		},
+		HP:        Stat{Current: 4, Max: 4},
+		Glitches:  Stat{Current: 2, Max: 2},
+		GlitchDie: "d3",
+		Gear:      []string{"Default Deck", "Flashlight"},
+		Weapons: []Weapon{
+			{Name: "Light Pistol", Damage: "d6", Description: "Standard sidearm"},
+		},
+		Armor:     []Armor{},
+		Cybertech: []string{},
+		Apps:      []string{},
+		Creds:     100,
 	}
 }
 
