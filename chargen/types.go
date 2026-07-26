@@ -38,6 +38,7 @@ type Character struct {
 	IsSaved   bool            `json:"is_saved"`
 	IsDead    bool            `json:"is_dead"`
 	DeathNote string          `json:"death_note"`
+	DiedAt    time.Time       `json:"died_at,omitempty"`
 	Name      string          `json:"name"`
 	Handle    string          `json:"handle"`
 	Class     ClassInfo       `json:"class"`

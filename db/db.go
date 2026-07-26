@@ -122,29 +122,36 @@ func (d *DB) SaveCharacter(c *chargen.Character, ownerID string) error {
 		isDeadInt = 1
 	}
 
+	var diedAtVal interface{}
+	if !c.DiedAt.IsZero() {
+		diedAtVal = c.DiedAt
+	}
+
 	query := `
-	INSERT INTO characters (id, edit_code, game_id, owner_id, is_saved, is_dead, death_note, data_json, updated_at)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	INSERT INTO characters (id, edit_code, game_id, owner_id, is_saved, is_dead, death_note, died_at, data_json, updated_at)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 	ON CONFLICT(id) DO UPDATE SET
 		game_id = excluded.game_id,
 		is_saved = excluded.is_saved,
 		is_dead = excluded.is_dead,
 		death_note = excluded.death_note,
+		died_at = excluded.died_at,
 		data_json = excluded.data_json,
 		updated_at = CURRENT_TIMESTAMP;
 	`
-	_, err = d.conn.Exec(query, c.ID, c.EditCode, c.GameID, ownerID, isSavedInt, isDeadInt, c.DeathNote, string(data))
+	_, err = d.conn.Exec(query, c.ID, c.EditCode, c.GameID, ownerID, isSavedInt, isDeadInt, c.DeathNote, diedAtVal, string(data))
 	return err
 }
 
 func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
-	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, data_json, updated_at FROM characters WHERE id = ?`
+	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, died_at, data_json, updated_at FROM characters WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
 	var ownerID, gameID, deathNote, dataStr string
 	var isSavedInt, isDeadInt int
+	var diedAt sql.NullTime
 	var updatedAt time.Time
-	if err := row.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &dataStr, &updatedAt); err != nil {
+	if err := row.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -161,6 +168,9 @@ func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
 	c.IsDead = isDeadInt == 1 || c.IsDead
 	if deathNote != "" {
 		c.DeathNote = deathNote
+	}
+	if diedAt.Valid {
+		c.DiedAt = diedAt.Time
 	}
 	c.UpdatedAt = updatedAt
 
@@ -217,7 +227,7 @@ func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
 }
 
 func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
-	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, data_json, updated_at FROM characters WHERE game_id = ? ORDER BY updated_at DESC`
+	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, died_at, data_json, updated_at FROM characters WHERE game_id = ? ORDER BY is_dead ASC, died_at DESC, updated_at DESC`
 	rows, err := d.conn.Query(query, gameID)
 	if err != nil {
 		return nil, err
@@ -228,8 +238,9 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 	for rows.Next() {
 		var ownerID, gameID, deathNote, dataStr string
 		var isSavedInt, isDeadInt int
+		var diedAt sql.NullTime
 		var updatedAt time.Time
-		if err := rows.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
@@ -240,6 +251,9 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 			c.IsDead = isDeadInt == 1 || c.IsDead
 			if deathNote != "" {
 				c.DeathNote = deathNote
+			}
+			if diedAt.Valid {
+				c.DiedAt = diedAt.Time
 			}
 			c.UpdatedAt = updatedAt
 			chars = append(chars, c)
@@ -274,7 +288,7 @@ func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
 }
 
 func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
-	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, data_json, updated_at FROM characters WHERE owner_id = ?`
+	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, died_at, data_json, updated_at FROM characters WHERE owner_id = ? ORDER BY is_dead ASC, died_at DESC, updated_at DESC`
 	rows, err := d.conn.Query(query, ownerID)
 	if err != nil {
 		return nil, err
@@ -285,8 +299,9 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 	for rows.Next() {
 		var ownerIDVal, gameID, deathNote, dataStr string
 		var isSavedInt, isDeadInt int
+		var diedAt sql.NullTime
 		var updatedAt time.Time
-		if err := rows.Scan(&ownerIDVal, &gameID, &isSavedInt, &isDeadInt, &deathNote, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&ownerIDVal, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
@@ -297,6 +312,9 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 			c.IsDead = isDeadInt == 1 || c.IsDead
 			if deathNote != "" {
 				c.DeathNote = deathNote
+			}
+			if diedAt.Valid {
+				c.DiedAt = diedAt.Time
 			}
 			c.UpdatedAt = updatedAt
 			chars = append(chars, c)

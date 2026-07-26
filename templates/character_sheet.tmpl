@@ -263,7 +263,7 @@
 <div style="background: #20000a; border: 2px solid #ff0055; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 0 18px rgba(255,0,85,0.35);">
     <div>
         <div style="color: #ff0055; font-weight: bold; font-size: 1.15rem; text-transform: uppercase; display:flex; align-items:center; gap:8px;">
-            🪦 OPERATOR FLATLINED / IN GRAVEYARD
+            🪦 OPERATOR FLATLINED {{if not .Character.DiedAt.IsZero}}ON {{.Character.DiedAt.Format "2006-01-02 15:04:05"}}{{end}}
         </div>
         <div style="color: #ff99bb; font-size: 0.9rem; margin-top: 6px; font-style: italic;">
             "{{.Character.DeathNote}}"

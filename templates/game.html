@@ -310,7 +310,7 @@
                             <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px; line-height:1.4;">
                                 Mark <strong>{{.Name}}</strong> as deceased. Add a death note or final words:
                             </p>
-                            <form action="/character/{{.ID}}/kill" method="POST" style="display:flex; flex-direction:column; gap:12px;">
+                            <form action="/character/{{.ID}}/kill" method="POST" hx-post="/character/{{.ID}}/kill" hx-target=".party-container" hx-swap="outerHTML" style="display:flex; flex-direction:column; gap:12px;">
                                 <textarea name="death_note" placeholder="e.g. Flatlined by Cy-Spider in Sector 4" class="edit-input auto-stretch" style="border-color:#ff0055; font-size:0.95rem; min-height:60px;"></textarea>
                                 <div style="display:flex; gap:10px; justify-content:center; margin-top:5px;">
                                     <button type="button" class="btn-outline" onclick="toggleEditSection('kill-game-{{.ID}}')">Cancel</button>
@@ -339,6 +339,9 @@
                     <div style="color:var(--muted-color); font-size:0.85rem; margin-top:4px;">
                         {{if and $currentUserID (eq .OwnerID $currentUserID)}}<strong>YOU!</strong> ({{if .Handle}}@{{.Handle}}{{else}}[No Handle]{{end}}){{else}}{{if .Handle}}@{{.Handle}}{{else}}[No Handle]{{end}}{{end}} - {{.Class.Name}}
                     </div>
+                    {{if not .DiedAt.IsZero}}
+                    <div style="font-size:0.75rem; color:#ff77a8; margin-top:4px; font-weight:bold;">🪦 DIED: {{.DiedAt.Format "2006-01-02 15:04:05"}}</div>
+                    {{end}}
                     <div style="color:#ff99bb; font-style:italic; font-size:0.85rem; margin:10px 0; background:#20000a; padding:8px; border-left:3px solid #ff0055;">
                         "{{.DeathNote}}"
                     </div>
@@ -347,7 +350,7 @@
                             ⚡ INSPECT SHEET
                         </button>
                         {{if or $isGM (and $currentUserID (eq .OwnerID $currentUserID))}}
-                        <form action="/character/{{.ID}}/revive" method="POST" style="display:inline;">
+                        <form action="/character/{{.ID}}/revive" method="POST" hx-post="/character/{{.ID}}/revive" hx-target=".party-container" hx-swap="outerHTML" style="display:inline;">
                             <button type="submit" class="btn-outline" style="font-size:0.75rem; padding:4px 8px; border-color:#00ff66; color:#00ff66;">⚡ REVIVE</button>
                         </form>
                         {{end}}

@@ -875,6 +875,7 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.IsDead = true
+	c.DiedAt = time.Now()
 	deathNote := strings.TrimSpace(r.FormValue("death_note"))
 	if deathNote == "" {
 		deathNote = "Flatlined in the neon-soaked alleyways of CY."
@@ -893,6 +894,22 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
+		referer := r.Header.Get("Referer")
+		if c.GameID != "" && strings.Contains(referer, "/game/") {
+			if g, _ := database.GetGame(c.GameID); g != nil {
+				chars, _ := database.GetCharactersForGame(g.ID)
+				isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
+				currentUserID := getCookie(r, "cy_user_id")
+				data := map[string]interface{}{
+					"Game":          g,
+					"Characters":    chars,
+					"IsGM":          isGM,
+					"CurrentUserID": currentUserID,
+				}
+				_ = templates.ExecuteTemplate(w, "game.html", data)
+				return
+			}
+		}
 		renderCharacterViewWithChar(w, r, c)
 		return
 	}
@@ -928,6 +945,7 @@ func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.IsDead = false
+	c.DiedAt = time.Time{}
 
 	ownerID := getCookie(r, "cy_user_id")
 	if err := database.SaveCharacter(c, ownerID); err != nil {
@@ -941,6 +959,22 @@ func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
+		referer := r.Header.Get("Referer")
+		if c.GameID != "" && strings.Contains(referer, "/game/") {
+			if g, _ := database.GetGame(c.GameID); g != nil {
+				chars, _ := database.GetCharactersForGame(g.ID)
+				isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
+				currentUserID := getCookie(r, "cy_user_id")
+				data := map[string]interface{}{
+					"Game":          g,
+					"Characters":    chars,
+					"IsGM":          isGM,
+					"CurrentUserID": currentUserID,
+				}
+				_ = templates.ExecuteTemplate(w, "game.html", data)
+				return
+			}
+		}
 		renderCharacterViewWithChar(w, r, c)
 		return
 	}

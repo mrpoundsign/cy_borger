@@ -30,7 +30,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await page.waitForLoadState('networkidle');
 
         // 3. Confirm GRAVEYARD banner appears on character sheet
-        await expect(page.locator('text=OPERATOR FLATLINED / IN GRAVEYARD')).toBeVisible();
+        await expect(page.locator('text=OPERATOR FLATLINED')).toBeVisible();
         await expect(page.locator('text=Crushed by rogue cyber-mech in Sector 7')).toBeVisible();
 
         // 4. Test Revive
@@ -38,7 +38,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await page.waitForLoadState('networkidle');
 
         // Confirm flatline banner is gone
-        await expect(page.locator('text=OPERATOR FLATLINED / IN GRAVEYARD')).not.toBeVisible();
+        await expect(page.locator('text=OPERATOR FLATLINED')).not.toBeVisible();
     });
 
     test('kill button on game page opens modal and moves character to Graveyard', async ({ page }) => {
