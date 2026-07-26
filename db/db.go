@@ -1,8 +1,11 @@
 package db
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
 	"database/sql"
 	"embed"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -19,9 +22,12 @@ import (
 var migrationsFS embed.FS
 
 type User struct {
-	ID        string    `json:"id"`
-	Username  string    `json:"username"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           string    `json:"id"`
+	Username     string    `json:"username"`
+	Handle       string    `json:"handle"`
+	PasswordHash string    `json:"-"`
+	Salt         string    `json:"-"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type Game struct {
@@ -35,6 +41,19 @@ type Game struct {
 
 type DB struct {
 	conn *sql.DB
+}
+
+func GenerateSalt() (string, error) {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
+func HashPassword(password, salt string) string {
+	hash := sha256.Sum256([]byte(salt + ":" + password))
+	return hex.EncodeToString(hash[:])
 }
 
 func InitDB(dbPath string) (*DB, error) {
@@ -80,25 +99,88 @@ func runMigrations(conn *sql.DB) error {
 }
 
 func (d *DB) SaveUser(u *User) error {
-	existing, err := d.GetUser(u.ID)
-	if err != nil {
-		return err
-	}
-	if existing != nil {
-		return fmt.Errorf("user handle has already been customized and cannot be edited again")
-	}
-
-	query := `INSERT INTO users (id, username, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)`
-	_, err = d.conn.Exec(query, u.ID, u.Username)
+	query := `
+	INSERT INTO users (id, username, handle, password_hash, salt, updated_at)
+	VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	ON CONFLICT(id) DO UPDATE SET
+		username = excluded.username,
+		handle = excluded.handle,
+		updated_at = CURRENT_TIMESTAMP;
+	`
+	_, err := d.conn.Exec(query, u.ID, u.Username, u.Handle, u.PasswordHash, u.Salt)
 	return err
 }
 
+func (d *DB) CreateUserAccount(username, password string) (*User, error) {
+	existing, err := d.GetUserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	if existing != nil {
+		return nil, fmt.Errorf("Username already registered")
+	}
+
+	salt, err := GenerateSalt()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate salt: %w", err)
+	}
+
+	hash := HashPassword(password, salt)
+	userID := "usr_" + chargen.GenerateRandomID(6)
+
+	num := (time.Now().UnixNano() % 9000) + 1000
+	handle := fmt.Sprintf("%s#%04d", username, num)
+
+	query := `INSERT INTO users (id, username, handle, password_hash, salt, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+	_, err = d.conn.Exec(query, userID, username, handle, hash, salt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{
+		ID:           userID,
+		Username:     username,
+		Handle:       handle,
+		PasswordHash: hash,
+		Salt:         salt,
+		UpdatedAt:    time.Now(),
+	}, nil
+}
+
+func (d *DB) AuthenticateUser(username, password string) (*User, error) {
+	u, err := d.GetUserByUsername(username)
+	if err != nil || u == nil {
+		return nil, fmt.Errorf("Invalid username or password")
+	}
+
+	expectedHash := HashPassword(password, u.Salt)
+	if u.PasswordHash != expectedHash {
+		return nil, fmt.Errorf("Invalid username or password")
+	}
+
+	return u, nil
+}
+
+func (d *DB) GetUserByUsername(username string) (*User, error) {
+	query := `SELECT id, username, handle, password_hash, salt, updated_at FROM users WHERE LOWER(username) = LOWER(?)`
+	row := d.conn.QueryRow(query, username)
+
+	var u User
+	if err := row.Scan(&u.ID, &u.Username, &u.Handle, &u.PasswordHash, &u.Salt, &u.UpdatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &u, nil
+}
+
 func (d *DB) GetUser(id string) (*User, error) {
-	query := `SELECT id, username, updated_at FROM users WHERE id = ?`
+	query := `SELECT id, username, handle, password_hash, salt, updated_at FROM users WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
 	var u User
-	if err := row.Scan(&u.ID, &u.Username, &u.UpdatedAt); err != nil {
+	if err := row.Scan(&u.ID, &u.Username, &u.Handle, &u.PasswordHash, &u.Salt, &u.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -144,14 +226,19 @@ func (d *DB) SaveCharacter(c *chargen.Character, ownerID string) error {
 }
 
 func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
-	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, died_at, data_json, updated_at FROM characters WHERE id = ?`
+	query := `
+	SELECT c.owner_id, c.game_id, c.is_saved, c.is_dead, c.death_note, c.died_at, c.data_json, c.updated_at, COALESCE(NULLIF(u.handle, ''), u.username, '') AS owner_username
+	FROM characters c
+	LEFT JOIN users u ON c.owner_id = u.id
+	WHERE c.id = ?
+	`
 	row := d.conn.QueryRow(query, id)
 
-	var ownerID, gameID, deathNote, dataStr string
+	var ownerID, gameID, deathNote, dataStr, ownerUsername string
 	var isSavedInt, isDeadInt int
 	var diedAt sql.NullTime
 	var updatedAt time.Time
-	if err := row.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt); err != nil {
+	if err := row.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt, &ownerUsername); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -163,6 +250,7 @@ func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
 		return nil, err
 	}
 	c.OwnerID = ownerID
+	c.OwnerUsername = ownerUsername
 	c.GameID = gameID
 	c.IsSaved = isSavedInt == 1 || c.IsSaved
 	c.IsDead = isDeadInt == 1 || c.IsDead
@@ -227,7 +315,13 @@ func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
 }
 
 func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
-	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, died_at, data_json, updated_at FROM characters WHERE game_id = ? ORDER BY is_dead ASC, died_at DESC, updated_at DESC`
+	query := `
+	SELECT c.owner_id, c.game_id, c.is_saved, c.is_dead, c.death_note, c.died_at, c.data_json, c.updated_at, COALESCE(NULLIF(u.handle, ''), u.username, '') AS owner_username
+	FROM characters c
+	LEFT JOIN users u ON c.owner_id = u.id
+	WHERE c.game_id = ?
+	ORDER BY c.is_dead ASC, c.died_at DESC, c.updated_at DESC
+	`
 	rows, err := d.conn.Query(query, gameID)
 	if err != nil {
 		return nil, err
@@ -236,16 +330,17 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 
 	var chars []chargen.Character
 	for rows.Next() {
-		var ownerID, gameID, deathNote, dataStr string
+		var ownerID, gameID, deathNote, dataStr, ownerUsername string
 		var isSavedInt, isDeadInt int
 		var diedAt sql.NullTime
 		var updatedAt time.Time
-		if err := rows.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&ownerID, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt, &ownerUsername); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
 			c.OwnerID = ownerID
+			c.OwnerUsername = ownerUsername
 			c.GameID = gameID
 			c.IsSaved = isSavedInt == 1 || c.IsSaved
 			c.IsDead = isDeadInt == 1 || c.IsDead
@@ -288,7 +383,13 @@ func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
 }
 
 func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
-	query := `SELECT owner_id, game_id, is_saved, is_dead, death_note, died_at, data_json, updated_at FROM characters WHERE owner_id = ? ORDER BY is_dead ASC, died_at DESC, updated_at DESC`
+	query := `
+	SELECT c.owner_id, c.game_id, c.is_saved, c.is_dead, c.death_note, c.died_at, c.data_json, c.updated_at, COALESCE(u.username, '') AS owner_username
+	FROM characters c
+	LEFT JOIN users u ON c.owner_id = u.id
+	WHERE c.owner_id = ?
+	ORDER BY c.is_dead ASC, c.died_at DESC, c.updated_at DESC
+	`
 	rows, err := d.conn.Query(query, ownerID)
 	if err != nil {
 		return nil, err
@@ -297,16 +398,17 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 
 	var chars []chargen.Character
 	for rows.Next() {
-		var ownerIDVal, gameID, deathNote, dataStr string
+		var ownerIDVal, gameID, deathNote, dataStr, ownerUsername string
 		var isSavedInt, isDeadInt int
 		var diedAt sql.NullTime
 		var updatedAt time.Time
-		if err := rows.Scan(&ownerIDVal, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&ownerIDVal, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt, &ownerUsername); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
 			c.OwnerID = ownerIDVal
+			c.OwnerUsername = ownerUsername
 			c.GameID = gameID
 			c.IsSaved = isSavedInt == 1 || c.IsSaved
 			c.IsDead = isDeadInt == 1 || c.IsDead

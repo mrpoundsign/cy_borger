@@ -286,11 +286,7 @@
                     {{end}}
                 </div>
                 <div style="color:var(--muted-color); font-size:0.9rem; margin-bottom:10px;">
-                    {{if and $currentUserID (eq .OwnerID $currentUserID)}}
-                    <strong style="color:var(--accent-color);">YOU!</strong> ({{if .Handle}}@{{.Handle}}{{else}}[No Handle]{{end}}) - {{.Class.Name}}
-                    {{else}}
-                    {{if .Handle}}@{{.Handle}}{{else}}[No Handle]{{end}} - {{.Class.Name}}
-                    {{end}}
+                    Player: {{if .OwnerUsername}}<strong style="color:var(--accent-color);">{{.OwnerUsername}}</strong>{{else if .Handle}}@{{.Handle}}{{else}}<span style="color:#777;">[Unnamed Player]</span>{{end}} — {{.Class.Name}}
                 </div>
                 <div><strong>HP:</strong> {{.HP.Current}}/{{.HP.Max}} | <strong>Glitches:</strong> {{.Glitches.Current}}/{{.Glitches.Max}}</div>
                 <div style="margin-top:8px;"><strong>Weapons:</strong> {{range .Weapons}}{{.Name}} ({{.Damage}}), {{end}}</div>
@@ -334,10 +330,15 @@
                 <div class="char-card" style="border-color: #ff0055; background: #120006; opacity: 0.9;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div class="char-name" style="color:#ff0055; text-decoration:line-through;">☠️ {{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</div>
-                        <span style="background:#ff0055; color:#fff; font-weight:bold; font-size:0.7rem; padding:2px 6px; border-radius:3px;">FLATLINED</span>
+                        <div>
+                            {{if and $currentUserID (eq .OwnerID $currentUserID)}}
+                            <span style="background:var(--accent-color); color:#000; font-weight:bold; font-size:0.7rem; padding:2px 6px; border-radius:3px; margin-right:4px;">⚡ YOU!</span>
+                            {{end}}
+                            <span style="background:#ff0055; color:#fff; font-weight:bold; font-size:0.7rem; padding:2px 6px; border-radius:3px;">FLATLINED</span>
+                        </div>
                     </div>
                     <div style="color:var(--muted-color); font-size:0.85rem; margin-top:4px;">
-                        {{if and $currentUserID (eq .OwnerID $currentUserID)}}<strong>YOU!</strong> ({{if .Handle}}@{{.Handle}}{{else}}[No Handle]{{end}}){{else}}{{if .Handle}}@{{.Handle}}{{else}}[No Handle]{{end}}{{end}} - {{.Class.Name}}
+                        Player: {{if .OwnerUsername}}<strong style="color:#ff99bb;">{{.OwnerUsername}}</strong>{{else if .Handle}}@{{.Handle}}{{else}}<span style="color:#777;">[Unnamed Player]</span>{{end}} — {{.Class.Name}}
                     </div>
                     {{if not .DiedAt.IsZero}}
                     <div style="font-size:0.75rem; color:#ff77a8; margin-top:4px; font-weight:bold;">🪦 DIED: {{.DiedAt.Format "2006-01-02 15:04:05"}}</div>

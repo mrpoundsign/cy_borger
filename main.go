@@ -40,6 +40,9 @@ func main() {
 
 	// Routes
 	mux.HandleFunc("GET /", handleIndex)
+	mux.HandleFunc("POST /auth/register", handleRegister)
+	mux.HandleFunc("POST /auth/login", handleLogin)
+	mux.HandleFunc("POST /auth/logout", handleLogout)
 	mux.HandleFunc("POST /user/update", handleUpdateUser)
 	mux.HandleFunc("POST /character/generate", handleGenerateCharacter)
 	mux.HandleFunc("POST /character/create_blank", handleCreateBlankCharacter)
@@ -110,6 +113,18 @@ func getCookie(r *http.Request, name string) string {
 	return cookie.Value
 }
 
+func getUserFromSession(r *http.Request) *db.User {
+	cookie, err := r.Cookie("cy_user_id")
+	if err != nil || cookie.Value == "" {
+		return nil
+	}
+	u, err := database.GetUser(cookie.Value)
+	if err != nil || u == nil {
+		return nil
+	}
+	return u
+}
+
 // Handlers
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -117,16 +132,15 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ownerID := getCookie(r, "cy_user_id")
+	user := getUserFromSession(r)
+
 	var myGames []db.Game
 	var myChars []chargen.Character
 	var draftChars []chargen.Character
-	var user *db.User
 
-	if ownerID != "" {
-		user, _ = database.GetUser(ownerID)
-		myGames, _ = database.GetGamesByOwner(ownerID)
-		allChars, _ := database.GetCharactersByOwner(ownerID)
+	if user != nil {
+		myGames, _ = database.GetGamesByOwner(user.ID)
+		allChars, _ := database.GetCharactersByOwner(user.ID)
 		for _, c := range allChars {
 			if c.IsSaved {
 				myChars = append(myChars, c)
@@ -147,46 +161,143 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
-	userID := r.FormValue("user_id")
-	username := r.FormValue("username")
-
-	if userID == "" || username == "" {
-		http.Error(w, "Missing user_id or username", http.StatusBadRequest)
+	user := getUserFromSession(r)
+	if user == nil {
+		http.Error(w, "Authentication required.", http.StatusUnauthorized)
 		return
 	}
 
-	// Server-side validation: no spaces/whitespace, and must end with #xxxx
-	matched, err := regexp.MatchString(`^[^\s#]+#\d{4}$`, username)
+	handle := strings.TrimSpace(r.FormValue("handle"))
+	if handle == "" {
+		handle = strings.TrimSpace(r.FormValue("username"))
+	}
+	if handle == "" {
+		http.Error(w, "Handle required", http.StatusBadRequest)
+		return
+	}
+
+	// Format validation for handle
+	matched, err := regexp.MatchString(`^[^\s#]+#\d{4}$`, handle)
 	if err != nil || !matched {
-		http.Error(w, "Invalid Operator handle format. Must be Name#XXXX with no spaces.", http.StatusBadRequest)
+		hashIndex := strings.Index(handle, "#")
+		baseName := handle
+		if hashIndex != -1 {
+			baseName = strings.TrimSpace(handle[:hashIndex])
+		}
+		if baseName == "" || strings.Contains(baseName, " ") {
+			http.Error(w, "Invalid Operator handle format. No spaces allowed.", http.StatusBadRequest)
+			return
+		}
+		num := (time.Now().UnixNano() % 9000) + 1000
+		handle = fmt.Sprintf("%s#%04d", baseName, num)
+	}
+
+	user.Handle = handle
+	if err := database.SaveUser(user); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	u := db.User{ID: userID, Username: username}
-	if err := database.SaveUser(&u); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest) // Send back the "already customized" database lock error
-		return
-	}
-
-	setCookie(w, "cy_user_id", userID)
-	setCookie(w, "cy_username", username)
-
+	setCookie(w, "cy_username", user.Handle)
 	w.WriteHeader(http.StatusOK)
 }
 
-func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
-	c := chargen.GenerateCharacter()
+func handleRegister(w http.ResponseWriter, r *http.Request) {
+	username := strings.TrimSpace(r.FormValue("username"))
+	password := strings.TrimSpace(r.FormValue("password"))
 
-	ownerID := getCookie(r, "cy_user_id")
-	if ownerID == "" {
-		ownerID = "usr_" + chargen.GenerateRandomID(6)
-		setCookie(w, "cy_user_id", ownerID)
+	if username == "" || password == "" {
+		http.Error(w, "Login username and password required.", http.StatusBadRequest)
+		return
 	}
 
-	// Persist the display name from cookie if available
-	username := getCookie(r, "cy_username")
-	if username != "" {
-		c.Handle = username
+	if strings.Contains(username, " ") {
+		http.Error(w, "Username cannot contain spaces.", http.StatusBadRequest)
+		return
+	}
+
+	u, err := database.CreateUserAccount(username, password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	setCookie(w, "cy_user_id", u.ID)
+	setCookie(w, "cy_username", u.Handle)
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func handleLogin(w http.ResponseWriter, r *http.Request) {
+	username := strings.TrimSpace(r.FormValue("username"))
+	password := strings.TrimSpace(r.FormValue("password"))
+
+	if username == "" || password == "" {
+		http.Error(w, "Username and password required.", http.StatusBadRequest)
+		return
+	}
+
+	u, err := database.AuthenticateUser(username, password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	setCookie(w, "cy_user_id", u.ID)
+	setCookie(w, "cy_username", u.Handle)
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "cy_user_id",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "cy_username",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
+	user := getUserFromSession(r)
+	if user == nil {
+		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
+		return
+	}
+
+	c := chargen.GenerateCharacter()
+	ownerID := user.ID
+
+	if user.Handle != "" {
+		c.Handle = user.Handle
 	}
 
 	if gameID := r.FormValue("game_id"); gameID != "" {
@@ -424,16 +535,18 @@ func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreateGame(w http.ResponseWriter, r *http.Request) {
+	user := getUserFromSession(r)
+	if user == nil {
+		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
+		return
+	}
+
 	name := r.FormValue("name")
 	if name == "" {
 		name = "Unnamed Campaign"
 	}
 
-	ownerID := getCookie(r, "cy_user_id")
-	if ownerID == "" {
-		ownerID = "usr_" + chargen.GenerateRandomID(6)
-		setCookie(w, "cy_user_id", ownerID)
-	}
+	ownerID := user.ID
 
 	g, err := database.CreateGame(name, ownerID)
 	if err != nil {
@@ -529,17 +642,17 @@ func handleWSCharacter(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
-	c := chargen.CreateBlankCharacter()
-
-	ownerID := getCookie(r, "cy_user_id")
-	if ownerID == "" {
-		ownerID = "usr_" + chargen.GenerateRandomID(6)
-		setCookie(w, "cy_user_id", ownerID)
+	user := getUserFromSession(r)
+	if user == nil {
+		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
+		return
 	}
 
-	username := getCookie(r, "cy_username")
-	if username != "" {
-		c.Handle = username
+	c := chargen.CreateBlankCharacter()
+	ownerID := user.ID
+
+	if user.Handle != "" {
+		c.Handle = user.Handle
 	}
 
 	if err := database.SaveCharacter(&c, ownerID); err != nil {

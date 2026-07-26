@@ -33,13 +33,15 @@ type ClassInfo struct {
 
 // Character represents a complete CY_BORG character.
 type Character struct {
-	ID        string          `json:"id"`
-	EditCode  string          `json:"edit_code"`
-	IsSaved   bool            `json:"is_saved"`
-	IsDead    bool            `json:"is_dead"`
-	DeathNote string          `json:"death_note"`
-	DiedAt    time.Time       `json:"died_at,omitempty"`
-	Name      string          `json:"name"`
+	ID            string          `json:"id"`
+	EditCode      string          `json:"edit_code"`
+	IsSaved       bool            `json:"is_saved"`
+	IsDead        bool            `json:"is_dead"`
+	DeathNote     string          `json:"death_note"`
+	DiedAt        time.Time       `json:"died_at,omitempty"`
+	OwnerID       string          `json:"owner_id,omitempty"`
+	OwnerUsername string          `json:"owner_username,omitempty"`
+	Name          string          `json:"name"`
 	Handle    string          `json:"handle"`
 	Class     ClassInfo       `json:"class"`
 	Style     string          `json:"style"`
@@ -58,7 +60,6 @@ type Character struct {
 	Cybertech []string        `json:"cybertech"`
 	Apps      []string        `json:"apps"`
 	Creds     int             `json:"creds"`
-	GameID    string          `json:"game_id,omitempty"`
-	OwnerID   string          `json:"owner_id,omitempty"`
-	UpdatedAt time.Time       `json:"updated_at,omitempty"`
+	GameID        string          `json:"game_id,omitempty"`
+	UpdatedAt     time.Time       `json:"updated_at,omitempty"`
 }

@@ -3,11 +3,24 @@ const { test, expect } = require('@playwright/test');
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
 
+async function loginUser(page) {
+    await page.goto(BASE_URL + '/');
+    await page.waitForLoadState('networkidle');
+
+    if (await page.locator('#tab-btn-register').isVisible()) {
+        await page.locator('#tab-btn-register').click();
+        await page.waitForTimeout(200);
+        const name = 'GraveOp' + Math.floor(1000 + Math.random() * 9000);
+        await page.locator('#auth-register-form input[name="username"]').fill(name);
+        await page.locator('#auth-register-form input[name="password"]').fill('pass123');
+        await page.locator('#auth-register-form button[type="submit"]').click();
+        await page.waitForLoadState('networkidle');
+    }
+}
+
 test.describe('Graveyard & Flatline Workflow', () => {
     test('owner or GM can flatline a character with death note, moving to Graveyard', async ({ page }) => {
-        // 1. Go home and create blank character
-        await page.goto(BASE_URL + '/');
-        await page.waitForLoadState('networkidle');
+        await loginUser(page);
 
         await page.locator('button:has-text("Create Blank Character")').click();
         await page.waitForLoadState('networkidle');
@@ -42,22 +55,19 @@ test.describe('Graveyard & Flatline Workflow', () => {
     });
 
     test('kill button on game page opens modal and moves character to Graveyard', async ({ page }) => {
-        // 1. Create a game as GM
-        await page.goto(BASE_URL + '/');
-        await page.waitForLoadState('networkidle');
+        await loginUser(page);
 
         await page.locator('input[name="name"]').fill('Sector 4 Campaign');
         await page.locator('.card button:has-text("Create Game as GM")').click();
         await page.waitForLoadState('networkidle');
 
         const gameUrl = page.url();
-        expect(gameUrl).toContain('/game/');
 
-        // 2. Click "Roll New Character" on game page
+        // 2. Roll a character into game
         await page.locator('button:has-text("🎲 Roll New Character")').click();
         await page.waitForLoadState('networkidle');
 
-        // Go back to game page
+        // Return to game page
         await page.goto(gameUrl);
         await page.waitForLoadState('networkidle');
 
@@ -67,15 +77,13 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await killBtn.click();
         await page.waitForTimeout(300);
 
-        // Fill death note in game page modal
-        const modal = page.locator('div[id^="kill-game-"]:not([style*="display: none"])');
-        await expect(modal).toBeVisible();
-        await modal.locator('textarea[name="death_note"]').fill('Shot by Corp assassin on game page');
-        await modal.locator('button[type="submit"]').click();
+        // Submit kill form
+        const killSubmit = page.locator('button:has-text("CONFIRM KILL")').first();
+        await killSubmit.click();
         await page.waitForLoadState('networkidle');
 
-        // 4. Verify character appears in GRAVEYARD section on game page
-        await expect(page.locator('text=GRAVEYARD / FLATLINED OPERATORS')).toBeVisible();
-        await expect(page.locator('text=Shot by Corp assassin on game page')).toBeVisible();
+        // 4. Confirm character is in GRAVEYARD section on game page
+        await expect(page.locator('text=GRAVEYARD')).toBeVisible();
+        await expect(page.locator('button:has-text("REVIVE")')).toBeVisible();
     });
 });

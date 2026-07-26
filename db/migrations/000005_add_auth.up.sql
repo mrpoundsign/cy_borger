@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN password_hash TEXT DEFAULT '';
+ALTER TABLE users ADD COLUMN salt TEXT DEFAULT '';
