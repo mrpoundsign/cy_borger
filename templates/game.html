@@ -99,6 +99,39 @@
         }
     </style>
     <script>
+        (function() {
+            let uid = localStorage.getItem('cy_user_id');
+            if (!uid) {
+                uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+                localStorage.setItem('cy_user_id', uid);
+            }
+
+            window.cyStore = {
+                getUserId: function() { return localStorage.getItem('cy_user_id'); },
+                saveGMGame: function(gameId, gmCode, name) {
+                    let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
+                    games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
+                    localStorage.setItem('cy_gm_games', JSON.stringify(games));
+                },
+                getGMGames: function() { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
+                saveCharEdit: function(charId, editCode, name) {
+                    let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
+                    chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
+                    localStorage.setItem('cy_user_chars', JSON.stringify(chars));
+                },
+                getCharEdits: function() { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
+            };
+
+            // Real-Time Room WebSocket Live Sync
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/game/{{.Game.ID}}');
+            socket.onmessage = function(e) {
+                if (typeof htmx !== 'undefined') {
+                    htmx.ajax('GET', '/game/{{.Game.ID}}', {target: 'body', swap: 'outerHTML'});
+                }
+            };
+        })();
+
         function copyText(text, btn) {
             navigator.clipboard.writeText(text).then(() => {
                 const orig = btn.innerText;
@@ -116,6 +149,9 @@
 </head>
 <body>
 
+    <!-- Container for GM Inline Character Modal -->
+    <div id="char-modal-container"></div>
+
     <div class="header">
         <div>
             <h1>GAME: {{.Game.Name}}</h1>
@@ -123,8 +159,28 @@
             <span style="color: #00ff66; font-weight: bold;">[GM MODE ACTIVE]</span>
             <button class="btn-outline" style="font-size:0.8rem; margin-left:10px;" onclick="copyText(window.location.origin + '/game/{{.Game.ID}}?gm_code={{.Game.GMCode}}', this)">Copy GM Link</button>
             <button class="btn-outline" style="font-size:0.8rem; margin-left:5px;" onclick="copyText('{{.Game.GMCode}}', this)">Copy GM Code</button>
+            <script>
+                if (window.cyStore) {
+                    cyStore.saveGMGame('{{.Game.ID}}', '{{.Game.GMCode}}', '{{.Game.Name}}');
+                }
+            </script>
             {{else}}
             <span style="color: var(--muted-color)">[PLAYER PARTY VIEW]</span>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    if (window.cyStore) {
+                        const games = cyStore.getGMGames();
+                        if (games['{{.Game.ID}}'] && games['{{.Game.ID}}'].gmCode) {
+                            const code = games['{{.Game.ID}}'].gmCode;
+                            const form = document.querySelector('form[action="/game/{{.Game.ID}}/auth"]');
+                            if (form) {
+                                form.querySelector('input[name="gm_code"]').value = code;
+                                form.submit();
+                            }
+                        }
+                    }
+                });
+            </script>
             {{end}}
         </div>
         <div class="invite-box">
@@ -156,8 +212,12 @@
             <div style="color:var(--muted-color); font-size:0.9rem; margin-bottom:10px;">@{{.Handle}} - {{.Class.Name}}</div>
             <div><strong>HP:</strong> {{.HP.Current}}/{{.HP.Max}} | <strong>Glitches:</strong> {{.Glitches.Current}}/{{.Glitches.Max}}</div>
             <div style="margin-top:8px;"><strong>Weapons:</strong> {{range .Weapons}}{{.Name}} ({{.Damage}}), {{end}}</div>
-            <div style="margin-top:12px;">
-                <a href="/character/{{.ID}}" class="btn-outline">View Sheet</a>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+                <!-- HTMX Modal Inspection for GM directly inside GM Interface -->
+                <button class="btn" hx-get="/character/{{.ID}}?modal=true" hx-target="#char-modal-container" hx-swap="innerHTML">
+                    ⚡ INSPECT SHEET
+                </button>
+                <a href="/character/{{.ID}}" class="btn-outline">Full Page</a>
             </div>
         </div>
         {{else}}

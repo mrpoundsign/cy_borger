@@ -11,6 +11,7 @@ import (
 
 	"github.com/mrpoundsign/cy_borger/chargen"
 	"github.com/mrpoundsign/cy_borger/db"
+	"github.com/mrpoundsign/cy_borger/ws"
 )
 
 //go:embed templates/*
@@ -43,10 +44,15 @@ func main() {
 	mux.HandleFunc("POST /character/{id}/join", handleJoinGame)
 	mux.HandleFunc("PUT /character/{id}/update_hp", handleUpdateHP)
 	mux.HandleFunc("PUT /character/{id}/update_glitches", handleUpdateGlitches)
+	mux.HandleFunc("PUT /character/{id}/update_stat", handleUpdateStat)
 
 	mux.HandleFunc("POST /game/create", handleCreateGame)
 	mux.HandleFunc("GET /game/{id}", handleViewGame)
 	mux.HandleFunc("POST /game/{id}/auth", handleAuthGame)
+
+	// WebSockets (Go stdlib http.Hijacker)
+	mux.HandleFunc("GET /ws/game/{id}", handleWSGame)
+	mux.HandleFunc("GET /ws/character/{id}", handleWSCharacter)
 
 	server := &http.Server{
 		Addr:         ":8080",
@@ -142,6 +148,12 @@ func renderCharacterView(w http.ResponseWriter, r *http.Request, id string) {
 		"ActiveGame": activeGame,
 	}
 
+	// Render in modal if requested
+	if r.URL.Query().Get("modal") == "true" {
+		_ = templates.ExecuteTemplate(w, "character_modal.html", data)
+		return
+	}
+
 	_ = templates.ExecuteTemplate(w, "character.html", data)
 }
 
@@ -188,15 +200,19 @@ func handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	c.GameID = g.ID
 	_ = database.SaveCharacter(c)
 
-	// Remember this game invite in cookies for future rolls
 	setCookie(w, "last_game_invite", g.InviteCode)
+
+	// Broadcast update to real-time clients!
+	ws.GlobalHub.Broadcast("game_"+g.ID, "refresh")
+	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
 
 	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
 }
 
 func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	valStr := r.FormValue("hp_current")
+	currStr := r.FormValue("hp_current")
+	maxStr := r.FormValue("hp_max")
 
 	c, err := database.GetCharacter(id)
 	if err != nil || c == nil {
@@ -204,9 +220,18 @@ func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if val, err := strconv.Atoi(valStr); err == nil {
+	if val, err := strconv.Atoi(currStr); err == nil {
 		c.HP.Current = val
-		_ = database.SaveCharacter(c)
+	}
+	if val, err := strconv.Atoi(maxStr); err == nil {
+		c.HP.Max = val
+	}
+	_ = database.SaveCharacter(c)
+
+	// Broadcast real-time update to connected WebSockets
+	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "refresh")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -214,7 +239,8 @@ func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 
 func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	valStr := r.FormValue("glitches_current")
+	currStr := r.FormValue("glitches_current")
+	maxStr := r.FormValue("glitches_max")
 
 	c, err := database.GetCharacter(id)
 	if err != nil || c == nil {
@@ -222,9 +248,49 @@ func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if val, err := strconv.Atoi(valStr); err == nil {
+	if val, err := strconv.Atoi(currStr); err == nil {
 		c.Glitches.Current = val
+	}
+	if val, err := strconv.Atoi(maxStr); err == nil {
+		c.Glitches.Max = val
+	}
+	_ = database.SaveCharacter(c)
+
+	// Broadcast real-time update to connected WebSockets
+	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "refresh")
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	statName := r.FormValue("stat_name")
+	currStr := r.FormValue("stat_current")
+	maxStr := r.FormValue("stat_max")
+
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+
+	if stat, exists := c.Abilities[statName]; exists {
+		if val, err := strconv.Atoi(currStr); err == nil {
+			stat.Current = val
+		}
+		if val, err := strconv.Atoi(maxStr); err == nil {
+			stat.Max = val
+		}
+		c.Abilities[statName] = stat
 		_ = database.SaveCharacter(c)
+
+		ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+		if c.GameID != "" {
+			ws.GlobalHub.Broadcast("game_"+c.GameID, "refresh")
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -287,4 +353,15 @@ func handleAuthGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/game/"+id, http.StatusSeeOther)
+}
+
+// WebSocket Handlers
+func handleWSGame(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	ws.ServeWS(w, r, "game_"+id)
+}
+
+func handleWSCharacter(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	ws.ServeWS(w, r, "char_"+id)
 }

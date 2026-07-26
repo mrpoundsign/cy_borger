@@ -33,7 +33,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
             border: 2px solid var(--border-color);
             padding: 30px;
@@ -89,12 +89,65 @@
             margin-bottom: 10px;
             width: 80%;
         }
+
+        .user-banner {
+            background: #111;
+            border: 1px solid var(--accent-color);
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     </style>
+    <script>
+        (function() {
+            let uid = localStorage.getItem('cy_user_id');
+            if (!uid) {
+                uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+                localStorage.setItem('cy_user_id', uid);
+            }
+
+            let uname = localStorage.getItem('cy_user_name');
+            if (!uname) {
+                uname = 'CyberPunk#' + Math.floor(1000 + Math.random() * 9000);
+                localStorage.setItem('cy_user_name', uname);
+            }
+
+            window.cyStore = {
+                getUserId: function() { return localStorage.getItem('cy_user_id'); },
+                getUserName: function() { return localStorage.getItem('cy_user_name'); },
+                setUserName: function(name) { localStorage.setItem('cy_user_name', name); },
+                saveGMGame: function(gameId, gmCode, name) {
+                    let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
+                    games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
+                    localStorage.setItem('cy_gm_games', JSON.stringify(games));
+                },
+                getGMGames: function() { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
+                saveCharEdit: function(charId, editCode, name) {
+                    let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
+                    chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
+                    localStorage.setItem('cy_user_chars', JSON.stringify(chars));
+                },
+                getCharEdits: function() { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
+            };
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>CY_BORG</h1>
         <p>KILL THE CORPORATIONS. LIVE FAST. DIE CHROME.</p>
+
+        <div class="user-banner">
+            <span>OPERATOR HANDLE: <strong id="user-handle-display" style="color:var(--accent-color)"></strong></span>
+            <div>
+                <input type="text" id="user-handle-input" style="width:140px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
+                <button onclick="saveHandle()" class="btn" style="padding:4px 10px; font-size:0.8rem; margin:0;">Save</button>
+            </div>
+        </div>
 
         <form action="/character/generate" method="POST">
             <button type="submit" class="btn">Generate Character</button>
@@ -107,6 +160,57 @@
                 <button type="submit" class="btn" style="padding: 10px 20px; font-size: 0.9rem;">Create Game as GM</button>
             </form>
         </div>
+
+        <div class="card" id="my-stuff-card" style="display:none; text-align:left;">
+            <h3 style="color: #00ff66; margin-bottom: 10px; font-size:1.1rem;">MY GAMES (GM)</h3>
+            <ul id="my-gm-games-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;"></ul>
+
+            <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size:1.1rem;">MY CHARACTERS</h3>
+            <ul id="my-chars-list" style="list-style:none; padding:0; line-height:1.5;"></ul>
+        </div>
     </div>
+
+    <script>
+        function saveHandle() {
+            const input = document.getElementById("user-handle-input").value.trim();
+            if (input) {
+                cyStore.setUserName(input);
+                document.getElementById("user-handle-display").innerText = input;
+                document.getElementById("user-handle-input").value = "";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!window.cyStore) return;
+            document.getElementById("user-handle-display").innerText = cyStore.getUserName();
+
+            const games = cyStore.getGMGames();
+            const chars = cyStore.getCharEdits();
+            
+            const gamesList = document.getElementById("my-gm-games-list");
+            const charsList = document.getElementById("my-chars-list");
+            let count = 0;
+
+            for (let id in games) {
+                count++;
+                const g = games[id];
+                const li = document.createElement("li");
+                li.innerHTML = `<a href="/game/${g.id}" style="color:#00ff66; text-decoration:none;">⚡ <strong>${g.name}</strong> [GM Mode]</a>`;
+                gamesList.appendChild(li);
+            }
+
+            for (let id in chars) {
+                count++;
+                const c = chars[id];
+                const li = document.createElement("li");
+                li.innerHTML = `<a href="/character/${c.id}" style="color:var(--accent-color); text-decoration:none;">👤 <strong>${c.name}</strong> [Edit]</a>`;
+                charsList.appendChild(li);
+            }
+
+            if (count > 0) {
+                document.getElementById("my-stuff-card").style.display = "block";
+            }
+        });
+    </script>
 </body>
 </html>

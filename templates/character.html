@@ -24,43 +24,69 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            max-width: 1200px;
+            padding: 30px 20px;
+            max-width: 1350px;
             margin: 0 auto;
         }
 
         .top-bar {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border: 2px solid var(--border-color);
+            padding: 15px 20px;
+            margin-bottom: 25px;
             font-size: 1.1rem;
             font-weight: bold;
+            background: #0a0a0a;
         }
 
         .stat-box {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             color: var(--accent-color);
+            padding: 5px 10px;
         }
 
         .stat-box span {
             color: #fff;
         }
 
+        .vitals-box {
+            border: 2px solid var(--accent-color);
+            background: #0a0a0a;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 0 10px rgba(255, 230, 0, 0.15);
+        }
+
+        .vitals-item {
+            text-align: center;
+        }
+
+        .vitals-title {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            border-left: 2px solid var(--border-color);
-            padding-left: 20px;
+            gap: 35px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .grid-container {
                 grid-template-columns: 1fr;
             }
@@ -70,28 +96,33 @@
             color: var(--accent-color);
             font-size: 1.8rem;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             letter-spacing: 1px;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 5px;
         }
 
         .sub-title {
             color: var(--muted-color);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             margin-bottom: 15px;
         }
 
         .content-box {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 25px;
         }
 
         ul {
             list-style-type: square;
             padding-left: 20px;
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         li {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .highlight {
@@ -102,20 +133,20 @@
         .toolbar {
             background: #111;
             border: 1px solid var(--border-color);
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
 
         .btn {
             background: var(--accent-color);
             color: #000;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 16px;
             font-weight: bold;
             font-family: inherit;
             cursor: pointer;
@@ -126,7 +157,7 @@
             background: #00ff66;
             color: #000;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 16px;
             font-weight: bold;
             font-family: inherit;
             cursor: pointer;
@@ -137,29 +168,96 @@
             background: transparent;
             color: var(--accent-color);
             border: 1px solid var(--accent-color);
-            padding: 8px 15px;
+            padding: 8px 16px;
             font-weight: bold;
             font-family: inherit;
             cursor: pointer;
         }
 
         input[type="number"] {
-            width: 45px;
+            width: 52px;
             background: #000;
             border: 1px solid var(--accent-color);
             color: var(--accent-color);
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-family: inherit;
+            padding: 4px;
         }
 
-        .copy-group {
-            display: inline-flex;
-            gap: 5px;
-            align-items: center;
+        input[type="number"]:focus {
+            outline: none;
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        /* Gear Table */
+        .gear-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .gear-table th {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding: 8px 10px;
+            font-size: 0.95rem;
+        }
+
+        .gear-table td {
+            border-bottom: 1px solid #222;
+            padding: 10px;
+            line-height: 1.5;
+        }
+
+        .badge {
+            background: #151515;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
         }
     </style>
     <script>
+        (function() {
+            let uid = localStorage.getItem('cy_user_id');
+            if (!uid) {
+                uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+                localStorage.setItem('cy_user_id', uid);
+            }
+
+            window.cyStore = {
+                getUserId: function() { return localStorage.getItem('cy_user_id'); },
+                saveGMGame: function(gameId, gmCode, name) {
+                    let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
+                    games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
+                    localStorage.setItem('cy_gm_games', JSON.stringify(games));
+                },
+                getGMGames: function() { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
+                saveCharEdit: function(charId, editCode, name) {
+                    let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
+                    chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
+                    localStorage.setItem('cy_user_chars', JSON.stringify(chars));
+                },
+                getCharEdits: function() { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
+            };
+
+            // Real-Time WebSocket Connection
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/character/{{.Character.ID}}');
+            socket.onmessage = function(e) {
+                // Ignore self updates if user is currently typing inside an active input
+                if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+                    return;
+                }
+                if (typeof htmx !== 'undefined') {
+                    htmx.ajax('GET', '/character/{{.Character.ID}}', {target: 'body', swap: 'outerHTML'});
+                }
+            };
+        })();
+
         function copyText(text, btn) {
             navigator.clipboard.writeText(text).then(() => {
                 const orig = btn.innerText;
@@ -183,8 +281,28 @@
             {{if .CanEdit}}
             <span style="margin-left: 10px; color: #00ff66;">[EDIT MODE]</span>
             <button class="btn-outline" style="font-size: 0.8rem; margin-left: 8px;" onclick="copyText(window.location.origin + '/character/{{.Character.ID}}?code={{.Character.EditCode}}', this)">Copy Edit Link</button>
+            <script>
+                if (window.cyStore) {
+                    cyStore.saveCharEdit('{{.Character.ID}}', '{{.Character.EditCode}}', '{{.Character.Name}}');
+                }
+            </script>
             {{else}}
             <span style="margin-left: 10px; color: #ff3366;">[READ-ONLY]</span>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    if (window.cyStore) {
+                        const chars = cyStore.getCharEdits();
+                        if (chars['{{.Character.ID}}'] && chars['{{.Character.ID}}'].editCode) {
+                            const code = chars['{{.Character.ID}}'].editCode;
+                            const form = document.querySelector('form[action="/character/{{.Character.ID}}/auth"]');
+                            if (form) {
+                                form.querySelector('input[name="edit_code"]').value = code;
+                                form.submit();
+                            }
+                        }
+                    }
+                });
+            </script>
             {{end}}
             <button class="btn-outline" style="font-size: 0.8rem; margin-left: 8px;" onclick="copyText(window.location.origin + '/character/{{.Character.ID}}', this)">Copy View Link</button>
         </div>
@@ -210,51 +328,86 @@
             </form>
             {{end}}
 
-            <!-- HTMX Reroll without full page refresh -->
             <button class="btn" hx-post="/character/generate" hx-target="body" hx-push-url="true">
                 🎲 REROLL NEW
             </button>
         </div>
     </div>
 
-    <!-- Top Stats Bar -->
+    <!-- Top Stats Bar (Strength, Agility, Presence, Toughness, Knowledge) -->
     <div class="top-bar">
         {{range $name, $stat := .Character.Abilities}}
         <div class="stat-box">
-            {{$name}} 
+            <span>{{$name}}:</span> 
             {{if $.CanEdit}}
-            <span>
-                <input type="number" name="{{$name}}_current" value="{{$stat.Current}}" 
-                       hx-put="/character/{{$.Character.ID}}/update_stat" hx-trigger="change" hx-target="#sheet-root"> / {{$stat.Max}}
-            </span>
+            <form id="stat-form-{{$name}}" style="display:inline-flex; align-items:center; gap:2px;">
+                <input type="hidden" name="stat_name" value="{{$name}}">
+                <input type="number" name="stat_current" value="{{$stat.Current}}"
+                       hx-put="/character/{{$.Character.ID}}/update_stat"
+                       hx-include="#stat-form-{{$name}}"
+                       hx-trigger="change, input delay:300ms"
+                       hx-swap="none"> / 
+                <input type="number" name="stat_max" value="{{$stat.Max}}"
+                       hx-put="/character/{{$.Character.ID}}/update_stat"
+                       hx-include="#stat-form-{{$name}}"
+                       hx-trigger="change, input delay:300ms"
+                       hx-swap="none">
+            </form>
             {{else}}
             <span>{{if gt $stat.Current 0}}+{{end}}{{$stat.Current}} (max {{$stat.Max}})</span>
             {{end}}
         </div>
         {{end}}
+    </div>
 
-        <div class="stat-box">
-            HP 
+    <!-- Dedicated Vitals & Glitches Box -->
+    <div class="vitals-box">
+        <div class="vitals-item">
+            <div class="vitals-title">❤️ HIT POINTS (HP)</div>
             {{if .CanEdit}}
-            <span>
-                <input type="number" name="hp_current" value="{{.Character.HP.Current}}" 
-                       hx-put="/character/{{.Character.ID}}/update_hp" hx-trigger="change"> / {{.Character.HP.Max}}
-            </span>
+            <form id="hp-form" style="display:inline-flex; align-items:center; gap:4px;">
+                <input type="number" name="hp_current" value="{{.Character.HP.Current}}" style="font-size:1.3rem; width:58px;"
+                       hx-put="/character/{{.Character.ID}}/update_hp"
+                       hx-include="#hp-form"
+                       hx-trigger="change, input delay:300ms"
+                       hx-swap="none"> 
+                <span style="font-size:1.3rem;">/</span> 
+                <input type="number" name="hp_max" value="{{.Character.HP.Max}}" style="font-size:1.3rem; width:58px;"
+                       hx-put="/character/{{.Character.ID}}/update_hp"
+                       hx-include="#hp-form"
+                       hx-trigger="change, input delay:300ms"
+                       hx-swap="none">
+            </form>
             {{else}}
-            <span>{{.Character.HP.Current}}/{{.Character.HP.Max}}</span>
+            <div style="font-size: 1.5rem; font-weight: bold;">{{.Character.HP.Current}} / {{.Character.HP.Max}}</div>
             {{end}}
         </div>
 
-        <div class="stat-box">
-            Glitches 
+        <div class="vitals-item">
+            <div class="vitals-title">⚡ GLITCHES</div>
             {{if .CanEdit}}
-            <span>
-                <input type="number" name="glitches_current" value="{{.Character.Glitches.Current}}" 
-                       hx-put="/character/{{.Character.ID}}/update_glitches" hx-trigger="change"> / {{.Character.Glitches.Max}} ({{.Character.GlitchDie}})
-            </span>
+            <form id="glitches-form" style="display:inline-flex; align-items:center; gap:4px;">
+                <input type="number" name="glitches_current" value="{{.Character.Glitches.Current}}" style="font-size:1.3rem; width:58px;"
+                       hx-put="/character/{{.Character.ID}}/update_glitches"
+                       hx-include="#glitches-form"
+                       hx-trigger="change, input delay:300ms"
+                       hx-swap="none"> 
+                <span style="font-size:1.3rem;">/</span> 
+                <input type="number" name="glitches_max" value="{{.Character.Glitches.Max}}" style="font-size:1.3rem; width:58px;"
+                       hx-put="/character/{{.Character.ID}}/update_glitches"
+                       hx-include="#glitches-form"
+                       hx-trigger="change, input delay:300ms"
+                       hx-swap="none">
+                <span style="color:var(--muted-color)">({{.Character.GlitchDie}})</span>
+            </form>
             {{else}}
-            <span>{{.Character.Glitches.Current}}/{{.Character.Glitches.Max}} ({{.Character.GlitchDie}})</span>
+            <div style="font-size: 1.5rem; font-weight: bold;">{{.Character.Glitches.Current}} / {{.Character.Glitches.Max}} <span style="font-size:1rem; color:var(--muted-color)">({{.Character.GlitchDie}})</span></div>
             {{end}}
+        </div>
+
+        <div class="vitals-item">
+            <div class="vitals-title">💰 CREDITS</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color:var(--accent-color)">{{.Character.Creds}}¤</div>
         </div>
     </div>
 
@@ -262,13 +415,13 @@
     <div class="grid-container">
         <!-- Top Left: Identity -->
         <div class="content-box">
-            <h1 style="color: var(--accent-color); font-size: 2.2rem;">YOU ARE {{.Character.Name}}</h1>
+            <h1 style="color: var(--accent-color); font-size: 2.2rem; margin-bottom:5px;">YOU ARE {{.Character.Name}}</h1>
             <div class="sub-title">@{{.Character.Handle}}</div>
-            <p style="line-height: 1.6; margin-bottom: 15px;">
+            <p style="line-height: 1.7; margin-bottom: 15px;">
                 A <span class="highlight">{{.Character.Style}}</span> <span class="highlight">{{.Character.Class.Name}}</span>; 
                 {{.Character.Feature}}. {{.Character.Want}} {{.Character.Quirk}} {{.Character.Obsession}}
             </p>
-            <p style="color: var(--accent-color); font-weight: bold;">
+            <p style="color: var(--accent-color); font-weight: bold; font-size:1.05rem;">
                 {{.Character.Debt}}
             </p>
         </div>
@@ -276,29 +429,50 @@
         <!-- Top Right: Class -->
         <div class="content-box">
             <h2 class="section-title">{{.Character.Class.Name}}</h2>
-            <div class="sub-title" style="color: var(--accent-color)">{{.Character.Class.Glitch}}</div>
-            <p style="line-height: 1.6; font-style: italic; margin-bottom: 15px;">
+            <div class="sub-title" style="color: var(--accent-color); font-weight:bold;">{{.Character.Class.Glitch}}</div>
+            <p style="line-height: 1.7; font-style: italic; margin-bottom: 15px;">
                 {{.Character.Class.Description}}
             </p>
             {{if .Character.Class.Origin}}
-            <p style="margin-bottom: 10px;"><strong>Origin:</strong> {{.Character.Class.Origin}}</p>
+            <p style="margin-bottom: 10px; line-height:1.5;"><strong>Origin:</strong> {{.Character.Class.Origin}}</p>
             {{end}}
             {{if .Character.Class.Gift}}
-            <p style="margin-bottom: 10px;"><strong>Class Gift/Weapon:</strong> {{.Character.Class.Gift}}</p>
+            <p style="margin-bottom: 10px; line-height:1.5;"><strong>Class Gift/Weapon:</strong> {{.Character.Class.Gift}}</p>
             {{end}}
         </div>
 
-        <!-- Bottom Left: Gear -->
+        <!-- Bottom Left: Gear (Formatted as Table!) -->
         <div class="content-box">
-            <h2 class="section-title">GEAR</h2>
+            <h2 class="section-title">GEAR & ARSENAL</h2>
+
+            <table class="gear-table">
+                <thead>
+                    <tr>
+                        <th>ITEM / WEAPON</th>
+                        <th>DAMAGE / TIER</th>
+                        <th>NOTES & EFFECT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Character.Weapons}}
+                    <tr>
+                        <td class="highlight">⚔️ {{.Name}}</td>
+                        <td><span class="badge">{{.Damage}}</span></td>
+                        <td>{{.Description}}</td>
+                    </tr>
+                    {{end}}
+                    {{range .Character.Armor}}
+                    <tr>
+                        <td class="highlight">🛡️ {{.Name}}</td>
+                        <td><span class="badge">{{.Tier}}</span></td>
+                        <td>{{.Reduction}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+
+            <h3 style="color:var(--accent-color); font-size:1.1rem; margin-top:15px; margin-bottom:8px;">INVENTORY</h3>
             <ul>
-                <li><strong style="color:var(--accent-color)">{{.Character.Creds}}¤</strong></li>
-                {{range .Character.Weapons}}
-                <li><span class="highlight">{{.Name}}</span> ({{.Damage}} damage) {{.Description}}</li>
-                {{end}}
-                {{range .Character.Armor}}
-                <li><span class="highlight">{{.Name}}</span> ({{.Tier}} tier, {{.Reduction}})</li>
-                {{end}}
                 {{range .Character.Gear}}
                 <li>{{.}}</li>
                 {{end}}
@@ -318,7 +492,7 @@
             {{end}}
 
             {{if .Character.Apps}}
-            <h3 style="color:var(--accent-color); font-size:1.1rem; margin-top: 15px; margin-bottom: 8px;">NANO & APPS</h3>
+            <h3 style="color:var(--accent-color); font-size:1.1rem; margin-top: 20px; margin-bottom: 8px;">NANO & APPS</h3>
             <ul>
                 {{range .Character.Apps}}
                 <li>{{.}}</li>
