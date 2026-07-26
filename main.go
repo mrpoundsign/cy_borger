@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	templates, err = template.ParseFS(templateFS, "templates/*.html")
+	templates, err = template.ParseFS(templateFS, "templates/*.html", "templates/*.tmpl")
 	if err != nil {
 		log.Fatalf("Failed to parse templates: %v", err)
 	}
@@ -201,6 +201,7 @@ func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *char
 		"CanEdit":    canEdit,
 		"Game":       game,
 		"ActiveGame": activeGame,
+		"IsModal":    r.URL.Query().Get("modal") == "true",
 	}
 
 	// Render in modal if requested
@@ -227,15 +228,19 @@ func handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set Last-Modified header
+	// HTTP Caching Headers
+	w.Header().Set("Cache-Control", "no-cache, must-revalidate")
+	w.Header().Set("Vary", "HX-Request, Accept")
 	w.Header().Set("Last-Modified", c.UpdatedAt.UTC().Format(http.TimeFormat))
 
 	// Check If-Modified-Since header (HTTP Caching)
-	if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
-		if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
-			if !c.UpdatedAt.Truncate(time.Second).After(t) {
-				w.WriteHeader(http.StatusNotModified)
-				return
+	if r.Header.Get("HX-Request") != "true" && r.URL.Query().Get("modal") != "true" {
+		if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
+			if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
+				if !c.UpdatedAt.Truncate(time.Second).After(t) {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
 			}
 		}
 	}
@@ -416,22 +421,35 @@ func handleViewGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set Last-Modified header
-	w.Header().Set("Last-Modified", g.UpdatedAt.UTC().Format(http.TimeFormat))
+	chars, _ := database.GetCharactersForGame(g.ID)
+
+	// Compute latest update timestamp among game and its characters
+	latestUpdate := g.UpdatedAt
+	for _, c := range chars {
+		if c.UpdatedAt.After(latestUpdate) {
+			latestUpdate = c.UpdatedAt
+		}
+	}
+
+	// HTTP Caching Headers
+	w.Header().Set("Cache-Control", "no-cache, must-revalidate")
+	w.Header().Set("Vary", "HX-Request, Accept")
+	w.Header().Set("Last-Modified", latestUpdate.UTC().Format(http.TimeFormat))
 
 	// Check If-Modified-Since header (HTTP Caching)
-	if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
-		if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
-			if !g.UpdatedAt.Truncate(time.Second).After(t) {
-				w.WriteHeader(http.StatusNotModified)
-				return
+	if r.Header.Get("HX-Request") != "true" {
+		if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
+			if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
+				if !latestUpdate.Truncate(time.Second).After(t) {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
 			}
 		}
 	}
 
 	setCookie(w, "last_game_invite", g.InviteCode)
 
-	chars, _ := database.GetCharactersForGame(g.ID)
 	isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
 
 	data := map[string]interface{}{

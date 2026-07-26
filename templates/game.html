@@ -181,6 +181,10 @@
     </script>
 </head>
 <body>
+    <div style="margin: 10px 0 20px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px;">
+        <a href="/" style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️ Back to Home</a>
+        <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">CY_BORG Game Terminal</span>
+    </div>
 
     <!-- Container for GM Inline Character Modal -->
     <div id="char-modal-container"></div>
@@ -252,8 +256,11 @@
             <div><strong>HP:</strong> {{.HP.Current}}/{{.HP.Max}} | <strong>Glitches:</strong> {{.Glitches.Current}}/{{.Glitches.Max}}</div>
             <div style="margin-top:8px;"><strong>Weapons:</strong> {{range .Weapons}}{{.Name}} ({{.Damage}}), {{end}}</div>
             <div style="margin-top:12px; display:flex; gap:8px;">
-                <!-- HTMX Modal Inspection for GM directly inside GM Interface -->
-                <button class="btn" hx-get="/character/{{.ID}}?modal=true" hx-target="#char-modal-container" hx-swap="innerHTML">
+                <button class="btn"
+                    hx-get="/character/{{.ID}}?modal=true"
+                    hx-target="#char-modal-container"
+                    hx-swap="innerHTML"
+                    hx-select=".modal-overlay">
                     ⚡ INSPECT SHEET
                 </button>
                 <a href="/character/{{.ID}}" class="btn-outline">Full Page</a>

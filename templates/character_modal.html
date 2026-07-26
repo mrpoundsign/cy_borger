@@ -1,7 +1,7 @@
 <div class="modal-overlay" id="char-modal" data-char-id="{{.Character.ID}}" onclick="if(event.target === this) this.remove();">
     <div class="modal-content">
         <button class="btn-outline" style="float:right; color:#ff3366; border-color:#ff3366;" onclick="document.getElementById('char-modal').remove()">✕ CLOSE</button>
-        {{template "character.html" .}}
+        {{template "character_sheet.tmpl" .}}
     </div>
 </div>
 <style>

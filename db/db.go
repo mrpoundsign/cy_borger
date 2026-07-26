@@ -118,7 +118,6 @@ func (d *DB) SaveCharacter(c *chargen.Character, ownerID string) error {
 	VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 	ON CONFLICT(id) DO UPDATE SET
 		game_id = excluded.game_id,
-		owner_id = excluded.owner_id,
 		data_json = excluded.data_json,
 		updated_at = CURRENT_TIMESTAMP;
 	`
