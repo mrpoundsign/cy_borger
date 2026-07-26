@@ -41,6 +41,12 @@ test.describe('INSPECT SHEET modal injection', () => {
             page.locator('button:has-text("🎲 Roll New Character")').click()
         ]);
 
+        // Character is generated as a draft; keep it to save it to the game
+        const keepBtn = page.locator('button:has-text("KEEP THIS CHARACTER")');
+        await keepBtn.click();
+        await expect(keepBtn).toBeHidden({ timeout: 10000 });
+        await page.waitForLoadState('networkidle');
+
         const charUrl = page.url();
 
         // Go back to game page

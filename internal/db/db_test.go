@@ -57,6 +57,7 @@ func TestDB(t *testing.T) {
 
 	// 3. Test Join Game
 	c.GameID = g.ID
+	c.IsSaved = true
 	if err := database.SaveCharacter(&c, u.ID); err != nil {
 		t.Fatalf("SaveCharacter join game failed: %v", err)
 	}

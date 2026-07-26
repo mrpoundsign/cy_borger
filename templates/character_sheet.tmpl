@@ -679,7 +679,10 @@ document.addEventListener("input", function(e) {
                 {{range $i, $w := .Character.Weapons}}
                 <tr>
                     <td class="highlight">⚔️ {{$w.Name}}</td>
-                    <td><span class="badge">{{$w.Damage}}</span></td>
+                    <td>
+                        <span class="badge">{{$w.Damage}}</span>
+                        {{if $w.Hands}}<span style="font-size: 0.75rem; color: #888; margin-left: 4px;">[{{$w.Hands}}]</span>{{end}}
+                    </td>
                     <td>{{$w.Description}}</td>
                     {{if $.CanEdit}}
                     <td>

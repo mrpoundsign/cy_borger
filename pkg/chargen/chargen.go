@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"math/big"
 	mrand "math/rand"
-	"strconv"
 )
 
 // GenerateRandomID returns a unique random string ID.
@@ -100,7 +99,6 @@ func GenerateCharacter() Character {
 		Glitches:  Stat{Current: glitchesMax, Max: glitchesMax},
 		GlitchDie: "d3",
 		Gear: []string{
-			strconv.Itoa(creds) + "¤",
 			pickRandom(GearList),
 			pickRandom(GearList),
 		},

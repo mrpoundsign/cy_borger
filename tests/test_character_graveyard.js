@@ -69,7 +69,14 @@ test.describe('Graveyard & Flatline Workflow', () => {
         const gameUrl = page.url();
 
         // 2. Roll a character into game
-        await page.locator('button:has-text("🎲 Roll New Character")').click();
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('button:has-text("🎲 Roll New Character")').click()
+        ]);
+
+        const keepBtn = page.locator('button:has-text("KEEP THIS CHARACTER")');
+        await keepBtn.click();
+        await expect(keepBtn).toBeHidden({ timeout: 10000 });
         await page.waitForLoadState('networkidle');
 
         // Return to game page
@@ -77,7 +84,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await page.waitForLoadState('networkidle');
 
         // 3. Click 💀 KILL button on game page
-        const killBtn = page.locator('button:has-text("💀 KILL")').first();
+        const killBtn = page.locator('button', { hasText: 'KILL' }).first();
         await expect(killBtn).toBeVisible();
         await killBtn.click();
         await page.waitForTimeout(300);

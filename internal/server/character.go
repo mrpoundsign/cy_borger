@@ -29,7 +29,6 @@ func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request)
 	_ = r.ParseForm()
 	if gameID := r.FormValue("game_id"); gameID != "" {
 		c.GameID = gameID
-		c.IsSaved = true
 	}
 
 	if err := s.DB.SaveCharacter(&c, ownerID); err != nil {
@@ -275,6 +274,11 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 
 	if user.Handle != "" {
 		c.Handle = user.Handle
+	}
+
+	_ = r.ParseForm()
+	if gameID := r.FormValue("game_id"); gameID != "" {
+		c.GameID = gameID
 	}
 
 	if err := s.DB.SaveCharacter(&c, ownerID); err != nil {

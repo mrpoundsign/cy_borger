@@ -58,7 +58,7 @@ func HashPassword(password, salt string) string {
 }
 
 func InitDB(dbPath string) (*DB, error) {
-	conn, err := sql.Open("sqlite", dbPath)
+	conn, err := sql.Open("sqlite", dbPath+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -369,7 +369,7 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 	SELECT c.owner_id, c.game_id, c.is_saved, c.is_dead, c.death_note, c.died_at, c.data_json, c.updated_at, COALESCE(NULLIF(u.handle, ''), u.username, '') AS owner_username
 	FROM characters c
 	LEFT JOIN users u ON c.owner_id = u.id
-	WHERE c.game_id = ?
+	WHERE c.game_id = ? AND c.is_saved = 1
 	ORDER BY c.is_dead ASC, c.died_at DESC, c.updated_at DESC
 	`
 	rows, err := d.conn.Query(query, gameID)

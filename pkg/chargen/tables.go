@@ -119,11 +119,16 @@ var Classes = []ClassPreset{
 }
 
 var WeaponsList = []Weapon{
-	{Name: "Steelcutter chainsaw", Damage: "d8", Description: "Absolutely not made for combat. When hitting for maximum damage, it gets stuck for d3 rounds."},
-	{Name: "2 small SMGs", Damage: "d6a", Description: "Only autofire."},
-	{Name: "Heavy Pistol", Damage: "d6", Description: "Standard sidearm."},
-	{Name: "Monofilament Whip", Damage: "d8", Description: "Ignores 2 points of armor."},
-	{Name: "Smart Rifle", Damage: "d8", Description: "Targeting assistance."},
+	{Name: "Vibro-knife", Damage: "d4", Hands: "1h", Description: "Cuts through cheap locks easily."},
+	{Name: "Telescopic baton", Damage: "d6", Hands: "1h", Description: "Easily concealed."},
+	{Name: "Heavy Pistol", Damage: "d6", Hands: "1h", Description: "Standard sidearm."},
+	{Name: "Shotgun", Damage: "d8", Hands: "2h", Description: "Devastating at close range."},
+	{Name: "Assault Rifle", Damage: "d8", Hands: "2h", Description: "Military grade."},
+	{Name: "SMG", Damage: "d6a", Hands: "1h", Description: "Autofire capability."},
+	{Name: "Sniper Rifle", Damage: "d10", Hands: "2h", Description: "Includes targeting scope."},
+	{Name: "Steelcutter chainsaw", Damage: "d8", Hands: "2h", Description: "Absolutely not made for combat. Gets stuck for d3 rounds on max damage."},
+	{Name: "Monofilament Whip", Damage: "d8", Hands: "1h", Description: "Ignores 2 points of armor."},
+	{Name: "Heavy Machine Gun", Damage: "d10a", Hands: "2h", Description: "Requires high Strength or tripod to fire accurately."},
 }
 
 var ArmorList = []Armor{

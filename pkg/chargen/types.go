@@ -12,6 +12,7 @@ type Stat struct {
 type Weapon struct {
 	Name        string `json:"name"`
 	Damage      string `json:"damage"`
+	Hands       string `json:"hands,omitempty"`
 	Description string `json:"description,omitempty"`
 }
 
