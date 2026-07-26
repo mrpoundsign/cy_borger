@@ -46,6 +46,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("POST /game/create", s.handleCreateGame)
 	mux.HandleFunc("GET /game/{id}", s.handleViewGame)
+	mux.HandleFunc("GET /game/{id}/party", s.handleGameParty)
+	mux.HandleFunc("GET /game/{id}/logs", s.handleGetGameLogs)
 	mux.HandleFunc("POST /game/{id}/auth", s.handleAuthGame)
 
 	// WebSockets

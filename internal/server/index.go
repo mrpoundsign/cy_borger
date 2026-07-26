@@ -24,8 +24,17 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	var draftChars []chargen.Character
 
 	if user != nil {
-		myGames, _ = s.DB.GetGamesByOwner(user.ID)
-		allChars, _ := s.DB.GetCharactersByOwner(user.ID)
+		games, err := s.DB.GetGamesByOwner(user.ID)
+		if err != nil {
+			log.Printf("Failed to get games for user %s: %v", user.ID, err)
+		} else {
+			myGames = games
+		}
+		
+		allChars, err := s.DB.GetCharactersByOwner(user.ID)
+		if err != nil {
+			log.Printf("Failed to get characters for user %s: %v", user.ID, err)
+		}
 		for _, c := range allChars {
 			if c.IsSaved {
 				myChars = append(myChars, c)

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,20 @@ import (
 	"github.com/mrpoundsign/cy_borger/internal/ws"
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
 )
+
+func (s *Server) logAndBroadcastGameEvent(c *chargen.Character, eventType, message string) {
+	if err := s.DB.LogGameEvent(c.GameID, c.ID, eventType, message); err != nil {
+		log.Printf("Failed to log event: %v", err)
+	}
+	if c.GameID != "" {
+		charName := c.Name
+		if charName == "" {
+			charName = "[UNNAMED OPERATOR]"
+		}
+		msgB64 := base64.StdEncoding.EncodeToString([]byte(message))
+		ws.GlobalHub.Broadcast("game_"+c.GameID, fmt.Sprintf("log_entry:%s:%s:%s", eventType, charName, msgB64))
+	}
+}
 
 func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 	user := s.getUserFromSession(r)
@@ -66,7 +81,12 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 	var game *db.Game
 	isGM := false
 	if c.GameID != "" {
-		game, _ = s.DB.GetGame(c.GameID)
+		g, err := s.DB.GetGame(c.GameID)
+		if err != nil {
+			log.Printf("Failed to get game %s: %v", c.GameID, err)
+		} else {
+			game = g
+		}
 		if game != nil {
 			isGM = getCookie(r, "game_gm_"+game.ID) == game.GMCode
 			if !canEdit && isGM {
@@ -80,7 +100,12 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 	if game != nil {
 		activeGame = game
 	} else if lastInvite := getCookie(r, "last_game_invite"); lastInvite != "" {
-		activeGame, _ = s.DB.GetGameByInviteCode(lastInvite)
+		ag, err := s.DB.GetGameByInviteCode(lastInvite)
+		if err != nil {
+			log.Printf("Failed to get game by invite code %s: %v", lastInvite, err)
+		} else {
+			activeGame = ag
+		}
 	}
 
 	data := map[string]interface{}{
@@ -220,6 +245,7 @@ func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
+		s.logAndBroadcastGameEvent(c, "stats", "HP updated to "+strconv.Itoa(c.HP.Current)+"/"+strconv.Itoa(c.HP.Max))
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
@@ -254,6 +280,7 @@ func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
+		s.logAndBroadcastGameEvent(c, "stats", "Glitches updated to "+strconv.Itoa(c.Glitches.Current)+"/"+strconv.Itoa(c.Glitches.Max))
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
@@ -290,6 +317,7 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 
 		ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 		if c.GameID != "" {
+			s.logAndBroadcastGameEvent(c, "stats", "Stat "+statName+" updated to "+r.FormValue("value"))
 			ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 		}
 	}
@@ -478,6 +506,7 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
+		s.logAndBroadcastGameEvent(c, "stats", "Updated character details")
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
@@ -548,6 +577,7 @@ func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
+		s.logAndBroadcastGameEvent(c, "inventory", "Added to "+listType)
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
@@ -603,6 +633,7 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
+		s.logAndBroadcastGameEvent(c, "inventory", "Deleted item from "+listType)
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
@@ -663,11 +694,14 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
-	isOwner := sessionCode != "" && sessionCode == c.EditCode
+	user := s.getUserFromSession(r)
+	isOwner := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
 	isGM := false
 	if c.GameID != "" {
-		if g, _ := s.DB.GetGame(c.GameID); g != nil {
+		if g, err := s.DB.GetGame(c.GameID); err == nil && g != nil {
 			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
+		} else if err != nil {
+			log.Printf("Failed to get game %s: %v", c.GameID, err)
 		}
 	}
 
@@ -684,6 +718,8 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 	c.DeathNote = deathNote
 
+	s.logAndBroadcastGameEvent(c, "death", "has flatlined. "+deathNote)
+
 	ownerID := getCookie(r, "cy_user_id")
 	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
 		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
@@ -696,25 +732,11 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		referer := r.Header.Get("Referer")
-		if c.GameID != "" && strings.Contains(referer, "/game/") {
-			if g, _ := s.DB.GetGame(c.GameID); g != nil {
-				chars, _ := s.DB.GetCharactersForGame(g.ID)
-				isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
-				currentUserID := getCookie(r, "cy_user_id")
-				data := map[string]interface{}{
-					"Game":          g,
-					"Characters":    chars,
-					"IsGM":          isGM,
-					"CurrentUserID": currentUserID,
-				}
-				if err := s.Templates.ExecuteTemplate(w, "game.html", data); err != nil {
-					log.Printf("Template execution error (game.html): %v", err)
-				}
-				return
-			}
+		if r.Header.Get("HX-Target") == "character-sheet-container" {
+			s.renderCharacterViewWithChar(w, r, c)
+			return
 		}
-		s.renderCharacterViewWithChar(w, r, c)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
@@ -735,11 +757,14 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
-	isOwner := sessionCode != "" && sessionCode == c.EditCode
+	user := s.getUserFromSession(r)
+	isOwner := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
 	isGM := false
 	if c.GameID != "" {
-		if g, _ := s.DB.GetGame(c.GameID); g != nil {
+		if g, err := s.DB.GetGame(c.GameID); err == nil && g != nil {
 			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
+		} else if err != nil {
+			log.Printf("Failed to get game %s: %v", c.GameID, err)
 		}
 	}
 
@@ -750,6 +775,9 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 
 	c.IsDead = false
 	c.DiedAt = time.Time{}
+	c.DeathNote = ""
+
+	s.logAndBroadcastGameEvent(c, "death", "was revived from the dead.")
 
 	ownerID := getCookie(r, "cy_user_id")
 	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
@@ -763,25 +791,11 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		referer := r.Header.Get("Referer")
-		if c.GameID != "" && strings.Contains(referer, "/game/") {
-			if g, _ := s.DB.GetGame(c.GameID); g != nil {
-				chars, _ := s.DB.GetCharactersForGame(g.ID)
-				isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
-				currentUserID := getCookie(r, "cy_user_id")
-				data := map[string]interface{}{
-					"Game":          g,
-					"Characters":    chars,
-					"IsGM":          isGM,
-					"CurrentUserID": currentUserID,
-				}
-				if err := s.Templates.ExecuteTemplate(w, "game.html", data); err != nil {
-					log.Printf("Template execution error (game.html): %v", err)
-				}
-				return
-			}
+		if r.Header.Get("HX-Target") == "character-sheet-container" {
+			s.renderCharacterViewWithChar(w, r, c)
+			return
 		}
-		s.renderCharacterViewWithChar(w, r, c)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
