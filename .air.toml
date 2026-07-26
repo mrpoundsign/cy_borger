@@ -5,10 +5,10 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main main.go"
+  cmd = "go build -o ./tmp/main cmd/cy_borger/main.go"
   delay = 1000
-  exclude_dir = ["tmp", "vendor", "testdata", "node_modules"]
-  exclude_file = ["test_inject.js", "test_character_edit.js", "test_character_delete.js", "test_character_graveyard.js", "test_auth.js", "playwright.config.js", "package.json", "package-lock.json"]
+  exclude_dir = ["tests", "tmp", "vendor", "testdata", "node_modules"]
+  exclude_file = ["playwright.config.js", "package.json", "package-lock.json"]
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
   follow_symlink = false

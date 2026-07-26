@@ -46,6 +46,11 @@ test.describe('INSPECT SHEET modal injection', () => {
         await page.waitForLoadState('networkidle');
         await page.waitForTimeout(500);
 
+        console.log("Game URL:", gameUrl);
+        console.log("Char URL:", charUrl);
+        const html = await page.content();
+        console.log("Page HTML:", html);
+        
         // Party grid shows character card
         await expect(page.locator('.char-card')).toHaveCount(1, { timeout: 5000 });
 

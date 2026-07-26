@@ -1,293 +1,19 @@
-package main
+package server
 
 import (
-	"embed"
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/mrpoundsign/cy_borger/chargen"
-	"github.com/mrpoundsign/cy_borger/db"
-	"github.com/mrpoundsign/cy_borger/ws"
+	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/internal/ws"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
 )
 
-//go:embed templates/*
-var templateFS embed.FS
-
-var (
-	database  *db.DB
-	templates *template.Template
-)
-
-func main() {
-	var err error
-	database, err = db.InitDB("./cy_borger.db")
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
-	}
-
-	templates, err = template.ParseFS(templateFS, "templates/*.html", "templates/*.tmpl")
-	if err != nil {
-		log.Fatalf("Failed to parse templates: %v", err)
-	}
-
-	mux := http.NewServeMux()
-
-	// Routes
-	mux.HandleFunc("GET /", handleIndex)
-	mux.HandleFunc("POST /auth/register", handleRegister)
-	mux.HandleFunc("POST /auth/login", handleLogin)
-	mux.HandleFunc("POST /auth/logout", handleLogout)
-	mux.HandleFunc("POST /user/update", handleUpdateUser)
-	mux.HandleFunc("POST /character/generate", handleGenerateCharacter)
-	mux.HandleFunc("POST /character/create_blank", handleCreateBlankCharacter)
-	mux.HandleFunc("GET /character/{id}", handleViewCharacter)
-	mux.HandleFunc("POST /character/{id}/auth", handleAuthCharacter)
-	mux.HandleFunc("POST /character/{id}/join", handleJoinGame)
-	mux.HandleFunc("POST /character/{id}/keep", handleKeepCharacter)
-	mux.HandleFunc("PUT /character/{id}/update_hp", handleUpdateHP)
-	mux.HandleFunc("PUT /character/{id}/update_glitches", handleUpdateGlitches)
-	mux.HandleFunc("PUT /character/{id}/update_stat", handleUpdateStat)
-	mux.HandleFunc("PUT /character/{id}/update_field", handleUpdateField)
-	mux.HandleFunc("POST /character/{id}/update_field", handleUpdateField)
-	mux.HandleFunc("POST /character/{id}/add_item", handleAddListItem)
-	mux.HandleFunc("POST /character/{id}/delete_item", handleDeleteListItem)
-	mux.HandleFunc("POST /character/{id}/delete", handleDeleteCharacter)
-	mux.HandleFunc("POST /character/{id}/kill", handleKillCharacter)
-	mux.HandleFunc("POST /character/{id}/revive", handleReviveCharacter)
-
-	mux.HandleFunc("POST /game/create", handleCreateGame)
-	mux.HandleFunc("GET /game/{id}", handleViewGame)
-	mux.HandleFunc("POST /game/{id}/auth", handleAuthGame)
-
-	// Static Files & Favicon
-	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/favicon.svg")
-	})
-	mux.HandleFunc("GET /favicon.png", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/favicon.svg")
-	})
-	mux.HandleFunc("GET /favicon.svg", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/favicon.svg")
-	})
-
-	// WebSockets (Go stdlib http.Hijacker)
-	mux.HandleFunc("GET /ws/game/{id}", handleWSGame)
-	mux.HandleFunc("GET /ws/character/{id}", handleWSCharacter)
-
-	server := &http.Server{
-		Addr:         ":8080",
-		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
-
-	fmt.Println("⚡ CY_BORGER Character Generator running on http://localhost:8080")
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("Server stopped: %v", err)
-	}
-}
-
-// Helpers for Session Cookies
-func setCookie(w http.ResponseWriter, name, value string) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     name,
-		Value:    value,
-		Path:     "/",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	})
-}
-
-func getCookie(r *http.Request, name string) string {
-	cookie, err := r.Cookie(name)
-	if err != nil {
-		return ""
-	}
-	return cookie.Value
-}
-
-func getUserFromSession(r *http.Request) *db.User {
-	cookie, err := r.Cookie("cy_user_id")
-	if err != nil || cookie.Value == "" {
-		return nil
-	}
-	u, err := database.GetUser(cookie.Value)
-	if err != nil || u == nil {
-		return nil
-	}
-	return u
-}
-
-// Handlers
-func handleIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
-	user := getUserFromSession(r)
-
-	var myGames []db.Game
-	var myChars []chargen.Character
-	var draftChars []chargen.Character
-
-	if user != nil {
-		myGames, _ = database.GetGamesByOwner(user.ID)
-		allChars, _ := database.GetCharactersByOwner(user.ID)
-		for _, c := range allChars {
-			if c.IsSaved {
-				myChars = append(myChars, c)
-			} else {
-				draftChars = append(draftChars, c)
-			}
-		}
-	}
-
-	data := map[string]interface{}{
-		"User":            user,
-		"MyGames":         myGames,
-		"MyCharacters":    myChars,
-		"DraftCharacters": draftChars,
-	}
-
-	_ = templates.ExecuteTemplate(w, "index.html", data)
-}
-
-func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
-	user := getUserFromSession(r)
-	if user == nil {
-		http.Error(w, "Authentication required.", http.StatusUnauthorized)
-		return
-	}
-
-	handle := strings.TrimSpace(r.FormValue("handle"))
-	if handle == "" {
-		handle = strings.TrimSpace(r.FormValue("username"))
-	}
-	if handle == "" {
-		http.Error(w, "Handle required", http.StatusBadRequest)
-		return
-	}
-
-	// Format validation for handle
-	matched, err := regexp.MatchString(`^[^\s#]+#\d{4}$`, handle)
-	if err != nil || !matched {
-		hashIndex := strings.Index(handle, "#")
-		baseName := handle
-		if hashIndex != -1 {
-			baseName = strings.TrimSpace(handle[:hashIndex])
-		}
-		if baseName == "" || strings.Contains(baseName, " ") {
-			http.Error(w, "Invalid Operator handle format. No spaces allowed.", http.StatusBadRequest)
-			return
-		}
-		num := (time.Now().UnixNano() % 9000) + 1000
-		handle = fmt.Sprintf("%s#%04d", baseName, num)
-	}
-
-	user.Handle = handle
-	if err := database.SaveUser(user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	setCookie(w, "cy_username", user.Handle)
-	w.WriteHeader(http.StatusOK)
-}
-
-func handleRegister(w http.ResponseWriter, r *http.Request) {
-	username := strings.TrimSpace(r.FormValue("username"))
-	password := strings.TrimSpace(r.FormValue("password"))
-
-	if username == "" || password == "" {
-		http.Error(w, "Login username and password required.", http.StatusBadRequest)
-		return
-	}
-
-	if strings.Contains(username, " ") {
-		http.Error(w, "Username cannot contain spaces.", http.StatusBadRequest)
-		return
-	}
-
-	u, err := database.CreateUserAccount(username, password)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	setCookie(w, "cy_user_id", u.ID)
-	setCookie(w, "cy_username", u.Handle)
-
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func handleLogin(w http.ResponseWriter, r *http.Request) {
-	username := strings.TrimSpace(r.FormValue("username"))
-	password := strings.TrimSpace(r.FormValue("password"))
-
-	if username == "" || password == "" {
-		http.Error(w, "Username and password required.", http.StatusBadRequest)
-		return
-	}
-
-	u, err := database.AuthenticateUser(username, password)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	setCookie(w, "cy_user_id", u.ID)
-	setCookie(w, "cy_username", u.Handle)
-
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func handleLogout(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     "cy_user_id",
-		Value:    "",
-		Path:     "/",
-		MaxAge:   -1,
-		HttpOnly: true,
-	})
-	http.SetCookie(w, &http.Cookie{
-		Name:     "cy_username",
-		Value:    "",
-		Path:     "/",
-		MaxAge:   -1,
-		HttpOnly: true,
-	})
-
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
-	user := getUserFromSession(r)
+func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
+	user := s.getUserFromSession(r)
 	if user == nil {
 		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
 		return
@@ -306,7 +32,7 @@ func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 		c.IsSaved = true
 	}
 
-	if err := database.SaveCharacter(&c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(&c, ownerID); err != nil {
 		http.Error(w, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
@@ -317,22 +43,22 @@ func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 	// If HTMX request, render the character template directly with HX-Push-Url header!
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
-		renderCharacterViewWithChar(w, r, &c)
+		s.renderCharacterViewWithChar(w, r, &c)
 		return
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *chargen.Character) {
-	user := getUserFromSession(r)
+func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *chargen.Character) {
+	user := s.getUserFromSession(r)
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
 	canEdit := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
 
 	var game *db.Game
 	isGM := false
 	if c.GameID != "" {
-		game, _ = database.GetGame(c.GameID)
+		game, _ = s.DB.GetGame(c.GameID)
 		if game != nil {
 			isGM = getCookie(r, "game_gm_"+game.ID) == game.GMCode
 			if !canEdit && isGM {
@@ -346,7 +72,7 @@ func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *char
 	if game != nil {
 		activeGame = game
 	} else if lastInvite := getCookie(r, "last_game_invite"); lastInvite != "" {
-		activeGame, _ = database.GetGameByInviteCode(lastInvite)
+		activeGame, _ = s.DB.GetGameByInviteCode(lastInvite)
 	}
 
 	data := map[string]interface{}{
@@ -360,14 +86,14 @@ func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *char
 
 	// Render in modal if requested
 	if r.URL.Query().Get("modal") == "true" {
-		_ = templates.ExecuteTemplate(w, "character_modal.html", data)
+		_ = s.Templates.ExecuteTemplate(w, "character_modal.html", data)
 		return
 	}
 
-	_ = templates.ExecuteTemplate(w, "character.html", data)
+	_ = s.Templates.ExecuteTemplate(w, "character.html", data)
 }
 
-func handleViewCharacter(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if code := r.URL.Query().Get("code"); code != "" {
 		// Set cookie & redirect to clean URL
@@ -376,7 +102,7 @@ func handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.NotFound(w, r)
 		return
@@ -399,14 +125,14 @@ func handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	renderCharacterViewWithChar(w, r, c)
+	s.renderCharacterViewWithChar(w, r, c)
 }
 
-func handleAuthCharacter(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleAuthCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	editCode := r.FormValue("edit_code")
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err == nil && c != nil && c.EditCode == editCode {
 		setCookie(w, "char_edit_"+id, editCode)
 	}
@@ -414,17 +140,17 @@ func handleAuthCharacter(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/character/"+id, http.StatusSeeOther)
 }
 
-func handleJoinGame(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	inviteCode := r.FormValue("invite_code")
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	g, err := database.GetGameByInviteCode(inviteCode)
+	g, err := s.DB.GetGameByInviteCode(inviteCode)
 	if err != nil || g == nil {
 		http.Redirect(w, r, "/character/"+id+"?error=invalid_invite", http.StatusSeeOther)
 		return
@@ -433,7 +159,7 @@ func handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	c.GameID = g.ID
 	ownerID := getCookie(r, "cy_user_id")
 
-	_ = database.SaveCharacter(c, ownerID)
+	_ = s.DB.SaveCharacter(c, ownerID)
 
 	setCookie(w, "last_game_invite", g.InviteCode)
 
@@ -444,12 +170,12 @@ func handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
 }
 
-func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	currStr := r.FormValue("hp_current")
 	maxStr := r.FormValue("hp_max")
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -463,7 +189,7 @@ func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = database.SaveCharacter(c, ownerID)
+	_ = s.DB.SaveCharacter(c, ownerID)
 
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
@@ -474,12 +200,12 @@ func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	currStr := r.FormValue("glitches_current")
 	maxStr := r.FormValue("glitches_max")
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -493,7 +219,7 @@ func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = database.SaveCharacter(c, ownerID)
+	_ = s.DB.SaveCharacter(c, ownerID)
 
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
@@ -504,13 +230,13 @@ func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	statName := r.FormValue("stat_name")
 	currStr := r.FormValue("stat_current")
 	maxStr := r.FormValue("stat_max")
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -526,7 +252,7 @@ func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 		c.Abilities[statName] = stat
 
 		ownerID := getCookie(r, "cy_user_id")
-		_ = database.SaveCharacter(c, ownerID)
+		_ = s.DB.SaveCharacter(c, ownerID)
 
 		ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 		if c.GameID != "" {
@@ -537,117 +263,8 @@ func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func handleCreateGame(w http.ResponseWriter, r *http.Request) {
-	user := getUserFromSession(r)
-	if user == nil {
-		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
-		return
-	}
-
-	name := r.FormValue("name")
-	if name == "" {
-		name = "Unnamed Campaign"
-	}
-
-	ownerID := user.ID
-
-	g, err := database.CreateGame(name, ownerID)
-	if err != nil {
-		http.Error(w, "Failed to create game", http.StatusInternalServerError)
-		return
-	}
-
-	setCookie(w, "game_gm_"+g.ID, g.GMCode)
-	setCookie(w, "last_game_invite", g.InviteCode)
-
-	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
-}
-
-func handleViewGame(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	if gmCode := r.URL.Query().Get("gm_code"); gmCode != "" {
-		setCookie(w, "game_gm_"+id, gmCode)
-		http.Redirect(w, r, "/game/"+id, http.StatusSeeOther)
-		return
-	}
-
-	g, err := database.GetGame(id)
-	if err != nil || g == nil {
-		http.NotFound(w, r)
-		return
-	}
-
-	chars, _ := database.GetCharactersForGame(g.ID)
-
-	// Compute latest update timestamp among game and its characters
-	latestUpdate := g.UpdatedAt
-	for _, c := range chars {
-		if c.UpdatedAt.After(latestUpdate) {
-			latestUpdate = c.UpdatedAt
-		}
-	}
-
-	// HTTP Caching Headers
-	w.Header().Set("Cache-Control", "no-cache, must-revalidate")
-	w.Header().Set("Vary", "HX-Request, Accept")
-	w.Header().Set("Last-Modified", latestUpdate.UTC().Format(http.TimeFormat))
-
-	// Check If-Modified-Since header (HTTP Caching)
-	if r.Header.Get("HX-Request") != "true" {
-		if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
-			if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
-				if !latestUpdate.Truncate(time.Second).After(t) {
-					w.WriteHeader(http.StatusNotModified)
-					return
-				}
-			}
-		}
-	}
-
-	user := getUserFromSession(r)
-	isGM := (getCookie(r, "game_gm_"+g.ID) == g.GMCode) || (user != nil && user.ID != "" && g.OwnerID == user.ID)
-
-	currentUserID := getCookie(r, "cy_user_id")
-	if currentUserID == "" && user != nil {
-		currentUserID = user.ID
-	}
-
-	data := map[string]interface{}{
-		"Game":          g,
-		"Characters":    chars,
-		"IsGM":          isGM,
-		"CurrentUserID": currentUserID,
-	}
-
-	_ = templates.ExecuteTemplate(w, "game.html", data)
-}
-
-func handleAuthGame(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	gmCode := r.FormValue("gm_code")
-
-	g, err := database.GetGame(id)
-	if err == nil && g != nil && g.GMCode == gmCode {
-		setCookie(w, "game_gm_"+id, gmCode)
-		setCookie(w, "last_game_invite", g.InviteCode)
-	}
-
-	http.Redirect(w, r, "/game/"+id, http.StatusSeeOther)
-}
-
-// WebSocket Handlers
-func handleWSGame(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	ws.ServeWS(w, r, "game_"+id)
-}
-
-func handleWSCharacter(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	ws.ServeWS(w, r, "char_"+id)
-}
-
-func handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
-	user := getUserFromSession(r)
+func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
+	user := s.getUserFromSession(r)
 	if user == nil {
 		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
 		return
@@ -660,7 +277,7 @@ func handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
 		c.Handle = user.Handle
 	}
 
-	if err := database.SaveCharacter(&c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(&c, ownerID); err != nil {
 		http.Error(w, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
@@ -669,16 +286,16 @@ func handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
 
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
-		renderCharacterViewWithChar(w, r, &c)
+		s.renderCharacterViewWithChar(w, r, &c)
 		return
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -686,7 +303,7 @@ func handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 
 	c.IsSaved = true
 	ownerID := getCookie(r, "cy_user_id")
-	_ = database.SaveCharacter(c, ownerID)
+	_ = s.DB.SaveCharacter(c, ownerID)
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
@@ -694,16 +311,16 @@ func handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		renderCharacterViewWithChar(w, r, c)
+		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func handleUpdateField(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -795,7 +412,7 @@ func handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	if err := database.SaveCharacter(c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
 		http.Error(w, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
@@ -806,18 +423,18 @@ func handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		renderCharacterViewWithChar(w, r, c)
+		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 }
 
-func handleAddListItem(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	listType := r.FormValue("type")
 
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -864,7 +481,7 @@ func handleAddListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = database.SaveCharacter(c, ownerID)
+	_ = s.DB.SaveCharacter(c, ownerID)
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
@@ -872,20 +489,20 @@ func handleAddListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		renderCharacterViewWithChar(w, r, c)
+		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	listType := r.FormValue("type")
 	indexStr := r.FormValue("index")
 	idx, err := strconv.Atoi(indexStr)
 
-	c, getErr := database.GetCharacter(id)
+	c, getErr := s.DB.GetCharacter(id)
 	if getErr != nil || c == nil || err != nil || idx < 0 {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
@@ -915,7 +532,7 @@ func handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = database.SaveCharacter(c, ownerID)
+	_ = s.DB.SaveCharacter(c, ownerID)
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
@@ -923,16 +540,16 @@ func handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		renderCharacterViewWithChar(w, r, c)
+		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Character not found", http.StatusNotFound)
 		return
@@ -951,7 +568,7 @@ func handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := database.DeleteCharacter(id); err != nil {
+	if err := s.DB.DeleteCharacter(id); err != nil {
 		http.Error(w, "Failed to delete character", http.StatusInternalServerError)
 		return
 	}
@@ -970,9 +587,9 @@ func handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Character not found", http.StatusNotFound)
 		return
@@ -982,7 +599,7 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	isOwner := sessionCode != "" && sessionCode == c.EditCode
 	isGM := false
 	if c.GameID != "" {
-		if g, _ := database.GetGame(c.GameID); g != nil {
+		if g, _ := s.DB.GetGame(c.GameID); g != nil {
 			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
 		}
 	}
@@ -1001,7 +618,7 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	c.DeathNote = deathNote
 
 	ownerID := getCookie(r, "cy_user_id")
-	if err := database.SaveCharacter(c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
 		http.Error(w, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
@@ -1014,8 +631,8 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("HX-Request") == "true" {
 		referer := r.Header.Get("Referer")
 		if c.GameID != "" && strings.Contains(referer, "/game/") {
-			if g, _ := database.GetGame(c.GameID); g != nil {
-				chars, _ := database.GetCharactersForGame(g.ID)
+			if g, _ := s.DB.GetGame(c.GameID); g != nil {
+				chars, _ := s.DB.GetCharactersForGame(g.ID)
 				isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
 				currentUserID := getCookie(r, "cy_user_id")
 				data := map[string]interface{}{
@@ -1024,11 +641,11 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 					"IsGM":          isGM,
 					"CurrentUserID": currentUserID,
 				}
-				_ = templates.ExecuteTemplate(w, "game.html", data)
+				_ = s.Templates.ExecuteTemplate(w, "game.html", data)
 				return
 			}
 		}
-		renderCharacterViewWithChar(w, r, c)
+		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
 
@@ -1040,9 +657,9 @@ func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	c, err := database.GetCharacter(id)
+	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Character not found", http.StatusNotFound)
 		return
@@ -1052,7 +669,7 @@ func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	isOwner := sessionCode != "" && sessionCode == c.EditCode
 	isGM := false
 	if c.GameID != "" {
-		if g, _ := database.GetGame(c.GameID); g != nil {
+		if g, _ := s.DB.GetGame(c.GameID); g != nil {
 			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
 		}
 	}
@@ -1066,7 +683,7 @@ func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	c.DiedAt = time.Time{}
 
 	ownerID := getCookie(r, "cy_user_id")
-	if err := database.SaveCharacter(c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
 		http.Error(w, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
@@ -1079,8 +696,8 @@ func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("HX-Request") == "true" {
 		referer := r.Header.Get("Referer")
 		if c.GameID != "" && strings.Contains(referer, "/game/") {
-			if g, _ := database.GetGame(c.GameID); g != nil {
-				chars, _ := database.GetCharactersForGame(g.ID)
+			if g, _ := s.DB.GetGame(c.GameID); g != nil {
+				chars, _ := s.DB.GetCharactersForGame(g.ID)
 				isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
 				currentUserID := getCookie(r, "cy_user_id")
 				data := map[string]interface{}{
@@ -1089,11 +706,11 @@ func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 					"IsGM":          isGM,
 					"CurrentUserID": currentUserID,
 				}
-				_ = templates.ExecuteTemplate(w, "game.html", data)
+				_ = s.Templates.ExecuteTemplate(w, "game.html", data)
 				return
 			}
 		}
-		renderCharacterViewWithChar(w, r, c)
+		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
 

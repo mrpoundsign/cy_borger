@@ -14,7 +14,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/mrpoundsign/cy_borger/chargen"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
 	_ "modernc.org/sqlite"
 )
 

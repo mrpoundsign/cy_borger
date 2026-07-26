@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mrpoundsign/cy_borger/chargen"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
 )
 
 func TestDB(t *testing.T) {

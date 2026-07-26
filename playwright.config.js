@@ -11,5 +11,6 @@ module.exports = defineConfig({
         baseURL: process.env.BASE_URL || 'http://localhost:8080',
         headless: true,
     },
+    globalSetup: require.resolve('./tests/global-setup.js'),
     reporter: 'list',
 });
