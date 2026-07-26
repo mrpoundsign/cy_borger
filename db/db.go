@@ -132,13 +132,13 @@ func (d *DB) SaveCharacter(c *chargen.Character, ownerID string) error {
 }
 
 func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
-	query := `SELECT game_id, is_saved, data_json, updated_at FROM characters WHERE id = ?`
+	query := `SELECT owner_id, game_id, is_saved, data_json, updated_at FROM characters WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
-	var gameID, dataStr string
+	var ownerID, gameID, dataStr string
 	var isSavedInt int
 	var updatedAt time.Time
-	if err := row.Scan(&gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
+	if err := row.Scan(&ownerID, &gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -149,6 +149,7 @@ func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
 	if err := json.Unmarshal([]byte(dataStr), &c); err != nil {
 		return nil, err
 	}
+	c.OwnerID = ownerID
 	c.GameID = gameID
 	c.IsSaved = isSavedInt == 1 || c.IsSaved
 	c.UpdatedAt = updatedAt
@@ -206,7 +207,7 @@ func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
 }
 
 func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
-	query := `SELECT game_id, is_saved, data_json, updated_at FROM characters WHERE game_id = ?`
+	query := `SELECT owner_id, game_id, is_saved, data_json, updated_at FROM characters WHERE game_id = ? ORDER BY updated_at DESC`
 	rows, err := d.conn.Query(query, gameID)
 	if err != nil {
 		return nil, err
@@ -215,14 +216,15 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 
 	var chars []chargen.Character
 	for rows.Next() {
-		var gameID, dataStr string
+		var ownerID, gameID, dataStr string
 		var isSavedInt int
 		var updatedAt time.Time
-		if err := rows.Scan(&gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&ownerID, &gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
+			c.OwnerID = ownerID
 			c.GameID = gameID
 			c.IsSaved = isSavedInt == 1 || c.IsSaved
 			c.UpdatedAt = updatedAt

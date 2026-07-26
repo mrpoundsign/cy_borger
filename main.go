@@ -481,10 +481,13 @@ func handleViewGame(w http.ResponseWriter, r *http.Request) {
 
 	isGM := getCookie(r, "game_gm_"+g.ID) == g.GMCode
 
+	currentUserID := getCookie(r, "cy_user_id")
+
 	data := map[string]interface{}{
-		"Game":       g,
-		"Characters": chars,
-		"IsGM":       isGM,
+		"Game":          g,
+		"Characters":    chars,
+		"IsGM":          isGM,
+		"CurrentUserID": currentUserID,
 	}
 
 	_ = templates.ExecuteTemplate(w, "game.html", data)
