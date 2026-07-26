@@ -556,45 +556,94 @@ func handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 
 func handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	field := r.FormValue("field")
-	value := r.FormValue("value")
-
 	c, err := database.GetCharacter(id)
 	if err != nil || c == nil {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
 	}
 
-	switch field {
-	case "name":
-		c.Name = value
-	case "handle":
-		c.Handle = value
-	case "style":
-		c.Style = value
-	case "feature":
-		c.Feature = value
-	case "quirk":
-		c.Quirk = value
-	case "obsession":
-		c.Obsession = value
-	case "want":
-		c.Want = value
-	case "debt":
-		c.Debt = value
-	case "class_name":
-		c.Class.Name = value
-	case "class_glitch":
-		c.Class.Glitch = value
-	case "class_description":
-		c.Class.Description = value
-	case "class_origin":
-		c.Class.Origin = value
-	case "class_gift":
-		c.Class.Gift = value
-	case "creds":
-		if val, err := strconv.Atoi(value); err == nil {
-			c.Creds = val
+	_ = r.ParseForm()
+
+	// Handle section multi-field form updates
+	if r.Form.Has("name") {
+		c.Name = r.FormValue("name")
+	}
+	if r.Form.Has("handle") {
+		c.Handle = r.FormValue("handle")
+	}
+	if r.Form.Has("style") {
+		c.Style = r.FormValue("style")
+	}
+	if r.Form.Has("feature") {
+		c.Feature = r.FormValue("feature")
+	}
+	if r.Form.Has("want") {
+		c.Want = r.FormValue("want")
+	}
+	if r.Form.Has("quirk") {
+		c.Quirk = r.FormValue("quirk")
+	}
+	if r.Form.Has("obsession") {
+		c.Obsession = r.FormValue("obsession")
+	}
+	if r.Form.Has("debt") {
+		c.Debt = r.FormValue("debt")
+	}
+	if r.Form.Has("class_name") {
+		c.Class.Name = r.FormValue("class_name")
+	}
+	if r.Form.Has("class_glitch") {
+		c.Class.Glitch = r.FormValue("class_glitch")
+	}
+	if r.Form.Has("class_description") {
+		c.Class.Description = r.FormValue("class_description")
+	}
+	if r.Form.Has("class_origin") {
+		c.Class.Origin = r.FormValue("class_origin")
+	}
+	if r.Form.Has("class_gift") {
+		c.Class.Gift = r.FormValue("class_gift")
+	}
+	if r.Form.Has("creds") {
+		if num, err := strconv.Atoi(r.FormValue("creds")); err == nil {
+			c.Creds = num
+		}
+	}
+
+	// Single field legacy fallback
+	if field := r.FormValue("field"); field != "" {
+		val := r.FormValue("value")
+		switch field {
+		case "name":
+			c.Name = val
+		case "handle":
+			c.Handle = val
+		case "style":
+			c.Style = val
+		case "feature":
+			c.Feature = val
+		case "quirk":
+			c.Quirk = val
+		case "obsession":
+			c.Obsession = val
+		case "want":
+			c.Want = val
+		case "debt":
+			c.Debt = val
+		case "class_name":
+			c.Class.Name = val
+		case "class_glitch":
+			c.Class.Glitch = val
+		case "class_description":
+			c.Class.Description = val
+		case "class_origin":
+			c.Class.Origin = val
+		case "class_gift":
+			c.Class.Gift = val
+		case "creds":
+			if num, err := strconv.Atoi(val); err == nil {
+				c.Creds = num
+			}
 		}
 	}
 
@@ -604,6 +653,11 @@ func handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderCharacterViewWithChar(w, r, c)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

@@ -73,8 +73,11 @@
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/character/{{.Character.ID}}');
             socket.onmessage = function(e) {
-                // Ignore self updates if user is currently typing inside an active input
-                if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+                // Ignore self updates if user is currently typing inside an active input/textarea or editing a section
+                if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+                    return;
+                }
+                if (document.querySelector('[id$="-edit"]:not([style*="display: none"])')) {
                     return;
                 }
                 if (typeof htmx !== 'undefined') {
