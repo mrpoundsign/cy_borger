@@ -1,7 +1,7 @@
 local/
 *.db
 tmp/
-cy_borger
+/cy_borger
 build-errors.log
 node_modules/
 playwright-report/
