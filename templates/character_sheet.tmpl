@@ -405,10 +405,12 @@
 function toggleEditSection(sectionId) {
     const editEl = document.getElementById(sectionId + '-edit');
     const viewEl = document.getElementById(sectionId + '-view');
-    if (editEl && viewEl) {
+    if (editEl) {
         const isHidden = editEl.style.display === 'none';
         editEl.style.display = isHidden ? 'block' : 'none';
-        viewEl.style.display = isHidden ? 'none' : 'block';
+        if (viewEl) {
+            viewEl.style.display = isHidden ? 'none' : 'block';
+        }
     }
 }
 </script>
