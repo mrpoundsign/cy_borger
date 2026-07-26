@@ -80,6 +80,9 @@ test.describe('Character editing & Draft/Keep workflow', () => {
     });
 
     test('add and delete weapon items', async ({ page }) => {
+        // Accept confirm dialogs automatically
+        page.on('dialog', dialog => dialog.accept());
+
         await page.goto(BASE_URL + '/');
         await page.waitForLoadState('networkidle');
 
