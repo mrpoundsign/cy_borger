@@ -4,7 +4,7 @@
   "description": "CY_BORG character sheet — Playwright tests",
   "scripts": {
     "test": "npx playwright test",
-    "test:inject": "npx playwright test test_inject.js"
+    "test:inject": "npx playwright test tests/test_inject.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.0"
