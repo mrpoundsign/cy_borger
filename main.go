@@ -63,10 +63,10 @@ func main() {
 	// Static Files & Favicon
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/favicon.png")
+		http.ServeFile(w, r, "static/favicon.svg")
 	})
 	mux.HandleFunc("GET /favicon.png", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/favicon.png")
+		http.ServeFile(w, r, "static/favicon.svg")
 	})
 	mux.HandleFunc("GET /favicon.svg", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/favicon.svg")
