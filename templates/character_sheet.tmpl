@@ -184,6 +184,16 @@
         font-family: inherit;
         font-size: 0.95rem;
         margin-bottom: 5px;
+        box-sizing: border-box;
+    }
+
+    textarea.edit-input {
+        width: 100%;
+        min-height: 42px;
+        resize: vertical;
+        overflow-y: hidden;
+        line-height: 1.4;
+        font-size: 0.95rem;
     }
 
     .editable-field {
@@ -405,7 +415,7 @@
     </div>
 </div>
 
-<!-- Edit Form Toggle Script -->
+<!-- Edit Form Toggle & Auto-Stretch Script -->
 <script>
 function toggleEditSection(sectionId) {
     const editEl = document.getElementById(sectionId + '-edit');
@@ -416,8 +426,22 @@ function toggleEditSection(sectionId) {
         if (viewEl) {
             viewEl.style.display = isHidden ? 'none' : 'block';
         }
+        if (isHidden) {
+            editEl.querySelectorAll('textarea.auto-stretch').forEach(autoResizeTextarea);
+        }
     }
 }
+
+function autoResizeTextarea(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.max(el.scrollHeight + 4, 42) + 'px';
+}
+
+document.addEventListener("input", function(e) {
+    if (e.target.tagName === 'TEXTAREA' && e.target.classList.contains('auto-stretch')) {
+        autoResizeTextarea(e.target);
+    }
+});
 </script>
 
 <!-- 2x2 Grid Layout -->
@@ -471,60 +495,60 @@ function toggleEditSection(sectionId) {
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
                 <div>
                     <label style="font-size:0.75rem; color:#aaa; display:block;">STYLE</label>
-                    <input type="text" value="{{.Character.Style}}" class="edit-input" style="width:100%;"
-                           hx-put="/character/{{.Character.ID}}/update_field"
-                           hx-trigger="change, input delay:400ms"
-                           name="value"
-                           hx-vals='{"field": "style"}'
-                           hx-swap="none">
+                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                              hx-put="/character/{{.Character.ID}}/update_field"
+                              hx-trigger="change, input delay:400ms"
+                              name="value"
+                              hx-vals='{"field": "style"}'
+                              hx-swap="none">{{.Character.Style}}</textarea>
                 </div>
                 <div>
                     <label style="font-size:0.75rem; color:#aaa; display:block;">FEATURE</label>
-                    <input type="text" value="{{.Character.Feature}}" class="edit-input" style="width:100%;"
-                           hx-put="/character/{{.Character.ID}}/update_field"
-                           hx-trigger="change, input delay:400ms"
-                           name="value"
-                           hx-vals='{"field": "feature"}'
-                           hx-swap="none">
+                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                              hx-put="/character/{{.Character.ID}}/update_field"
+                              hx-trigger="change, input delay:400ms"
+                              name="value"
+                              hx-vals='{"field": "feature"}'
+                              hx-swap="none">{{.Character.Feature}}</textarea>
                 </div>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
                 <div>
                     <label style="font-size:0.75rem; color:#aaa; display:block;">WANT</label>
-                    <input type="text" value="{{.Character.Want}}" class="edit-input" style="width:100%;"
-                           hx-put="/character/{{.Character.ID}}/update_field"
-                           hx-trigger="change, input delay:400ms"
-                           name="value"
-                           hx-vals='{"field": "want"}'
-                           hx-swap="none">
+                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                              hx-put="/character/{{.Character.ID}}/update_field"
+                              hx-trigger="change, input delay:400ms"
+                              name="value"
+                              hx-vals='{"field": "want"}'
+                              hx-swap="none">{{.Character.Want}}</textarea>
                 </div>
                 <div>
                     <label style="font-size:0.75rem; color:#aaa; display:block;">QUIRK</label>
-                    <input type="text" value="{{.Character.Quirk}}" class="edit-input" style="width:100%;"
-                           hx-put="/character/{{.Character.ID}}/update_field"
-                           hx-trigger="change, input delay:400ms"
-                           name="value"
-                           hx-vals='{"field": "quirk"}'
-                           hx-swap="none">
+                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                              hx-put="/character/{{.Character.ID}}/update_field"
+                              hx-trigger="change, input delay:400ms"
+                              name="value"
+                              hx-vals='{"field": "quirk"}'
+                              hx-swap="none">{{.Character.Quirk}}</textarea>
                 </div>
             </div>
             <div style="margin-bottom:8px;">
                 <label style="font-size:0.75rem; color:#aaa; display:block;">OBSESSION</label>
-                <input type="text" value="{{.Character.Obsession}}" class="edit-input" style="width:100%;"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "obsession"}'
-                       hx-swap="none">
+                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                          hx-put="/character/{{.Character.ID}}/update_field"
+                          hx-trigger="change, input delay:400ms"
+                          name="value"
+                          hx-vals='{"field": "obsession"}'
+                          hx-swap="none">{{.Character.Obsession}}</textarea>
             </div>
             <div>
                 <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">DEBT</label>
-                <input type="text" value="{{.Character.Debt}}" class="edit-input" style="width:100%; color:var(--accent-color);"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "debt"}'
-                       hx-swap="none">
+                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)" style="color:var(--accent-color);"
+                          hx-put="/character/{{.Character.ID}}/update_field"
+                          hx-trigger="change, input delay:400ms"
+                          name="value"
+                          hx-vals='{"field": "debt"}'
+                          hx-swap="none">{{.Character.Debt}}</textarea>
             </div>
         </div>
         {{end}}
@@ -580,30 +604,30 @@ function toggleEditSection(sectionId) {
             </div>
             <div style="margin-bottom:8px;">
                 <label style="font-size:0.75rem; color:#aaa; display:block;">DESCRIPTION</label>
-                <input type="text" value="{{.Character.Class.Description}}" class="edit-input" style="width:100%;"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "class_description"}'
-                       hx-swap="none">
+                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                          hx-put="/character/{{.Character.ID}}/update_field"
+                          hx-trigger="change, input delay:400ms"
+                          name="value"
+                          hx-vals='{"field": "class_description"}'
+                          hx-swap="none">{{.Character.Class.Description}}</textarea>
             </div>
             <div style="margin-bottom:8px;">
                 <label style="font-size:0.75rem; color:#aaa; display:block;">ORIGIN</label>
-                <input type="text" value="{{.Character.Class.Origin}}" class="edit-input" style="width:100%;"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "class_origin"}'
-                       hx-swap="none">
+                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                          hx-put="/character/{{.Character.ID}}/update_field"
+                          hx-trigger="change, input delay:400ms"
+                          name="value"
+                          hx-vals='{"field": "class_origin"}'
+                          hx-swap="none">{{.Character.Class.Origin}}</textarea>
             </div>
             <div>
                 <label style="font-size:0.75rem; color:#aaa; display:block;">CLASS GIFT / WEAPON</label>
-                <input type="text" value="{{.Character.Class.Gift}}" class="edit-input" style="width:100%;"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "class_gift"}'
-                       hx-swap="none">
+                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
+                          hx-put="/character/{{.Character.ID}}/update_field"
+                          hx-trigger="change, input delay:400ms"
+                          name="value"
+                          hx-vals='{"field": "class_gift"}'
+                          hx-swap="none">{{.Character.Class.Gift}}</textarea>
             </div>
         </div>
         {{end}}
