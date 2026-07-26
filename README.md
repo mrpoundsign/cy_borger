@@ -5,7 +5,7 @@ A lightning-fast, cyberpunk-themed character generator and campaign manager buil
 CY_BORGER is designed for the [CY_BORG](https://cy-borg.com/) tabletop roleplaying game. 
 
 ## Demo
-**[🔗 Try the Live Demo!](https://cy-borger.panther-bleak.ts.net/game/f10ecea4e9fc)**
+**[🔗 Try the Live Demo!](https://cy-borger.poundsigndesign.com/game/cedf07b275d9)**
 
 ## Features
 
