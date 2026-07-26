@@ -126,8 +126,25 @@
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/game/{{.Game.ID}}');
             socket.onmessage = function(e) {
-                if (typeof htmx !== 'undefined') {
-                    htmx.ajax('GET', '/game/{{.Game.ID}}', {target: 'body', swap: 'outerHTML'});
+                const parts = e.data.split(":");
+                const type = parts[0];
+                const charId = parts[1];
+
+                // Trigger party grid reload
+                document.body.dispatchEvent(new Event('party-update'));
+
+                // Reload modal if matching character updated and GM is not editing
+                const modal = document.getElementById("char-modal");
+                if (modal && modal.dataset.charId === charId) {
+                    if (document.activeElement && document.activeElement.closest('.modal-content')) {
+                        return;
+                    }
+                    if (typeof htmx !== 'undefined') {
+                        htmx.ajax('GET', '/character/' + charId + '?modal=true', {
+                            target: '#char-modal-container',
+                            swap: 'innerHTML'
+                        });
+                    }
                 }
             };
         })();
@@ -205,7 +222,12 @@
         </form>
     </div>
 
-    <div class="party-grid">
+    <div class="party-grid"
+         hx-get="/game/{{.Game.ID}}"
+         hx-select=".party-grid"
+         hx-target="this"
+         hx-swap="outerHTML"
+         hx-trigger="party-update from:body">
         {{range .Characters}}
         <div class="char-card">
             <div class="char-name">{{.Name}}</div>

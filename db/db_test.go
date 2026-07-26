@@ -45,7 +45,7 @@ func TestDB(t *testing.T) {
 	}
 
 	// 2. Test Create & Get Game
-	g, err := database.CreateGame("Test Campaign")
+	g, err := database.CreateGame("Test Campaign", u.ID)
 	if err != nil || g == nil {
 		t.Fatalf("CreateGame failed: %v", err)
 	}
@@ -67,5 +67,16 @@ func TestDB(t *testing.T) {
 	}
 	if len(party) != 1 {
 		t.Errorf("Expected party size 1, got %d", len(party))
+	}
+
+	// 4. Test GetGamesByOwner & GetCharactersByOwner
+	myGames, err := database.GetGamesByOwner(u.ID)
+	if err != nil || len(myGames) != 1 {
+		t.Errorf("Expected myGames size 1, got %d", len(myGames))
+	}
+
+	myChars, err := database.GetCharactersByOwner(u.ID)
+	if err != nil || len(myChars) != 1 {
+		t.Errorf("Expected myChars size 1, got %d", len(myChars))
 	}
 }

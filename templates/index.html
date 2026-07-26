@@ -73,6 +73,40 @@
             box-shadow: 0 0 10px #fff;
         }
 
+        .btn-small {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin: 0 2px;
+        }
+
+        .btn-small:hover {
+            background: #fff;
+        }
+
+        .btn-outline-small {
+            background: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 3px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin: 0 2px;
+        }
+
+        .btn-outline-small:hover {
+            background: rgba(255, 230, 0, 0.1);
+        }
+
         .card {
             border: 1px solid var(--muted-color);
             padding: 20px;
@@ -103,6 +137,22 @@
         }
     </style>
     <script>
+        const firstNames = ["SPICE", "CHROME", "RAZOR", "HEX", "VOIX", "KILOWATT", "NULL", "CYPHER", "VEX", "ASH", "CINDER", "NEXUS", "RIPPED", "GLITCH", "STATIC", "ZERO", "SHADOW", "BLADE", "VIPER", "VENOM", "HAWK", "ECHO", "GHOST", "SPECTRE"];
+
+        function toTitleCase(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+
+        function generateRandomUsername() {
+            const name1 = toTitleCase(firstNames[Math.floor(Math.random() * firstNames.length)]);
+            let name2 = toTitleCase(firstNames[Math.floor(Math.random() * firstNames.length)]);
+            while (name2 === name1) {
+                name2 = toTitleCase(firstNames[Math.floor(Math.random() * firstNames.length)]);
+            }
+            const num = Math.floor(1000 + Math.random() * 9000);
+            return name1 + name2 + "#" + num;
+        }
+
         (function() {
             let uid = localStorage.getItem('cy_user_id');
             if (!uid) {
@@ -112,7 +162,7 @@
 
             let uname = localStorage.getItem('cy_user_name');
             if (!uname) {
-                uname = 'CyberPunk#' + Math.floor(1000 + Math.random() * 9000);
+                uname = generateRandomUsername();
                 localStorage.setItem('cy_user_name', uname);
             }
 
@@ -120,6 +170,8 @@
                 getUserId: function() { return localStorage.getItem('cy_user_id'); },
                 getUserName: function() { return localStorage.getItem('cy_user_name'); },
                 setUserName: function(name) { localStorage.setItem('cy_user_name', name); },
+                hasEditedName: function() { return localStorage.getItem('cy_user_name_edited') === 'true'; },
+                setEditedName: function() { localStorage.setItem('cy_user_name_edited', 'true'); },
                 saveGMGame: function(gameId, gmCode, name) {
                     let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
                     games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
@@ -142,14 +194,30 @@
         <p>KILL THE CORPORATIONS. LIVE FAST. DIE CHROME.</p>
 
         <div class="user-banner">
+            {{if .User}}
+            <span>OPERATOR HANDLE: <strong style="color:var(--accent-color)">{{.User.Username}}</strong></span>
+            <script>
+                if (window.cyStore) {
+                    cyStore.setUserName('{{.User.Username}}');
+                    cyStore.setEditedName();
+                }
+            </script>
+            {{else}}
             <span>OPERATOR HANDLE: <strong id="user-handle-display" style="color:var(--accent-color)"></strong></span>
-            <div>
-                <form id="handle-form" hx-post="/user/update" hx-trigger="submit" hx-swap="none" style="display:inline-flex; gap:10px;">
+            <div id="handle-editor-area">
+                <div style="font-size: 0.75rem; color: #ff3366; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; text-align: right;">⚠️ Warning: Can only be edited ONCE!</div>
+                <form id="handle-form" hx-post="/user/update" hx-trigger="submit" hx-swap="none" style="display:inline-flex; gap:5px; align-items:center;">
                     <input type="hidden" name="user_id" id="user-id-input">
-                    <input type="text" name="username" id="user-handle-input" style="width:140px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
-                    <button type="submit" onclick="saveHandle()" class="btn" style="padding:4px 10px; font-size:0.8rem; margin:0;">Save</button>
+                    <input type="text" name="username" id="user-handle-input" style="width:230px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
+                    <button type="button" onclick="randomizeInputName()" class="btn-outline-small" title="Randomize name">🎲</button>
+                    <button type="submit" onclick="saveHandle()" class="btn-small">Save</button>
                 </form>
             </div>
+            <script>
+                // Database was wiped or user is new; reset client local storage state
+                localStorage.removeItem('cy_user_name_edited');
+            </script>
+            {{end}}
         </div>
 
         <form action="/character/generate" method="POST">
@@ -164,21 +232,62 @@
             </form>
         </div>
 
-        <div class="card" id="my-stuff-card" style="display:none; text-align:left;">
+        {{if or .MyGames .MyCharacters}}
+        <div class="card" id="my-stuff-card" style="text-align:left;">
+            {{if .MyGames}}
             <h3 style="color: #00ff66; margin-bottom: 10px; font-size:1.1rem;">MY GAMES (GM)</h3>
-            <ul id="my-gm-games-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;"></ul>
+            <ul id="my-gm-games-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
+                {{range .MyGames}}
+                <li><a href="/game/{{.ID}}" style="color:#00ff66; text-decoration:none;">⚡ <strong>{{.Name}}</strong> [GM Mode]</a></li>
+                {{end}}
+            </ul>
+            {{end}}
 
+            {{if .MyCharacters}}
             <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size:1.1rem;">MY CHARACTERS</h3>
-            <ul id="my-chars-list" style="list-style:none; padding:0; line-height:1.5;"></ul>
+            <ul id="my-chars-list" style="list-style:none; padding:0; line-height:1.5;">
+                {{range .MyCharacters}}
+                <li><a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">👤 <strong>{{.Name}}</strong> [Edit]</a></li>
+                {{end}}
+            </ul>
+            {{end}}
         </div>
+        {{end}}
     </div>
 
     <script>
+        function randomizeInputName() {
+            const randomName = generateRandomUsername();
+            document.getElementById("user-handle-input").value = randomName;
+        }
+
         function saveHandle() {
-            const input = document.getElementById("user-handle-input").value.trim();
+            let input = document.getElementById("user-handle-input").value.trim();
             if (input) {
+                if (/\s/.test(input)) {
+                    alert("No spaces or whitespace allowed in handles.");
+                    return;
+                }
+                const regex = /^[^\s#]+#\d{4}$/;
+                if (!regex.test(input)) {
+                    const hashIndex = input.indexOf('#');
+                    let baseName = input;
+                    if (hashIndex !== -1) {
+                        baseName = input.substring(0, hashIndex).trim();
+                    }
+                    if (!baseName) {
+                        alert("Invalid handle. Name cannot be empty.");
+                        return;
+                    }
+                    const num = Math.floor(1000 + Math.random() * 9000);
+                    input = baseName + "#" + num;
+                }
+                
                 cyStore.setUserName(input);
+                cyStore.setEditedName();
                 document.getElementById("user-handle-display").innerText = input;
+                document.getElementById("handle-editor-area").style.display = "none";
+                document.getElementById("user-handle-input").value = input;
             }
         }
 
@@ -188,31 +297,12 @@
             document.getElementById("user-id-input").value = cyStore.getUserId();
             document.getElementById("user-handle-display").innerText = cyStore.getUserName();
 
-            const games = cyStore.getGMGames();
-            const chars = cyStore.getCharEdits();
-            
-            const gamesList = document.getElementById("my-gm-games-list");
-            const charsList = document.getElementById("my-chars-list");
-            let count = 0;
-
-            for (let id in games) {
-                count++;
-                const g = games[id];
-                const li = document.createElement("li");
-                li.innerHTML = `<a href="/game/${g.id}" style="color:#00ff66; text-decoration:none;">⚡ <strong>${g.name}</strong> [GM Mode]</a>`;
-                gamesList.appendChild(li);
-            }
-
-            for (let id in chars) {
-                count++;
-                const c = chars[id];
-                const li = document.createElement("li");
-                li.innerHTML = `<a href="/character/${c.id}" style="color:var(--accent-color); text-decoration:none;">👤 <strong>${c.name}</strong> [Edit]</a>`;
-                charsList.appendChild(li);
-            }
-
-            if (count > 0) {
-                document.getElementById("my-stuff-card").style.display = "block";
+            // Edit only allowed once - hide if already edited
+            if (cyStore.hasEditedName()) {
+                document.getElementById("handle-editor-area").style.display = "none";
+            } else {
+                // Populate default generated name as initial value in input
+                document.getElementById("user-handle-input").value = cyStore.getUserName();
             }
         });
     </script>

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -93,7 +94,25 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	_ = templates.ExecuteTemplate(w, "index.html", nil)
+
+	ownerID := getCookie(r, "cy_user_id")
+	var myGames []db.Game
+	var myChars []chargen.Character
+	var user *db.User
+
+	if ownerID != "" {
+		user, _ = database.GetUser(ownerID)
+		myGames, _ = database.GetGamesByOwner(ownerID)
+		myChars, _ = database.GetCharactersByOwner(ownerID)
+	}
+
+	data := map[string]interface{}{
+		"User":         user,
+		"MyGames":      myGames,
+		"MyCharacters": myChars,
+	}
+
+	_ = templates.ExecuteTemplate(w, "index.html", data)
 }
 
 func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -105,9 +124,16 @@ func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Server-side validation: no spaces/whitespace, and must end with #xxxx
+	matched, err := regexp.MatchString(`^[^\s#]+#\d{4}$`, username)
+	if err != nil || !matched {
+		http.Error(w, "Invalid Operator handle format. Must be Name#XXXX with no spaces.", http.StatusBadRequest)
+		return
+	}
+
 	u := db.User{ID: userID, Username: username}
 	if err := database.SaveUser(&u); err != nil {
-		http.Error(w, "Failed to save user", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest) // Send back the "already customized" database lock error
 		return
 	}
 
@@ -143,21 +169,15 @@ func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 	// If HTMX request, render the character template directly with HX-Push-Url header!
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
-		renderCharacterView(w, r, c.ID)
+		renderCharacterViewWithChar(w, r, &c)
 		return
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }
 
-func renderCharacterView(w http.ResponseWriter, r *http.Request, id string) {
-	c, err := database.GetCharacter(id)
-	if err != nil || c == nil {
-		http.NotFound(w, r)
-		return
-	}
-
-	sessionCode := getCookie(r, "char_edit_"+id)
+func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *chargen.Character) {
+	sessionCode := getCookie(r, "char_edit_"+c.ID)
 	canEdit := sessionCode != "" && sessionCode == c.EditCode
 
 	var game *db.Game
@@ -201,7 +221,26 @@ func handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderCharacterView(w, r, id)
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Set Last-Modified header
+	w.Header().Set("Last-Modified", c.UpdatedAt.UTC().Format(http.TimeFormat))
+
+	// Check If-Modified-Since header (HTTP Caching)
+	if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
+		if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
+			if !c.UpdatedAt.Truncate(time.Second).After(t) {
+				w.WriteHeader(http.StatusNotModified)
+				return
+			}
+		}
+	}
+
+	renderCharacterViewWithChar(w, r, c)
 }
 
 func handleAuthCharacter(w http.ResponseWriter, r *http.Request) {
@@ -240,8 +279,8 @@ func handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	setCookie(w, "last_game_invite", g.InviteCode)
 
 	// Broadcast update to real-time clients!
-	ws.GlobalHub.Broadcast("game_"+g.ID, "refresh")
-	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+	ws.GlobalHub.Broadcast("game_"+g.ID, "char_update:"+c.ID)
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 
 	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
 }
@@ -268,9 +307,9 @@ func handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	_ = database.SaveCharacter(c, ownerID)
 
 	// Broadcast real-time update to connected WebSockets
-	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
-		ws.GlobalHub.Broadcast("game_"+c.GameID, "refresh")
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -298,9 +337,9 @@ func handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	_ = database.SaveCharacter(c, ownerID)
 
 	// Broadcast real-time update to connected WebSockets
-	ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
-		ws.GlobalHub.Broadcast("game_"+c.GameID, "refresh")
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -330,9 +369,9 @@ func handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 		ownerID := getCookie(r, "cy_user_id")
 		_ = database.SaveCharacter(c, ownerID)
 
-		ws.GlobalHub.Broadcast("char_"+c.ID, "refresh")
+		ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 		if c.GameID != "" {
-			ws.GlobalHub.Broadcast("game_"+c.GameID, "refresh")
+			ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 		}
 	}
 
@@ -345,7 +384,13 @@ func handleCreateGame(w http.ResponseWriter, r *http.Request) {
 		name = "Unnamed Campaign"
 	}
 
-	g, err := database.CreateGame(name)
+	ownerID := getCookie(r, "cy_user_id")
+	if ownerID == "" {
+		ownerID = "usr_" + chargen.GenerateRandomID(6)
+		setCookie(w, "cy_user_id", ownerID)
+	}
+
+	g, err := database.CreateGame(name, ownerID)
 	if err != nil {
 		http.Error(w, "Failed to create game", http.StatusInternalServerError)
 		return
@@ -369,6 +414,19 @@ func handleViewGame(w http.ResponseWriter, r *http.Request) {
 	if err != nil || g == nil {
 		http.NotFound(w, r)
 		return
+	}
+
+	// Set Last-Modified header
+	w.Header().Set("Last-Modified", g.UpdatedAt.UTC().Format(http.TimeFormat))
+
+	// Check If-Modified-Since header (HTTP Caching)
+	if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
+		if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
+			if !g.UpdatedAt.Truncate(time.Second).After(t) {
+				w.WriteHeader(http.StatusNotModified)
+				return
+			}
+		}
 	}
 
 	setCookie(w, "last_game_invite", g.InviteCode)

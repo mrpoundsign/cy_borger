@@ -1,5 +1,7 @@
 package chargen
 
+import "time"
+
 // Stat represents a character statistic with current and max values.
 type Stat struct {
 	Current int `json:"current"`
@@ -53,4 +55,5 @@ type Character struct {
 	Apps      []string        `json:"apps"`
 	Creds     int             `json:"creds"`
 	GameID    string          `json:"game_id,omitempty"`
+	UpdatedAt time.Time       `json:"updated_at,omitempty"`
 }

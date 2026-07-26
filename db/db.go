@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
@@ -18,15 +19,18 @@ import (
 var migrationsFS embed.FS
 
 type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
+	ID        string    `json:"id"`
+	Username  string    `json:"username"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Game struct {
-	ID         string `json:"id"`
-	GMCode     string `json:"gm_code"`
-	InviteCode string `json:"invite_code"`
-	Name       string `json:"name"`
+	ID         string    `json:"id"`
+	GMCode     string    `json:"gm_code"`
+	InviteCode string    `json:"invite_code"`
+	Name       string    `json:"name"`
+	OwnerID    string    `json:"owner_id"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 type DB struct {
@@ -76,22 +80,25 @@ func runMigrations(conn *sql.DB) error {
 }
 
 func (d *DB) SaveUser(u *User) error {
-	query := `
-	INSERT INTO users (id, username)
-	VALUES (?, ?)
-	ON CONFLICT(id) DO UPDATE SET
-		username = excluded.username;
-	`
-	_, err := d.conn.Exec(query, u.ID, u.Username)
+	existing, err := d.GetUser(u.ID)
+	if err != nil {
+		return err
+	}
+	if existing != nil {
+		return fmt.Errorf("user handle has already been customized and cannot be edited again")
+	}
+
+	query := `INSERT INTO users (id, username, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)`
+	_, err = d.conn.Exec(query, u.ID, u.Username)
 	return err
 }
 
 func (d *DB) GetUser(id string) (*User, error) {
-	query := `SELECT id, username FROM users WHERE id = ?`
+	query := `SELECT id, username, updated_at FROM users WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
 	var u User
-	if err := row.Scan(&u.ID, &u.Username); err != nil {
+	if err := row.Scan(&u.ID, &u.Username, &u.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -107,23 +114,25 @@ func (d *DB) SaveCharacter(c *chargen.Character, ownerID string) error {
 	}
 
 	query := `
-	INSERT INTO characters (id, edit_code, game_id, owner_id, data_json)
-	VALUES (?, ?, ?, ?, ?)
+	INSERT INTO characters (id, edit_code, game_id, owner_id, data_json, updated_at)
+	VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 	ON CONFLICT(id) DO UPDATE SET
 		game_id = excluded.game_id,
 		owner_id = excluded.owner_id,
-		data_json = excluded.data_json;
+		data_json = excluded.data_json,
+		updated_at = CURRENT_TIMESTAMP;
 	`
 	_, err = d.conn.Exec(query, c.ID, c.EditCode, c.GameID, ownerID, string(data))
 	return err
 }
 
 func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
-	query := `SELECT data_json FROM characters WHERE id = ?`
+	query := `SELECT game_id, data_json, updated_at FROM characters WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
-	var dataStr string
-	if err := row.Scan(&dataStr); err != nil {
+	var gameID, dataStr string
+	var updatedAt time.Time
+	if err := row.Scan(&gameID, &dataStr, &updatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -134,17 +143,19 @@ func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
 	if err := json.Unmarshal([]byte(dataStr), &c); err != nil {
 		return nil, err
 	}
+	c.GameID = gameID
+	c.UpdatedAt = updatedAt
 
 	return &c, nil
 }
 
-func (d *DB) CreateGame(name string) (*Game, error) {
+func (d *DB) CreateGame(name string, ownerID string) (*Game, error) {
 	id := chargen.GenerateRandomID(6)
 	gmCode := chargen.GenerateRandomID(6)
 	inviteCode := chargen.GenerateRandomID(4)
 
-	query := `INSERT INTO games (id, gm_code, invite_code, name) VALUES (?, ?, ?, ?)`
-	_, err := d.conn.Exec(query, id, gmCode, inviteCode, name)
+	query := `INSERT INTO games (id, gm_code, invite_code, name, owner_id, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+	_, err := d.conn.Exec(query, id, gmCode, inviteCode, name, ownerID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,15 +165,17 @@ func (d *DB) CreateGame(name string) (*Game, error) {
 		GMCode:     gmCode,
 		InviteCode: inviteCode,
 		Name:       name,
+		OwnerID:    ownerID,
+		UpdatedAt:  time.Now(),
 	}, nil
 }
 
 func (d *DB) GetGame(id string) (*Game, error) {
-	query := `SELECT id, gm_code, invite_code, name FROM games WHERE id = ?`
+	query := `SELECT id, gm_code, invite_code, name, owner_id, updated_at FROM games WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
 	var g Game
-	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name); err != nil {
+	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &g.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -172,11 +185,11 @@ func (d *DB) GetGame(id string) (*Game, error) {
 }
 
 func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
-	query := `SELECT id, gm_code, invite_code, name FROM games WHERE invite_code = ?`
+	query := `SELECT id, gm_code, invite_code, name, owner_id, updated_at FROM games WHERE invite_code = ?`
 	row := d.conn.QueryRow(query, code)
 
 	var g Game
-	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name); err != nil {
+	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &g.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -186,7 +199,7 @@ func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
 }
 
 func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
-	query := `SELECT data_json FROM characters WHERE game_id = ?`
+	query := `SELECT game_id, data_json, updated_at FROM characters WHERE game_id = ?`
 	rows, err := d.conn.Query(query, gameID)
 	if err != nil {
 		return nil, err
@@ -195,14 +208,70 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 
 	var chars []chargen.Character
 	for rows.Next() {
-		var dataStr string
-		if err := rows.Scan(&dataStr); err != nil {
+		var gameID, dataStr string
+		var updatedAt time.Time
+		if err := rows.Scan(&gameID, &dataStr, &updatedAt); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
+			c.GameID = gameID
+			c.UpdatedAt = updatedAt
 			chars = append(chars, c)
 		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return chars, nil
+}
+
+func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
+	query := `SELECT id, gm_code, invite_code, name, owner_id, updated_at FROM games WHERE owner_id = ?`
+	rows, err := d.conn.Query(query, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var games []Game
+	for rows.Next() {
+		var g Game
+		if err := rows.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &g.UpdatedAt); err != nil {
+			return nil, err
+		}
+		games = append(games, g)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return games, nil
+}
+
+func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
+	query := `SELECT game_id, data_json, updated_at FROM characters WHERE owner_id = ?`
+	rows, err := d.conn.Query(query, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var chars []chargen.Character
+	for rows.Next() {
+		var gameID, dataStr string
+		var updatedAt time.Time
+		if err := rows.Scan(&gameID, &dataStr, &updatedAt); err != nil {
+			return nil, err
+		}
+		var c chargen.Character
+		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
+			c.GameID = gameID
+			c.UpdatedAt = updatedAt
+			chars = append(chars, c)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return chars, nil
 }
