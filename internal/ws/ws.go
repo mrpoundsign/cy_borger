@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"sync"
 )
@@ -38,7 +39,9 @@ func (h *Hub) RemoveClient(room string, c *Client) {
 	defer h.mu.Unlock()
 	if h.rooms[room] != nil {
 		delete(h.rooms[room], c)
-		_ = c.conn.Close()
+		if err := c.conn.Close(); err != nil {
+			log.Printf("Error closing websocket connection: %v", err)
+		}
 	}
 }
 
@@ -48,7 +51,9 @@ func (h *Hub) Broadcast(room string, msg string) {
 	clients := h.rooms[room]
 	for c := range clients {
 		go func(cli *Client) {
-			_ = sendTextFrame(cli.conn, msg)
+			if err := sendTextFrame(cli.conn, msg); err != nil {
+				log.Printf("Error sending text frame: %v", err)
+			}
 		}(c)
 	}
 }
@@ -82,8 +87,12 @@ func ServeWS(w http.ResponseWriter, r *http.Request, room string) {
 		"Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" +
 		"Sec-WebSocket-Accept: " + acceptKey + "\r\n\r\n"
-	_, _ = bufrw.WriteString(res)
-	_ = bufrw.Flush()
+	if _, err := bufrw.WriteString(res); err != nil {
+		log.Printf("Error writing to websocket: %v", err)
+	}
+	if err := bufrw.Flush(); err != nil {
+		log.Printf("Error flushing websocket: %v", err)
+	}
 
 	client := &Client{conn: conn}
 	GlobalHub.AddClient(room, client)

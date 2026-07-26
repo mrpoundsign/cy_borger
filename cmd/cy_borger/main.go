@@ -40,19 +40,37 @@ func main() {
 	// Static Files & Favicon (Served from embedded FS)
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(static.FS))))
 	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		content, _ := static.FS.ReadFile("favicon.svg")
+		content, err := static.FS.ReadFile("favicon.svg")
+		if err != nil {
+			http.Error(w, "Failed to load favicon", http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "image/svg+xml")
-		_, _ = w.Write(content)
+		if _, err := w.Write(content); err != nil {
+			log.Printf("Error writing favicon: %v", err)
+		}
 	})
 	mux.HandleFunc("GET /favicon.png", func(w http.ResponseWriter, r *http.Request) {
-		content, _ := static.FS.ReadFile("favicon.png")
+		content, err := static.FS.ReadFile("favicon.png")
+		if err != nil {
+			http.Error(w, "Failed to load favicon", http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "image/png")
-		_, _ = w.Write(content)
+		if _, err := w.Write(content); err != nil {
+			log.Printf("Error writing favicon: %v", err)
+		}
 	})
 	mux.HandleFunc("GET /favicon.svg", func(w http.ResponseWriter, r *http.Request) {
-		content, _ := static.FS.ReadFile("favicon.svg")
+		content, err := static.FS.ReadFile("favicon.svg")
+		if err != nil {
+			http.Error(w, "Failed to load favicon", http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "image/svg+xml")
-		_, _ = w.Write(content)
+		if _, err := w.Write(content); err != nil {
+			log.Printf("Error writing favicon: %v", err)
+		}
 	})
 
 	srv := &http.Server{

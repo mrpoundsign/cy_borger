@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
@@ -10,7 +11,9 @@ import (
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		w.WriteHeader(http.StatusNotFound)
-		_ = s.Templates.ExecuteTemplate(w, "404.html", nil)
+		if err := s.Templates.ExecuteTemplate(w, "404.html", nil); err != nil {
+			log.Printf("Template execution error (404.html): %v", err)
+		}
 		return
 	}
 
@@ -42,5 +45,9 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		"ErrorMessage":    errMsg,
 	}
 
-	_ = s.Templates.ExecuteTemplate(w, "index.html", data)
+	if err := s.Templates.ExecuteTemplate(w, "index.html", data); err != nil {
+
+		log.Printf("Template execution error (index.html): %v", err)
+
+	}
 }

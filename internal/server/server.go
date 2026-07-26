@@ -2,6 +2,7 @@ package server
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
@@ -25,7 +26,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /auth/login", s.handleLogin)
 	mux.HandleFunc("POST /auth/logout", s.handleLogout)
 	mux.HandleFunc("POST /user/update", s.handleUpdateUser)
-	
+
 	mux.HandleFunc("POST /character/generate", s.handleGenerateCharacter)
 	mux.HandleFunc("POST /character/create_blank", s.handleCreateBlankCharacter)
 	mux.HandleFunc("GET /character/{id}", s.handleViewCharacter)
@@ -93,5 +94,7 @@ func (s *Server) renderError(w http.ResponseWriter, r *http.Request, message str
 		"ErrorMessage": message,
 		"StatusCode":   statusCode,
 	}
-	_ = s.Templates.ExecuteTemplate(w, "error.html", data)
+	if err := s.Templates.ExecuteTemplate(w, "error.html", data); err != nil {
+		log.Printf("Template execution error (error.html): %v", err)
+	}
 }

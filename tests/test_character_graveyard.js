@@ -84,8 +84,8 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await page.waitForLoadState('networkidle');
 
         // 3. Click 💀 KILL button on game page
-        const killBtn = page.locator('button', { hasText: 'KILL' }).first();
-        await expect(killBtn).toBeVisible();
+        const killBtn = page.locator('button:has-text("💀 KILL")').first();
+        await expect(killBtn).toBeVisible({ timeout: 10000 });
         await killBtn.click();
         await page.waitForTimeout(300);
 

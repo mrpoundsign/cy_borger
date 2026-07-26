@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"time"
 )
@@ -87,7 +88,11 @@ func (s *Server) handleViewGame(w http.ResponseWriter, r *http.Request) {
 		"CurrentUserID": currentUserID,
 	}
 
-	_ = s.Templates.ExecuteTemplate(w, "game.html", data)
+	if err := s.Templates.ExecuteTemplate(w, "game.html", data); err != nil {
+
+		log.Printf("Template execution error (game.html): %v", err)
+
+	}
 }
 
 func (s *Server) handleAuthGame(w http.ResponseWriter, r *http.Request) {

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -26,7 +27,15 @@ func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request)
 		c.Handle = user.Handle
 	}
 
-	_ = r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+
+		log.Printf("Failed to parse form: %v", err)
+
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+
+		return
+
+	}
 	if gameID := r.FormValue("game_id"); gameID != "" {
 		c.GameID = gameID
 	}
@@ -85,11 +94,17 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 
 	// Render in modal if requested
 	if r.URL.Query().Get("modal") == "true" {
-		_ = s.Templates.ExecuteTemplate(w, "character_modal.html", data)
+		if err := s.Templates.ExecuteTemplate(w, "character_modal.html", data); err != nil {
+			log.Printf("Template execution error (character_modal.html): %v", err)
+		}
 		return
 	}
 
-	_ = s.Templates.ExecuteTemplate(w, "character.html", data)
+	if err := s.Templates.ExecuteTemplate(w, "character.html", data); err != nil {
+
+		log.Printf("Template execution error (character.html): %v", err)
+
+	}
 }
 
 func (s *Server) handleViewCharacter(w http.ResponseWriter, r *http.Request) {
@@ -158,7 +173,15 @@ func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	c.GameID = g.ID
 	ownerID := getCookie(r, "cy_user_id")
 
-	_ = s.DB.SaveCharacter(c, ownerID)
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+
+		log.Printf("Failed to save character %s: %v", c.ID, err)
+
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+
+		return
+
+	}
 
 	setCookie(w, "last_game_invite", g.InviteCode)
 
@@ -188,7 +211,11 @@ func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = s.DB.SaveCharacter(c, ownerID)
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+		log.Printf("Failed to save character %s: %v", c.ID, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
@@ -218,7 +245,11 @@ func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = s.DB.SaveCharacter(c, ownerID)
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+		log.Printf("Failed to save character %s: %v", c.ID, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	// Broadcast real-time update to connected WebSockets
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
@@ -251,7 +282,11 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 		c.Abilities[statName] = stat
 
 		ownerID := getCookie(r, "cy_user_id")
-		_ = s.DB.SaveCharacter(c, ownerID)
+		if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+			log.Printf("Failed to save character %s: %v", c.ID, err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 
 		ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 		if c.GameID != "" {
@@ -276,7 +311,15 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 		c.Handle = user.Handle
 	}
 
-	_ = r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+
+		log.Printf("Failed to parse form: %v", err)
+
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+
+		return
+
+	}
 	if gameID := r.FormValue("game_id"); gameID != "" {
 		c.GameID = gameID
 	}
@@ -307,7 +350,11 @@ func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 
 	c.IsSaved = true
 	ownerID := getCookie(r, "cy_user_id")
-	_ = s.DB.SaveCharacter(c, ownerID)
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+		log.Printf("Failed to save character %s: %v", c.ID, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
@@ -330,7 +377,15 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+
+		log.Printf("Failed to parse form: %v", err)
+
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+
+		return
+
+	}
 
 	// Handle section multi-field form updates
 	if val := r.FormValue("name"); val != "" {
@@ -485,7 +540,11 @@ func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = s.DB.SaveCharacter(c, ownerID)
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+		log.Printf("Failed to save character %s: %v", c.ID, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
@@ -536,7 +595,11 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = s.DB.SaveCharacter(c, ownerID)
+	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+		log.Printf("Failed to save character %s: %v", c.ID, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
@@ -645,7 +708,9 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 					"IsGM":          isGM,
 					"CurrentUserID": currentUserID,
 				}
-				_ = s.Templates.ExecuteTemplate(w, "game.html", data)
+				if err := s.Templates.ExecuteTemplate(w, "game.html", data); err != nil {
+					log.Printf("Template execution error (game.html): %v", err)
+				}
 				return
 			}
 		}
@@ -710,7 +775,9 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 					"IsGM":          isGM,
 					"CurrentUserID": currentUserID,
 				}
-				_ = s.Templates.ExecuteTemplate(w, "game.html", data)
+				if err := s.Templates.ExecuteTemplate(w, "game.html", data); err != nil {
+					log.Printf("Template execution error (game.html): %v", err)
+				}
 				return
 			}
 		}
