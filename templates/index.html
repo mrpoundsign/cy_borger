@@ -257,7 +257,7 @@
             </form>
         </div>
 
-        {{if or .MyGames .MyCharacters}}
+        {{if or .MyGames .MyCharacters .DraftCharacters}}
         <div class="card" id="my-stuff-card" style="text-align:left;">
             {{if .MyGames}}
             <h3 style="color: #00ff66; margin-bottom: 10px; font-size:1.1rem;">MY GAMES (GM)</h3>
@@ -269,10 +269,19 @@
             {{end}}
 
             {{if .MyCharacters}}
-            <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size:1.1rem;">MY CHARACTERS</h3>
-            <ul id="my-chars-list" style="list-style:none; padding:0; line-height:1.5;">
+            <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size:1.1rem;">MY CHARACTERS (SAVED)</h3>
+            <ul id="my-chars-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
                 {{range .MyCharacters}}
-                <li><a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">👤 <strong>{{.Name}}</strong> [Edit]</a></li>
+                <li><a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">👤 <strong>{{.Name}}</strong> [Saved]</a></li>
+                {{end}}
+            </ul>
+            {{end}}
+
+            {{if .DraftCharacters}}
+            <h3 style="color: #ff9900; margin-bottom: 10px; font-size:1.1rem;">DRAFT / UNKEPT CHARACTERS</h3>
+            <ul id="my-drafts-list" style="list-style:none; padding:0; line-height:1.5;">
+                {{range .DraftCharacters}}
+                <li><a href="/character/{{.ID}}" style="color:#ff9900; text-decoration:none;">⚡ <strong>{{.Name}}</strong> [Draft Preview]</a></li>
                 {{end}}
             </ul>
             {{end}}

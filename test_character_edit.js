@@ -26,8 +26,8 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         await page.waitForLoadState('networkidle');
 
         await expect(page).toHaveURL(/\/character\//);
-        await expect(page.locator('input[hx-vals*=\'"field": "name"\']')).toHaveValue('UNNAMED OPERATOR');
-        await expect(page.locator('input[hx-vals*=\'"field": "handle"\']')).toHaveValue('operator');
+        await expect(page.locator('#identity-view h1')).toContainText('UNNAMED OPERATOR');
+        await expect(page.locator('#identity-view .sub-title')).toContainText('@operator');
     });
 
     test('roll random character shows draft banner, keeping it saves it', async ({ page }) => {
@@ -65,15 +65,18 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         await page.locator('button:has-text("Create Blank Character")').click();
         await page.waitForLoadState('networkidle');
 
+        // Click "✏️ Edit Text" to reveal input form
+        await page.locator('button:has-text("Edit Text")').click();
+
         const nameInput = page.locator('input[hx-vals*=\'"field": "name"\']');
         await nameInput.fill('CYBER_PUNK_X');
         await nameInput.blur();
         await page.waitForTimeout(500);
 
-        // Reload page to confirm persistence
+        // Reload page to confirm persistence in view
         await page.reload();
         await page.waitForLoadState('networkidle');
-        await expect(nameInput).toHaveValue('CYBER_PUNK_X');
+        await expect(page.locator('#identity-view h1')).toContainText('CYBER_PUNK_X');
     });
 
     test('add and delete weapon items', async ({ page }) => {
@@ -82,6 +85,9 @@ test.describe('Character editing & Draft/Keep workflow', () => {
 
         await page.locator('button:has-text("Create Blank Character")').click();
         await page.waitForLoadState('networkidle');
+
+        // Toggle add weapon section
+        await page.locator('button:has-text("+ Add Weapon / Armor")').click();
 
         // Fill Add Weapon form
         const addWpnForm = page.locator('form[action*="add_item"]').first();

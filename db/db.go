@@ -264,9 +264,6 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
-			if !c.IsSaved {
-				continue
-			}
 			c.GameID = gameID
 			c.UpdatedAt = updatedAt
 			chars = append(chars, c)

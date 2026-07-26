@@ -83,6 +83,7 @@
         background: #0a0a0a;
         border: 1px solid #222;
         padding: 25px;
+        position: relative;
     }
 
     ul {
@@ -172,12 +173,24 @@
 
     .edit-input {
         background: #000;
-        border: 1px solid #333;
+        border: 1px solid var(--accent-color);
         color: #fff;
         padding: 4px 8px;
         font-family: inherit;
         font-size: 0.95rem;
         margin-bottom: 5px;
+    }
+
+    .editable-field {
+        position: relative;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        border-bottom: 1px dotted transparent;
+    }
+
+    .can-edit .editable-field:hover {
+        background: rgba(255, 230, 0, 0.08);
+        border-bottom-color: var(--accent-color);
     }
 
     /* Gear Table */
@@ -208,6 +221,15 @@
         padding: 2px 6px;
         font-size: 0.85rem;
         font-weight: bold;
+    }
+
+    .toggle-edit-btn {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        background: transparent;
+        border: 1px solid var(--accent-color);
+        color: var(--accent-color);
+        cursor: pointer;
     }
 </style>
 
@@ -378,160 +400,205 @@
     </div>
 </div>
 
+<!-- Edit Form Toggle Script -->
+<script>
+function toggleEditSection(sectionId) {
+    const editEl = document.getElementById(sectionId + '-edit');
+    const viewEl = document.getElementById(sectionId + '-view');
+    if (editEl && viewEl) {
+        const isHidden = editEl.style.display === 'none';
+        editEl.style.display = isHidden ? 'block' : 'none';
+        viewEl.style.display = isHidden ? 'none' : 'block';
+    }
+}
+</script>
+
 <!-- 2x2 Grid Layout -->
-<div class="grid-container">
+<div class="grid-container {{if .CanEdit}}can-edit{{end}}">
     <!-- Top Left: Identity -->
     <div class="content-box">
         {{if .CanEdit}}
-        <div style="margin-bottom: 12px;">
-            <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block; margin-bottom:2px;">NAME</label>
-            <input type="text" value="{{.Character.Name}}" class="edit-input" style="font-size: 1.4rem; font-weight:bold; color:var(--accent-color); width:100%;"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "name"}'
-                   hx-swap="none">
+        <div style="position:absolute; top:15px; right:15px;">
+            <button type="button" onclick="toggleEditSection('identity')" class="toggle-edit-btn">✏️ Edit Text</button>
         </div>
-        <div style="margin-bottom: 15px;">
-            <label style="font-size:0.75rem; color:var(--muted-color); font-weight:bold; display:block; margin-bottom:2px;">HANDLE</label>
-            <input type="text" value="{{.Character.Handle}}" class="edit-input" style="width:100%; color:var(--muted-color);"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "handle"}'
-                   hx-swap="none">
+        {{end}}
+
+        <!-- Clean Text View (Default) -->
+        <div id="identity-view">
+            <h1 style="color: var(--accent-color); font-size: 2.2rem; margin-bottom:5px;">YOU ARE {{.Character.Name}}</h1>
+            <div class="sub-title">@{{.Character.Handle}}</div>
+            <p style="line-height: 1.7; margin-bottom: 15px;">
+                A <span class="highlight">{{.Character.Style}}</span> <span class="highlight">{{.Character.Class.Name}}</span>; 
+                {{.Character.Feature}}. {{.Character.Want}} {{.Character.Quirk}} {{.Character.Obsession}}
+            </p>
+            <p style="color: var(--accent-color); font-weight: bold; font-size:1.05rem;">
+                {{.Character.Debt}}
+            </p>
         </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-            <div>
-                <label style="font-size:0.75rem; color:#aaa; display:block;">STYLE</label>
-                <input type="text" value="{{.Character.Style}}" class="edit-input" style="width:100%;"
+
+        <!-- Editable Form (Hidden until Edit toggled) -->
+        {{if .CanEdit}}
+        <div id="identity-edit" style="display:none; margin-top:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT IDENTITY & BIO</span>
+                <button type="button" onclick="toggleEditSection('identity')" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;">Done</button>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">NAME</label>
+                <input type="text" value="{{.Character.Name}}" class="edit-input" style="font-size: 1.2rem; font-weight:bold; color:var(--accent-color); width:100%;"
                        hx-put="/character/{{.Character.ID}}/update_field"
                        hx-trigger="change, input delay:400ms"
                        name="value"
-                       hx-vals='{"field": "style"}'
+                       hx-vals='{"field": "name"}'
                        hx-swap="none">
             </div>
-            <div>
-                <label style="font-size:0.75rem; color:#aaa; display:block;">FEATURE</label>
-                <input type="text" value="{{.Character.Feature}}" class="edit-input" style="width:100%;"
+            <div style="margin-bottom: 10px;">
+                <label style="font-size:0.75rem; color:var(--muted-color); font-weight:bold; display:block;">HANDLE</label>
+                <input type="text" value="{{.Character.Handle}}" class="edit-input" style="width:100%; color:var(--muted-color);"
                        hx-put="/character/{{.Character.ID}}/update_field"
                        hx-trigger="change, input delay:400ms"
                        name="value"
-                       hx-vals='{"field": "feature"}'
+                       hx-vals='{"field": "handle"}'
                        hx-swap="none">
             </div>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-            <div>
-                <label style="font-size:0.75rem; color:#aaa; display:block;">WANT</label>
-                <input type="text" value="{{.Character.Want}}" class="edit-input" style="width:100%;"
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                <div>
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">STYLE</label>
+                    <input type="text" value="{{.Character.Style}}" class="edit-input" style="width:100%;"
+                           hx-put="/character/{{.Character.ID}}/update_field"
+                           hx-trigger="change, input delay:400ms"
+                           name="value"
+                           hx-vals='{"field": "style"}'
+                           hx-swap="none">
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">FEATURE</label>
+                    <input type="text" value="{{.Character.Feature}}" class="edit-input" style="width:100%;"
+                           hx-put="/character/{{.Character.ID}}/update_field"
+                           hx-trigger="change, input delay:400ms"
+                           name="value"
+                           hx-vals='{"field": "feature"}'
+                           hx-swap="none">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                <div>
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">WANT</label>
+                    <input type="text" value="{{.Character.Want}}" class="edit-input" style="width:100%;"
+                           hx-put="/character/{{.Character.ID}}/update_field"
+                           hx-trigger="change, input delay:400ms"
+                           name="value"
+                           hx-vals='{"field": "want"}'
+                           hx-swap="none">
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">QUIRK</label>
+                    <input type="text" value="{{.Character.Quirk}}" class="edit-input" style="width:100%;"
+                           hx-put="/character/{{.Character.ID}}/update_field"
+                           hx-trigger="change, input delay:400ms"
+                           name="value"
+                           hx-vals='{"field": "quirk"}'
+                           hx-swap="none">
+                </div>
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:0.75rem; color:#aaa; display:block;">OBSESSION</label>
+                <input type="text" value="{{.Character.Obsession}}" class="edit-input" style="width:100%;"
                        hx-put="/character/{{.Character.ID}}/update_field"
                        hx-trigger="change, input delay:400ms"
                        name="value"
-                       hx-vals='{"field": "want"}'
+                       hx-vals='{"field": "obsession"}'
                        hx-swap="none">
             </div>
             <div>
-                <label style="font-size:0.75rem; color:#aaa; display:block;">QUIRK</label>
-                <input type="text" value="{{.Character.Quirk}}" class="edit-input" style="width:100%;"
+                <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">DEBT</label>
+                <input type="text" value="{{.Character.Debt}}" class="edit-input" style="width:100%; color:var(--accent-color);"
                        hx-put="/character/{{.Character.ID}}/update_field"
                        hx-trigger="change, input delay:400ms"
                        name="value"
-                       hx-vals='{"field": "quirk"}'
+                       hx-vals='{"field": "debt"}'
                        hx-swap="none">
             </div>
         </div>
-        <div style="margin-bottom:10px;">
-            <label style="font-size:0.75rem; color:#aaa; display:block;">OBSESSION</label>
-            <input type="text" value="{{.Character.Obsession}}" class="edit-input" style="width:100%;"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "obsession"}'
-                   hx-swap="none">
-        </div>
-        <div>
-            <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">DEBT</label>
-            <input type="text" value="{{.Character.Debt}}" class="edit-input" style="width:100%; color:var(--accent-color);"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "debt"}'
-                   hx-swap="none">
-        </div>
-        {{else}}
-        <h1 style="color: var(--accent-color); font-size: 2.2rem; margin-bottom:5px;">YOU ARE {{.Character.Name}}</h1>
-        <div class="sub-title">@{{.Character.Handle}}</div>
-        <p style="line-height: 1.7; margin-bottom: 15px;">
-            A <span class="highlight">{{.Character.Style}}</span> <span class="highlight">{{.Character.Class.Name}}</span>; 
-            {{.Character.Feature}}. {{.Character.Want}} {{.Character.Quirk}} {{.Character.Obsession}}
-        </p>
-        <p style="color: var(--accent-color); font-weight: bold; font-size:1.05rem;">
-            {{.Character.Debt}}
-        </p>
         {{end}}
     </div>
 
     <!-- Top Right: Class -->
     <div class="content-box">
         {{if .CanEdit}}
-        <div style="margin-bottom:10px;">
-            <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">CLASS NAME</label>
-            <input type="text" value="{{.Character.Class.Name}}" class="edit-input" style="font-size:1.4rem; font-weight:bold; color:var(--accent-color); width:100%;"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "class_name"}'
-                   hx-swap="none">
+        <div style="position:absolute; top:15px; right:15px;">
+            <button type="button" onclick="toggleEditSection('class')" class="toggle-edit-btn">✏️ Edit Class</button>
         </div>
-        <div style="margin-bottom:10px;">
-            <label style="font-size:0.75rem; color:var(--accent-color); display:block;">CLASS GLITCH</label>
-            <input type="text" value="{{.Character.Class.Glitch}}" class="edit-input" style="width:100%; color:var(--accent-color);"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "class_glitch"}'
-                   hx-swap="none">
-        </div>
-        <div style="margin-bottom:10px;">
-            <label style="font-size:0.75rem; color:#aaa; display:block;">DESCRIPTION</label>
-            <input type="text" value="{{.Character.Class.Description}}" class="edit-input" style="width:100%;"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "class_description"}'
-                   hx-swap="none">
-        </div>
-        <div style="margin-bottom:10px;">
-            <label style="font-size:0.75rem; color:#aaa; display:block;">ORIGIN</label>
-            <input type="text" value="{{.Character.Class.Origin}}" class="edit-input" style="width:100%;"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "class_origin"}'
-                   hx-swap="none">
-        </div>
-        <div>
-            <label style="font-size:0.75rem; color:#aaa; display:block;">CLASS GIFT / WEAPON</label>
-            <input type="text" value="{{.Character.Class.Gift}}" class="edit-input" style="width:100%;"
-                   hx-put="/character/{{.Character.ID}}/update_field"
-                   hx-trigger="change, input delay:400ms"
-                   name="value"
-                   hx-vals='{"field": "class_gift"}'
-                   hx-swap="none">
-        </div>
-        {{else}}
-        <h2 class="section-title">{{.Character.Class.Name}}</h2>
-        <div class="sub-title" style="color: var(--accent-color); font-weight:bold;">{{.Character.Class.Glitch}}</div>
-        <p style="line-height: 1.7; font-style: italic; margin-bottom: 15px;">
-            {{.Character.Class.Description}}
-        </p>
-        {{if .Character.Class.Origin}}
-        <p style="margin-bottom: 10px; line-height:1.5;"><strong>Origin:</strong> {{.Character.Class.Origin}}</p>
         {{end}}
-        {{if .Character.Class.Gift}}
-        <p style="margin-bottom: 10px; line-height:1.5;"><strong>Class Gift/Weapon:</strong> {{.Character.Class.Gift}}</p>
-        {{end}}
+
+        <!-- Clean Text View (Default) -->
+        <div id="class-view">
+            <h2 class="section-title">{{.Character.Class.Name}}</h2>
+            <div class="sub-title" style="color: var(--accent-color); font-weight:bold;">{{.Character.Class.Glitch}}</div>
+            <p style="line-height: 1.7; font-style: italic; margin-bottom: 15px;">
+                {{.Character.Class.Description}}
+            </p>
+            {{if .Character.Class.Origin}}
+            <p style="margin-bottom: 10px; line-height:1.5;"><strong>Origin:</strong> {{.Character.Class.Origin}}</p>
+            {{end}}
+            {{if .Character.Class.Gift}}
+            <p style="margin-bottom: 10px; line-height:1.5;"><strong>Class Gift/Weapon:</strong> {{.Character.Class.Gift}}</p>
+            {{end}}
+        </div>
+
+        <!-- Editable Form (Hidden until Edit toggled) -->
+        {{if .CanEdit}}
+        <div id="class-edit" style="display:none; margin-top:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT CLASS DETAILS</span>
+                <button type="button" onclick="toggleEditSection('class')" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;">Done</button>
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">CLASS NAME</label>
+                <input type="text" value="{{.Character.Class.Name}}" class="edit-input" style="font-size:1.2rem; font-weight:bold; color:var(--accent-color); width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "class_name"}'
+                       hx-swap="none">
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:0.75rem; color:var(--accent-color); display:block;">CLASS GLITCH</label>
+                <input type="text" value="{{.Character.Class.Glitch}}" class="edit-input" style="width:100%; color:var(--accent-color);"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "class_glitch"}'
+                       hx-swap="none">
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:0.75rem; color:#aaa; display:block;">DESCRIPTION</label>
+                <input type="text" value="{{.Character.Class.Description}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "class_description"}'
+                       hx-swap="none">
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:0.75rem; color:#aaa; display:block;">ORIGIN</label>
+                <input type="text" value="{{.Character.Class.Origin}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "class_origin"}'
+                       hx-swap="none">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#aaa; display:block;">CLASS GIFT / WEAPON</label>
+                <input type="text" value="{{.Character.Class.Gift}}" class="edit-input" style="width:100%;"
+                       hx-put="/character/{{.Character.ID}}/update_field"
+                       hx-trigger="change, input delay:400ms"
+                       name="value"
+                       hx-vals='{"field": "class_gift"}'
+                       hx-swap="none">
+            </div>
+        </div>
         {{end}}
     </div>
 
@@ -585,25 +652,30 @@
         </table>
 
         {{if .CanEdit}}
-        <div style="background:#111; border:1px dashed #333; padding:10px; margin-bottom:15px;">
-            <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD WEAPON</div>
-            <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
-                <input type="hidden" name="type" value="weapon">
-                <input type="text" name="name" placeholder="Weapon Name" style="flex:1; min-width:120px;" class="edit-input" required>
-                <input type="text" name="damage" placeholder="Damage (e.g. d6)" style="width:90px;" class="edit-input">
-                <input type="text" name="description" placeholder="Notes" style="flex:1; min-width:120px;" class="edit-input">
-                <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add</button>
-            </form>
-        </div>
-        <div style="background:#111; border:1px dashed #333; padding:10px; margin-bottom:15px;">
-            <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD ARMOR</div>
-            <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
-                <input type="hidden" name="type" value="armor">
-                <input type="text" name="name" placeholder="Armor Name" style="flex:1; min-width:120px;" class="edit-input" required>
-                <input type="text" name="tier" placeholder="Tier (e.g. d4)" style="width:90px;" class="edit-input">
-                <input type="text" name="reduction" placeholder="Notes/Reduction" style="flex:1; min-width:120px;" class="edit-input">
-                <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add</button>
-            </form>
+        <div style="margin-top:10px; margin-bottom:15px;">
+            <button type="button" onclick="toggleEditSection('gear-add')" class="toggle-edit-btn">+ Add Weapon / Armor</button>
+            <div id="gear-add-edit" style="display:none; margin-top:10px;">
+                <div style="background:#111; border:1px dashed #333; padding:10px; margin-bottom:10px;">
+                    <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD WEAPON</div>
+                    <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
+                        <input type="hidden" name="type" value="weapon">
+                        <input type="text" name="name" placeholder="Weapon Name" style="flex:1; min-width:120px;" class="edit-input" required>
+                        <input type="text" name="damage" placeholder="Damage (e.g. d6)" style="width:90px;" class="edit-input">
+                        <input type="text" name="description" placeholder="Notes" style="flex:1; min-width:120px;" class="edit-input">
+                        <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add</button>
+                    </form>
+                </div>
+                <div style="background:#111; border:1px dashed #333; padding:10px;">
+                    <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD ARMOR</div>
+                    <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
+                        <input type="hidden" name="type" value="armor">
+                        <input type="text" name="name" placeholder="Armor Name" style="flex:1; min-width:120px;" class="edit-input" required>
+                        <input type="text" name="tier" placeholder="Tier (e.g. d4)" style="width:90px;" class="edit-input">
+                        <input type="text" name="reduction" placeholder="Notes/Reduction" style="flex:1; min-width:120px;" class="edit-input">
+                        <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add</button>
+                    </form>
+                </div>
+            </div>
         </div>
         {{end}}
 

@@ -103,18 +103,27 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	ownerID := getCookie(r, "cy_user_id")
 	var myGames []db.Game
 	var myChars []chargen.Character
+	var draftChars []chargen.Character
 	var user *db.User
 
 	if ownerID != "" {
 		user, _ = database.GetUser(ownerID)
 		myGames, _ = database.GetGamesByOwner(ownerID)
-		myChars, _ = database.GetCharactersByOwner(ownerID)
+		allChars, _ := database.GetCharactersByOwner(ownerID)
+		for _, c := range allChars {
+			if c.IsSaved {
+				myChars = append(myChars, c)
+			} else {
+				draftChars = append(draftChars, c)
+			}
+		}
 	}
 
 	data := map[string]interface{}{
-		"User":         user,
-		"MyGames":      myGames,
-		"MyCharacters": myChars,
+		"User":            user,
+		"MyGames":         myGames,
+		"MyCharacters":    myChars,
+		"DraftCharacters": draftChars,
 	}
 
 	_ = templates.ExecuteTemplate(w, "index.html", data)
