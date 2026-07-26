@@ -590,6 +590,11 @@ func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
 	id := r.PathValue("id")
 	listType := r.FormValue("type")
 	indexStr := r.FormValue("index")
@@ -600,6 +605,27 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 		s.renderError(w, r, "Invalid request", http.StatusBadRequest)
 		return
 	}
+
+	sessionCode := getCookie(r, "char_edit_"+c.ID)
+	user := s.getUserFromSession(r)
+	isOwner := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
+
+	isGM := false
+	if c.GameID != "" {
+		g, _ := s.DB.GetGame(c.GameID)
+		if g != nil {
+			gameGMCode := getCookie(r, "game_gm_"+g.ID)
+			if (gameGMCode != "" && gameGMCode == g.GMCode) || (user != nil && user.ID == g.OwnerID) {
+				isGM = true
+			}
+		}
+	}
+
+	if !isOwner && !isGM {
+		s.renderError(w, r, "Unauthorized", http.StatusForbidden)
+		return
+	}
+
 
 	switch listType {
 	case "weapon":
@@ -646,6 +672,11 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
@@ -654,11 +685,25 @@ func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
-	canEdit := sessionCode != "" && sessionCode == c.EditCode
-	if !canEdit {
-		s.renderError(w, r, "Unauthorized: Only the character owner can delete this character", http.StatusForbidden)
+	user := s.getUserFromSession(r)
+	isOwner := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
+	
+	isGM := false
+	if c.GameID != "" {
+		g, _ := s.DB.GetGame(c.GameID)
+		if g != nil {
+			gameGMCode := getCookie(r, "game_gm_"+g.ID)
+			if (gameGMCode != "" && gameGMCode == g.GMCode) || (user != nil && user.ID == g.OwnerID) {
+				isGM = true
+			}
+		}
+	}
+
+	if !isOwner && !isGM {
+		s.renderError(w, r, "Unauthorized: Only the character owner or GM can delete this character", http.StatusForbidden)
 		return
 	}
+
 
 	confirmName := r.FormValue("confirm_name")
 	if strings.TrimSpace(confirmName) != strings.TrimSpace(c.Name) {
