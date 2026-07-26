@@ -9,7 +9,8 @@ import (
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		_ = s.Templates.ExecuteTemplate(w, "404.html", nil)
 		return
 	}
 
@@ -31,11 +32,14 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	errMsg := r.URL.Query().Get("error")
+
 	data := map[string]interface{}{
 		"User":            user,
 		"MyGames":         myGames,
 		"MyCharacters":    myChars,
 		"DraftCharacters": draftChars,
+		"ErrorMessage":    errMsg,
 	}
 
 	_ = s.Templates.ExecuteTemplate(w, "index.html", data)

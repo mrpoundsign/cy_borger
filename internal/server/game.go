@@ -8,7 +8,7 @@ import (
 func (s *Server) handleCreateGame(w http.ResponseWriter, r *http.Request) {
 	user := s.getUserFromSession(r)
 	if user == nil {
-		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
+		s.renderError(w, r, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
 		return
 	}
 
@@ -21,7 +21,7 @@ func (s *Server) handleCreateGame(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.DB.CreateGame(name, ownerID)
 	if err != nil {
-		http.Error(w, "Failed to create game", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to create game", http.StatusInternalServerError)
 		return
 	}
 

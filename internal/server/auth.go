@@ -11,7 +11,7 @@ import (
 func (s *Server) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	user := s.getUserFromSession(r)
 	if user == nil {
-		http.Error(w, "Authentication required.", http.StatusUnauthorized)
+		s.renderError(w, r, "Authentication required.", http.StatusUnauthorized)
 		return
 	}
 
@@ -20,7 +20,7 @@ func (s *Server) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		handle = strings.TrimSpace(r.FormValue("username"))
 	}
 	if handle == "" {
-		http.Error(w, "Handle required", http.StatusBadRequest)
+		s.renderError(w, r, "Handle required", http.StatusBadRequest)
 		return
 	}
 
@@ -33,7 +33,7 @@ func (s *Server) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 			baseName = strings.TrimSpace(handle[:hashIndex])
 		}
 		if baseName == "" || strings.Contains(baseName, " ") {
-			http.Error(w, "Invalid Operator handle format. No spaces allowed.", http.StatusBadRequest)
+			s.renderError(w, r, "Invalid Operator handle format. No spaces allowed.", http.StatusBadRequest)
 			return
 		}
 		num := (time.Now().UnixNano() % 9000) + 1000
@@ -42,7 +42,7 @@ func (s *Server) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	user.Handle = handle
 	if err := s.DB.SaveUser(user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		s.renderError(w, r, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	u, err := s.DB.CreateUserAccount(username, password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Redirect(w, r, "/?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	u, err := s.DB.AuthenticateUser(username, password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		http.Redirect(w, r, "/?error="+err.Error(), http.StatusSeeOther)
 		return
 	}
 

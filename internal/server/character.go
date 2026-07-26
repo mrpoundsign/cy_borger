@@ -15,7 +15,7 @@ import (
 func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 	user := s.getUserFromSession(r)
 	if user == nil {
-		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
+		s.renderError(w, r, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
 		return
 	}
 
@@ -33,7 +33,7 @@ func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := s.DB.SaveCharacter(&c, ownerID); err != nil {
-		http.Error(w, "Failed to save character", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
 
@@ -177,7 +177,7 @@ func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		s.renderError(w, r, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -207,7 +207,7 @@ func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		s.renderError(w, r, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -238,7 +238,7 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		s.renderError(w, r, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -266,7 +266,7 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Request) {
 	user := s.getUserFromSession(r)
 	if user == nil {
-		http.Error(w, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
+		s.renderError(w, r, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
 		return
 	}
 
@@ -278,7 +278,7 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := s.DB.SaveCharacter(&c, ownerID); err != nil {
-		http.Error(w, "Failed to save character", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
 
@@ -297,7 +297,7 @@ func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		s.renderError(w, r, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -322,7 +322,7 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		s.renderError(w, r, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -413,7 +413,7 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 
 	ownerID := getCookie(r, "cy_user_id")
 	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
-		http.Error(w, "Failed to save character", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to save character", http.StatusInternalServerError)
 		return
 	}
 
@@ -436,7 +436,7 @@ func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Not found", http.StatusNotFound)
+		s.renderError(w, r, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -504,7 +504,7 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 
 	c, getErr := s.DB.GetCharacter(id)
 	if getErr != nil || c == nil || err != nil || idx < 0 {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		s.renderError(w, r, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
@@ -551,25 +551,25 @@ func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Character not found", http.StatusNotFound)
+		s.renderError(w, r, "Character not found", http.StatusNotFound)
 		return
 	}
 
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
 	canEdit := sessionCode != "" && sessionCode == c.EditCode
 	if !canEdit {
-		http.Error(w, "Unauthorized: Only the character owner can delete this character", http.StatusForbidden)
+		s.renderError(w, r, "Unauthorized: Only the character owner can delete this character", http.StatusForbidden)
 		return
 	}
 
 	confirmName := r.FormValue("confirm_name")
 	if strings.TrimSpace(confirmName) != strings.TrimSpace(c.Name) {
-		http.Error(w, fmt.Sprintf("Character name mismatch. You typed '%s', expected '%s'.", confirmName, c.Name), http.StatusBadRequest)
+		s.renderError(w, r, fmt.Sprintf("Character name mismatch. You typed '%s', expected '%s'.", confirmName, c.Name), http.StatusBadRequest)
 		return
 	}
 
 	if err := s.DB.DeleteCharacter(id); err != nil {
-		http.Error(w, "Failed to delete character", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to delete character", http.StatusInternalServerError)
 		return
 	}
 
@@ -591,7 +591,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Character not found", http.StatusNotFound)
+		s.renderError(w, r, "Character not found", http.StatusNotFound)
 		return
 	}
 
@@ -605,7 +605,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !isOwner && !isGM {
-		http.Error(w, "Unauthorized to mark character flatlined/dead", http.StatusForbidden)
+		s.renderError(w, r, "Unauthorized to mark character flatlined/dead", http.StatusForbidden)
 		return
 	}
 
@@ -619,7 +619,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 
 	ownerID := getCookie(r, "cy_user_id")
 	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
-		http.Error(w, "Failed to update character", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
 
@@ -661,7 +661,7 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.Error(w, "Character not found", http.StatusNotFound)
+		s.renderError(w, r, "Character not found", http.StatusNotFound)
 		return
 	}
 
@@ -675,7 +675,7 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !isOwner && !isGM {
-		http.Error(w, "Unauthorized to revive character", http.StatusForbidden)
+		s.renderError(w, r, "Unauthorized to revive character", http.StatusForbidden)
 		return
 	}
 
@@ -684,7 +684,7 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 
 	ownerID := getCookie(r, "cy_user_id")
 	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
-		http.Error(w, "Failed to update character", http.StatusInternalServerError)
+		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
 

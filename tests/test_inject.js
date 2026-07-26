@@ -36,8 +36,10 @@ test.describe('INSPECT SHEET modal injection', () => {
         const gameUrl = page.url();
 
         // Roll a character into game
-        await page.locator('button:has-text("🎲 Roll New Character")').click();
-        await page.waitForLoadState('networkidle');
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('button:has-text("🎲 Roll New Character")').click()
+        ]);
 
         const charUrl = page.url();
 

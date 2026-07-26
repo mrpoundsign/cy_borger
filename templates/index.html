@@ -250,6 +250,12 @@
                     <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
                 </div>
 
+                {{if .ErrorMessage}}
+                <div style="background:#ff0055; color:#fff; padding:8px; margin-bottom:12px; border-radius:4px; font-weight:bold; font-size:0.9rem;">
+                    ⚠ {{.ErrorMessage}}
+                </div>
+                {{end}}
+
                 <!-- Login Form -->
                 <form id="auth-login-form" action="/auth/login" method="POST" style="display:flex; flex-direction:column; gap:8px; max-width:300px; margin:0 auto;">
                     <input type="text" name="username" placeholder="Login Name (e.g. cybersam)" required style="width:100%; font-size:0.9rem; padding:6px; background:#000; border:1px solid var(--accent-color); color:#fff; font-family:inherit;">
