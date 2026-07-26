@@ -1,0 +1,2 @@
+ALTER TABLE characters ADD COLUMN is_dead INTEGER DEFAULT 0;
+ALTER TABLE characters ADD COLUMN death_note TEXT DEFAULT '';

@@ -55,6 +55,8 @@ func main() {
 	mux.HandleFunc("POST /character/{id}/add_item", handleAddListItem)
 	mux.HandleFunc("POST /character/{id}/delete_item", handleDeleteListItem)
 	mux.HandleFunc("POST /character/{id}/delete", handleDeleteCharacter)
+	mux.HandleFunc("POST /character/{id}/kill", handleKillCharacter)
+	mux.HandleFunc("POST /character/{id}/revive", handleReviveCharacter)
 
 	mux.HandleFunc("POST /game/create", handleCreateGame)
 	mux.HandleFunc("GET /game/{id}", handleViewGame)
@@ -187,6 +189,10 @@ func handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 		c.Handle = username
 	}
 
+	if gameID := r.FormValue("game_id"); gameID != "" {
+		c.GameID = gameID
+	}
+
 	if err := database.SaveCharacter(&c, ownerID); err != nil {
 		http.Error(w, "Failed to save character", http.StatusInternalServerError)
 		return
@@ -210,10 +216,14 @@ func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *char
 	canEdit := sessionCode != "" && sessionCode == c.EditCode
 
 	var game *db.Game
+	isGM := false
 	if c.GameID != "" {
 		game, _ = database.GetGame(c.GameID)
-		if !canEdit && game != nil && getCookie(r, "game_gm_"+game.ID) == game.GMCode {
-			canEdit = true
+		if game != nil {
+			isGM = getCookie(r, "game_gm_"+game.ID) == game.GMCode
+			if !canEdit && isGM {
+				canEdit = true
+			}
 		}
 	}
 
@@ -228,6 +238,7 @@ func renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *char
 	data := map[string]interface{}{
 		"Character":  c,
 		"CanEdit":    canEdit,
+		"IsGM":       isGM,
 		"Game":       game,
 		"ActiveGame": activeGame,
 		"IsModal":    r.URL.Query().Get("modal") == "true",
@@ -839,4 +850,100 @@ func handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func handleKillCharacter(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Character not found", http.StatusNotFound)
+		return
+	}
+
+	sessionCode := getCookie(r, "char_edit_"+c.ID)
+	isOwner := sessionCode != "" && sessionCode == c.EditCode
+	isGM := false
+	if c.GameID != "" {
+		if g, _ := database.GetGame(c.GameID); g != nil {
+			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
+		}
+	}
+
+	if !isOwner && !isGM {
+		http.Error(w, "Unauthorized to mark character flatlined/dead", http.StatusForbidden)
+		return
+	}
+
+	c.IsDead = true
+	deathNote := strings.TrimSpace(r.FormValue("death_note"))
+	if deathNote == "" {
+		deathNote = "Flatlined in the neon-soaked alleyways of CY."
+	}
+	c.DeathNote = deathNote
+
+	ownerID := getCookie(r, "cy_user_id")
+	if err := database.SaveCharacter(c, ownerID); err != nil {
+		http.Error(w, "Failed to update character", http.StatusInternalServerError)
+		return
+	}
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderCharacterViewWithChar(w, r, c)
+		return
+	}
+
+	if referer := r.Header.Get("Referer"); referer != "" {
+		http.Redirect(w, r, referer, http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+}
+
+func handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Character not found", http.StatusNotFound)
+		return
+	}
+
+	sessionCode := getCookie(r, "char_edit_"+c.ID)
+	isOwner := sessionCode != "" && sessionCode == c.EditCode
+	isGM := false
+	if c.GameID != "" {
+		if g, _ := database.GetGame(c.GameID); g != nil {
+			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
+		}
+	}
+
+	if !isOwner && !isGM {
+		http.Error(w, "Unauthorized to revive character", http.StatusForbidden)
+		return
+	}
+
+	c.IsDead = false
+
+	ownerID := getCookie(r, "cy_user_id")
+	if err := database.SaveCharacter(c, ownerID); err != nil {
+		http.Error(w, "Failed to update character", http.StatusInternalServerError)
+		return
+	}
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderCharacterViewWithChar(w, r, c)
+		return
+	}
+
+	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
 }

@@ -259,6 +259,24 @@
 </div>
 {{end}}
 
+{{if .Character.IsDead}}
+<div style="background: #20000a; border: 2px solid #ff0055; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 0 18px rgba(255,0,85,0.35);">
+    <div>
+        <div style="color: #ff0055; font-weight: bold; font-size: 1.15rem; text-transform: uppercase; display:flex; align-items:center; gap:8px;">
+            🪦 OPERATOR FLATLINED / IN GRAVEYARD
+        </div>
+        <div style="color: #ff99bb; font-size: 0.9rem; margin-top: 6px; font-style: italic;">
+            "{{.Character.DeathNote}}"
+        </div>
+    </div>
+    {{if or .CanEdit .IsGM}}
+    <form action="/character/{{.Character.ID}}/revive" method="POST" hx-post="/character/{{.Character.ID}}/revive" hx-target="#character-sheet-container" hx-swap="outerHTML">
+        <button type="submit" class="btn-outline" style="font-size: 0.85rem; border-color:#ff0055; color:#ff0055;">⚡ REVIVE OPERATOR</button>
+    </form>
+    {{end}}
+</div>
+{{end}}
+
 {{if and .CanEdit (not .Character.IsSaved)}}
 <div style="background: #0d1f12; border: 2px solid #00ff66; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 0 15px rgba(0,255,102,0.2);">
     <div>
@@ -328,6 +346,29 @@
         <button class="btn" hx-post="/character/generate" hx-target="#character-sheet-container" hx-push-url="true">
             🎲 REROLL NEW
         </button>
+
+        {{if or .CanEdit .IsGM}}
+        {{if not .Character.IsDead}}
+        <button class="btn-danger-small" style="font-size: 0.8rem; padding: 7px 12px; margin-left: 5px; background: #400015; border-color: #ff0055; color: #ff0055;" onclick="toggleEditSection('kill-char', 'flex')">💀 FLATLINE</button>
+        
+        <div id="kill-char-edit" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#0a0a0a; border:2px solid #ff0055; max-width:450px; width:90%; padding:25px; box-shadow:0 0 20px rgba(255,0,85,0.4); text-align:center;">
+                <h2 style="color:#ff0055; margin-bottom:10px;">💀 FLATLINE OPERATOR</h2>
+                <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px; line-height:1.4;">
+                    Mark <strong>{{.Character.Name}}</strong> as deceased in the GRAVEYARD. Add cause of death or final words:
+                </p>
+                <form action="/character/{{.Character.ID}}/kill" method="POST" hx-post="/character/{{.Character.ID}}/kill" hx-target="#character-sheet-container" hx-swap="outerHTML" style="display:flex; flex-direction:column; gap:12px;">
+                    <textarea name="death_note" placeholder="e.g. Flatlined by Cy-Spider in Sector 4" class="edit-input auto-stretch" style="border-color:#ff0055; font-size:0.95rem; min-height:60px;"></textarea>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-top:5px;">
+                        <button type="button" class="btn-outline" onclick="toggleEditSection('kill-char')">Cancel</button>
+                        <button type="submit" class="btn" style="background:#ff0055; color:#fff; border-color:#ff0055;">💀 FLATLINE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {{end}}
+        {{end}}
+
         {{if .CanEdit}}
         <button class="btn-danger-small" style="font-size: 0.8rem; padding: 7px 12px; margin-left: 5px;" onclick="toggleEditSection('delete-char', 'flex')">💣 DELETE</button>
         

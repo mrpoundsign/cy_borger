@@ -289,8 +289,17 @@
             <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size:1.1rem;">MY CHARACTERS (SAVED)</h3>
             <ul id="my-chars-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
                 {{range .MyCharacters}}
-                <li><a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">👤
-                        <strong>{{.Name}}</strong> [Saved]</a></li>
+                <li>
+                    {{if .IsDead}}
+                    <a href="/character/{{.ID}}" style="color:#ff0055; text-decoration:none;">
+                        🪦 <strong>{{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</strong> [FLATLINED]
+                    </a>
+                    {{else}}
+                    <a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">
+                        👤 <strong>{{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</strong> [Saved]
+                    </a>
+                    {{end}}
+                </li>
                 {{end}}
             </ul>
             {{end}}
