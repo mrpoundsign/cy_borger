@@ -1,0 +1,17 @@
+.git
+.gitignore
+.air.toml
+tmp/
+data/
+cy_borger.db
+tests/
+playwright.config.js
+node_modules/
+package-lock.json
+package.json
+playwright-report/
+test-results/
+.agents/
+walkthrough.md
+implementation_plan.md
+task.md
