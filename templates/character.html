@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Character.Name}} - CY_BORG Character Sheet</title>
+    <title>{{.Character.Name}} - CY_BORGER Character Sheet</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         :root {
@@ -42,7 +43,7 @@
             document.documentElement.style.setProperty('--border-color', next);
         }
 
-        (function() {
+        (function () {
             const accent = localStorage.getItem('cy_theme_accent') || '#ffe600';
             document.documentElement.style.setProperty('--accent-color', accent);
             document.documentElement.style.setProperty('--border-color', accent);
@@ -54,25 +55,25 @@
             }
 
             window.cyStore = {
-                getUserId: function() { return localStorage.getItem('cy_user_id'); },
-                saveGMGame: function(gameId, gmCode, name) {
+                getUserId: function () { return localStorage.getItem('cy_user_id'); },
+                saveGMGame: function (gameId, gmCode, name) {
                     let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
                     games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
                     localStorage.setItem('cy_gm_games', JSON.stringify(games));
                 },
-                getGMGames: function() { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
-                saveCharEdit: function(charId, editCode, name) {
+                getGMGames: function () { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
+                saveCharEdit: function (charId, editCode, name) {
                     let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
                     chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
                     localStorage.setItem('cy_user_chars', JSON.stringify(chars));
                 },
-                getCharEdits: function() { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
+                getCharEdits: function () { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
             };
 
             // Real-Time WebSocket Connection
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/character/{{.Character.ID}}');
-            socket.onmessage = function(e) {
+            socket.onmessage = function (e) {
                 // Ignore self updates if user is currently typing inside an active input/textarea or editing a section
                 if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
                     return;
@@ -81,7 +82,7 @@
                     return;
                 }
                 if (typeof htmx !== 'undefined') {
-                    htmx.ajax('GET', '/character/{{.Character.ID}}', {target: 'body', swap: 'outerHTML'});
+                    htmx.ajax('GET', '/character/{{.Character.ID}}', { target: 'body', swap: 'outerHTML' });
                 }
             };
         })();
@@ -101,7 +102,9 @@
         }
     </script>
 </head>
+
 <body>
     {{template "character_sheet.tmpl" .}}
 </body>
+
 </html>

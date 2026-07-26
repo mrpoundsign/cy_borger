@@ -145,7 +145,7 @@ test.describe('INSPECT SHEET modal injection', () => {
         await page.goto(charUrl);
         await page.waitForLoadState('networkidle');
 
-        await expect(page).toHaveTitle(/CY_BORG/);
+        await expect(page).toHaveTitle(/CY_BORGER/);
         await expect(page.locator('body h1')).toContainText('YOU ARE');
         await expect(page.locator('.vitals-box')).toBeVisible();
         await expect(page.locator('.toolbar')).toBeVisible();

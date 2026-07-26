@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CY_BORG Character Generator</title>
+    <title>🍔 CY_BORGER Character Generator</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         :root {
@@ -165,7 +166,7 @@
             document.documentElement.style.setProperty('--border-color', next);
         }
 
-        (function() {
+        (function () {
             const accent = localStorage.getItem('cy_theme_accent') || '#ffe600';
             document.documentElement.style.setProperty('--accent-color', accent);
             document.documentElement.style.setProperty('--border-color', accent);
@@ -183,37 +184,39 @@
             }
 
             window.cyStore = {
-                getUserId: function() { return localStorage.getItem('cy_user_id'); },
-                getUserName: function() { return localStorage.getItem('cy_user_name'); },
-                setUserName: function(name) { localStorage.setItem('cy_user_name', name); },
-                hasEditedName: function() { return localStorage.getItem('cy_user_name_edited') === 'true'; },
-                setEditedName: function() { localStorage.setItem('cy_user_name_edited', 'true'); },
-                saveGMGame: function(gameId, gmCode, name) {
+                getUserId: function () { return localStorage.getItem('cy_user_id'); },
+                getUserName: function () { return localStorage.getItem('cy_user_name'); },
+                setUserName: function (name) { localStorage.setItem('cy_user_name', name); },
+                hasEditedName: function () { return localStorage.getItem('cy_user_name_edited') === 'true'; },
+                setEditedName: function () { localStorage.setItem('cy_user_name_edited', 'true'); },
+                saveGMGame: function (gameId, gmCode, name) {
                     let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
                     games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
                     localStorage.setItem('cy_gm_games', JSON.stringify(games));
                 },
-                getGMGames: function() { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
-                saveCharEdit: function(charId, editCode, name) {
+                getGMGames: function () { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
+                saveCharEdit: function (charId, editCode, name) {
                     let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
                     chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
                     localStorage.setItem('cy_user_chars', JSON.stringify(chars));
                 },
-                getCharEdits: function() { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
+                getCharEdits: function () { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
             };
         })();
     </script>
 </head>
+
 <body>
     <div class="container">
-        <h1>CY_BORG</h1>
-        <p>KILL THE CORPORATIONS. LIVE FAST. DIE CHROME.</p>
+        <h1>CY_BORGER</h1>
+        <p>KILL THE CORPORATIONS. LIVE FAST. DIE CHROME. BBQ.</p>
 
         <div class="user-banner">
             {{if .User}}
             <span>OPERATOR HANDLE: <strong style="color:var(--accent-color)">{{.User.Username}}</strong></span>
             <div>
-                <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
+                <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈
+                    COLOR</button>
             </div>
             <script>
                 if (window.cyStore) {
@@ -224,14 +227,20 @@
             {{else}}
             <span>OPERATOR HANDLE: <strong id="user-handle-display" style="color:var(--accent-color)"></strong></span>
             <div id="handle-editor-area" style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <div style="font-size: 0.75rem; color: #ff3366; font-weight: bold; text-transform: uppercase;">⚠️ Warning: Can only be edited ONCE!</div>
-                <form id="handle-form" hx-post="/user/update" hx-trigger="submit" hx-swap="none" style="display:inline-flex; gap:5px; align-items:center;">
+                <div style="font-size: 0.75rem; color: #ff3366; font-weight: bold; text-transform: uppercase;">⚠️
+                    Warning: Can only be edited ONCE!</div>
+                <form id="handle-form" hx-post="/user/update" hx-trigger="submit" hx-swap="none"
+                    style="display:inline-flex; gap:5px; align-items:center;">
                     <input type="hidden" name="user_id" id="user-id-input">
-                    <input type="text" name="username" id="user-handle-input" style="width:230px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
-                    <button type="button" onclick="randomizeInputName()" class="btn-outline-small" title="Randomize name">🎲</button>
+                    <input type="text" name="username" id="user-handle-input"
+                        style="width:230px; padding:4px; font-size:0.9rem; margin-bottom:0;"
+                        placeholder="Change handle">
+                    <button type="button" onclick="randomizeInputName()" class="btn-outline-small"
+                        title="Randomize name">🎲</button>
                     <button type="submit" onclick="saveHandle()" class="btn-small">Save</button>
                 </form>
-                <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
+                <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈
+                    COLOR</button>
             </div>
             <script>
                 // Database was wiped or user is new; reset client local storage state
@@ -245,7 +254,8 @@
                 <button type="submit" class="btn">🎲 Roll Random Character</button>
             </form>
             <form action="/character/create_blank" method="POST" style="display:inline;">
-                <button type="submit" class="btn" style="background:#00ff66; color:#000;">📝 Create Blank Character</button>
+                <button type="submit" class="btn" style="background:#00ff66; color:#000;">📝 Create Blank
+                    Character</button>
             </form>
         </div>
 
@@ -253,7 +263,8 @@
             <h3 style="color: var(--accent-color); margin-bottom: 15px;">START A GAME</h3>
             <form action="/game/create" method="POST">
                 <input type="text" name="name" placeholder="Game Name (e.g. Sector 4 Heist)" required><br>
-                <button type="submit" class="btn" style="padding: 10px 20px; font-size: 0.9rem;">Create Game as GM</button>
+                <button type="submit" class="btn" style="padding: 10px 20px; font-size: 0.9rem;">Create Game as
+                    GM</button>
             </form>
         </div>
 
@@ -263,7 +274,8 @@
             <h3 style="color: #00ff66; margin-bottom: 10px; font-size:1.1rem;">MY GAMES (GM)</h3>
             <ul id="my-gm-games-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
                 {{range .MyGames}}
-                <li><a href="/game/{{.ID}}" style="color:#00ff66; text-decoration:none;">⚡ <strong>{{.Name}}</strong> [GM Mode]</a></li>
+                <li><a href="/game/{{.ID}}" style="color:#00ff66; text-decoration:none;">⚡ <strong>{{.Name}}</strong>
+                        [GM Mode]</a></li>
                 {{end}}
             </ul>
             {{end}}
@@ -272,7 +284,8 @@
             <h3 style="color: var(--accent-color); margin-bottom: 10px; font-size:1.1rem;">MY CHARACTERS (SAVED)</h3>
             <ul id="my-chars-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
                 {{range .MyCharacters}}
-                <li><a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">👤 <strong>{{.Name}}</strong> [Saved]</a></li>
+                <li><a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">👤
+                        <strong>{{.Name}}</strong> [Saved]</a></li>
                 {{end}}
             </ul>
             {{end}}
@@ -281,7 +294,8 @@
             <h3 style="color: #ff9900; margin-bottom: 10px; font-size:1.1rem;">DRAFT / UNKEPT CHARACTERS</h3>
             <ul id="my-drafts-list" style="list-style:none; padding:0; line-height:1.5;">
                 {{range .DraftCharacters}}
-                <li><a href="/character/{{.ID}}" style="color:#ff9900; text-decoration:none;">⚡ <strong>{{.Name}}</strong> [Draft Preview]</a></li>
+                <li><a href="/character/{{.ID}}" style="color:#ff9900; text-decoration:none;">⚡
+                        <strong>{{.Name}}</strong> [Draft Preview]</a></li>
                 {{end}}
             </ul>
             {{end}}
@@ -316,7 +330,7 @@
                     const num = Math.floor(1000 + Math.random() * 9000);
                     input = baseName + "#" + num;
                 }
-                
+
                 cyStore.setUserName(input);
                 cyStore.setEditedName();
                 document.getElementById("user-handle-display").innerText = input;
@@ -325,9 +339,9 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             if (!window.cyStore) return;
-            
+
             document.getElementById("user-id-input").value = cyStore.getUserId();
             document.getElementById("user-handle-display").innerText = cyStore.getUserName();
 
@@ -341,4 +355,5 @@
         });
     </script>
 </body>
+
 </html>

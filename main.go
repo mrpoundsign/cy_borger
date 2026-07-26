@@ -68,7 +68,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	fmt.Println("⚡ CY_BORG Character Generator running on http://localhost:8080")
+	fmt.Println("⚡ CY_BORGER Character Generator running on http://localhost:8080")
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Server stopped: %v", err)
 	}

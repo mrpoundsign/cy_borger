@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game: {{.Game.Name}} - CY_BORG</title>
+    <title>Game: {{.Game.Name}} - CY_BORGER</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         :root {
@@ -111,7 +112,7 @@
             document.documentElement.style.setProperty('--border-color', next);
         }
 
-        (function() {
+        (function () {
             const accent = localStorage.getItem('cy_theme_accent') || '#ffe600';
             document.documentElement.style.setProperty('--accent-color', accent);
             document.documentElement.style.setProperty('--border-color', accent);
@@ -123,25 +124,25 @@
             }
 
             window.cyStore = {
-                getUserId: function() { return localStorage.getItem('cy_user_id'); },
-                saveGMGame: function(gameId, gmCode, name) {
+                getUserId: function () { return localStorage.getItem('cy_user_id'); },
+                saveGMGame: function (gameId, gmCode, name) {
                     let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
                     games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
                     localStorage.setItem('cy_gm_games', JSON.stringify(games));
                 },
-                getGMGames: function() { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
-                saveCharEdit: function(charId, editCode, name) {
+                getGMGames: function () { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
+                saveCharEdit: function (charId, editCode, name) {
                     let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
                     chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
                     localStorage.setItem('cy_user_chars', JSON.stringify(chars));
                 },
-                getCharEdits: function() { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
+                getCharEdits: function () { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
             };
 
             // Real-Time Room WebSocket Live Sync
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/game/{{.Game.ID}}');
-            socket.onmessage = function(e) {
+            socket.onmessage = function (e) {
                 const parts = e.data.split(":");
                 const type = parts[0];
                 const charId = parts[1];
@@ -180,10 +181,15 @@
         }
     </script>
 </head>
+
 <body>
-    <div style="margin: 10px 0 20px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px;">
-        <a href="/" style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️ Back to Home</a>
-        <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">CY_BORG Game Terminal</span>
+    <div
+        style="margin: 10px 0 20px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px;">
+        <a href="/"
+            style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️
+            Back to Home</a>
+        <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">CY_BORGER Game
+            Terminal</span>
     </div>
 
     <!-- Container for GM Inline Character Modal -->
@@ -194,8 +200,11 @@
             <h1>GAME: {{.Game.Name}}</h1>
             {{if .IsGM}}
             <span style="color: #00ff66; font-weight: bold;">[GM MODE ACTIVE]</span>
-            <button class="btn-outline" style="font-size:0.8rem; margin-left:10px;" onclick="copyText(window.location.origin + '/game/{{.Game.ID}}?gm_code={{.Game.GMCode}}', this)">Copy GM Link</button>
-            <button class="btn-outline" style="font-size:0.8rem; margin-left:5px;" onclick="copyText('{{.Game.GMCode}}', this)">Copy GM Code</button>
+            <button class="btn-outline" style="font-size:0.8rem; margin-left:10px;"
+                onclick="copyText(window.location.origin + '/game/{{.Game.ID}}?gm_code={{.Game.GMCode}}', this)">Copy GM
+                Link</button>
+            <button class="btn-outline" style="font-size:0.8rem; margin-left:5px;"
+                onclick="copyText('{{.Game.GMCode}}', this)">Copy GM Code</button>
             <script>
                 if (window.cyStore) {
                     cyStore.saveGMGame('{{.Game.ID}}', '{{.Game.GMCode}}', '{{.Game.Name}}');
@@ -204,7 +213,7 @@
             {{else}}
             <span style="color: var(--muted-color)">[PLAYER PARTY VIEW]</span>
             <script>
-                document.addEventListener("DOMContentLoaded", function() {
+                document.addEventListener("DOMContentLoaded", function () {
                     if (window.cyStore) {
                         const games = cyStore.getGMGames();
                         if (games['{{.Game.ID}}'] && games['{{.Game.ID}}'].gmCode) {
@@ -219,18 +228,21 @@
                 });
             </script>
             {{end}}
-            <button onclick="randomizeThemeColor()" class="btn-outline" style="font-size:0.8rem; margin-left:8px;">🌈 Color</button>
+            <button onclick="randomizeThemeColor()" class="btn-outline" style="font-size:0.8rem; margin-left:8px;">🌈
+                Color</button>
         </div>
         <div class="invite-box">
             <span>PLAYER INVITE CODE: <strong style="color: #fff">{{.Game.InviteCode}}</strong></span>
-            <button class="btn-outline" style="font-size:0.8rem;" onclick="copyText('{{.Game.InviteCode}}', this)">Copy Code</button>
+            <button class="btn-outline" style="font-size:0.8rem;" onclick="copyText('{{.Game.InviteCode}}', this)">Copy
+                Code</button>
         </div>
     </div>
 
     {{if not .IsGM}}
     <div style="margin-bottom: 20px;">
         <form action="/game/{{.Game.ID}}/auth" method="POST" style="display:inline-flex; gap: 10px;">
-            <input type="text" name="gm_code" placeholder="Enter GM Code" style="background:#111; border:1px solid var(--accent-color); color:#fff; padding:8px;">
+            <input type="text" name="gm_code" placeholder="Enter GM Code"
+                style="background:#111; border:1px solid var(--accent-color); color:#fff; padding:8px;">
             <button type="submit" class="btn-outline">Unlock GM Controls</button>
         </form>
     </div>
@@ -243,35 +255,34 @@
         </form>
     </div>
 
-    <div class="party-grid"
-         hx-get="/game/{{.Game.ID}}"
-         hx-select=".party-grid"
-         hx-target="this"
-         hx-swap="outerHTML"
-         hx-trigger="party-update from:body">
+    <div class="party-grid" hx-get="/game/{{.Game.ID}}" hx-select=".party-grid" hx-target="this" hx-swap="outerHTML"
+        hx-trigger="party-update from:body">
         {{range .Characters}}
         <div class="char-card">
             <div class="char-name">{{.Name}}</div>
-            <div style="color:var(--muted-color); font-size:0.9rem; margin-bottom:10px;">@{{.Handle}} - {{.Class.Name}}</div>
-            <div><strong>HP:</strong> {{.HP.Current}}/{{.HP.Max}} | <strong>Glitches:</strong> {{.Glitches.Current}}/{{.Glitches.Max}}</div>
-            <div style="margin-top:8px;"><strong>Weapons:</strong> {{range .Weapons}}{{.Name}} ({{.Damage}}), {{end}}</div>
+            <div style="color:var(--muted-color); font-size:0.9rem; margin-bottom:10px;">@{{.Handle}} - {{.Class.Name}}
+            </div>
+            <div><strong>HP:</strong> {{.HP.Current}}/{{.HP.Max}} | <strong>Glitches:</strong>
+                {{.Glitches.Current}}/{{.Glitches.Max}}</div>
+            <div style="margin-top:8px;"><strong>Weapons:</strong> {{range .Weapons}}{{.Name}} ({{.Damage}}), {{end}}
+            </div>
             <div style="margin-top:12px; display:flex; gap:8px;">
-                <button class="btn"
-                    hx-get="/character/{{.ID}}?modal=true"
-                    hx-target="#char-modal-container"
-                    hx-swap="innerHTML"
-                    hx-select=".modal-overlay">
+                <button class="btn" hx-get="/character/{{.ID}}?modal=true" hx-target="#char-modal-container"
+                    hx-swap="innerHTML" hx-select=".modal-overlay">
                     ⚡ INSPECT SHEET
                 </button>
                 <a href="/character/{{.ID}}" class="btn-outline">Full Page</a>
             </div>
         </div>
         {{else}}
-        <p style="color:var(--muted-color)">No characters have joined this game yet. Share the invite code <strong>{{.Game.InviteCode}}</strong> with players!</p>
+        <p style="color:var(--muted-color)">No characters have joined this game yet. Share the invite code
+            <strong>{{.Game.InviteCode}}</strong> with players!
+        </p>
         {{end}}
     </div>
 
     <p style="margin-top: 30px;"><a href="/" class="btn-outline">← Back to Main Menu</a></p>
 
 </body>
+
 </html>
