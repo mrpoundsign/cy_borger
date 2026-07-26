@@ -113,25 +113,32 @@ func (d *DB) SaveCharacter(c *chargen.Character, ownerID string) error {
 		return fmt.Errorf("failed to marshal character: %w", err)
 	}
 
+	isSavedInt := 0
+	if c.IsSaved {
+		isSavedInt = 1
+	}
+
 	query := `
-	INSERT INTO characters (id, edit_code, game_id, owner_id, data_json, updated_at)
-	VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	INSERT INTO characters (id, edit_code, game_id, owner_id, is_saved, data_json, updated_at)
+	VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 	ON CONFLICT(id) DO UPDATE SET
 		game_id = excluded.game_id,
+		is_saved = excluded.is_saved,
 		data_json = excluded.data_json,
 		updated_at = CURRENT_TIMESTAMP;
 	`
-	_, err = d.conn.Exec(query, c.ID, c.EditCode, c.GameID, ownerID, string(data))
+	_, err = d.conn.Exec(query, c.ID, c.EditCode, c.GameID, ownerID, isSavedInt, string(data))
 	return err
 }
 
 func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
-	query := `SELECT game_id, data_json, updated_at FROM characters WHERE id = ?`
+	query := `SELECT game_id, is_saved, data_json, updated_at FROM characters WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
 	var gameID, dataStr string
+	var isSavedInt int
 	var updatedAt time.Time
-	if err := row.Scan(&gameID, &dataStr, &updatedAt); err != nil {
+	if err := row.Scan(&gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -143,6 +150,7 @@ func (d *DB) GetCharacter(id string) (*chargen.Character, error) {
 		return nil, err
 	}
 	c.GameID = gameID
+	c.IsSaved = isSavedInt == 1 || c.IsSaved
 	c.UpdatedAt = updatedAt
 
 	return &c, nil
@@ -198,7 +206,7 @@ func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
 }
 
 func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
-	query := `SELECT game_id, data_json, updated_at FROM characters WHERE game_id = ?`
+	query := `SELECT game_id, is_saved, data_json, updated_at FROM characters WHERE game_id = ?`
 	rows, err := d.conn.Query(query, gameID)
 	if err != nil {
 		return nil, err
@@ -208,13 +216,15 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 	var chars []chargen.Character
 	for rows.Next() {
 		var gameID, dataStr string
+		var isSavedInt int
 		var updatedAt time.Time
-		if err := rows.Scan(&gameID, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
 			c.GameID = gameID
+			c.IsSaved = isSavedInt == 1 || c.IsSaved
 			c.UpdatedAt = updatedAt
 			chars = append(chars, c)
 		}
@@ -248,7 +258,7 @@ func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
 }
 
 func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
-	query := `SELECT game_id, data_json, updated_at FROM characters WHERE owner_id = ?`
+	query := `SELECT game_id, is_saved, data_json, updated_at FROM characters WHERE owner_id = ?`
 	rows, err := d.conn.Query(query, ownerID)
 	if err != nil {
 		return nil, err
@@ -258,13 +268,15 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 	var chars []chargen.Character
 	for rows.Next() {
 		var gameID, dataStr string
+		var isSavedInt int
 		var updatedAt time.Time
-		if err := rows.Scan(&gameID, &dataStr, &updatedAt); err != nil {
+		if err := rows.Scan(&gameID, &isSavedInt, &dataStr, &updatedAt); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
 		if err := json.Unmarshal([]byte(dataStr), &c); err == nil {
 			c.GameID = gameID
+			c.IsSaved = isSavedInt == 1 || c.IsSaved
 			c.UpdatedAt = updatedAt
 			chars = append(chars, c)
 		}

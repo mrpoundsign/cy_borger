@@ -71,7 +71,10 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         const nameInput = page.locator('input[hx-vals*=\'"field": "name"\']');
         await nameInput.fill('CYBER_PUNK_X');
         await nameInput.blur();
-        await page.waitForTimeout(500);
+        
+        // Click Done to save form
+        await page.locator('#identity-edit button:has-text("Done")').click();
+        await page.waitForLoadState('networkidle');
 
         // Reload page to confirm persistence in view
         await page.reload();
