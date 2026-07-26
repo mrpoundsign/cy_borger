@@ -248,10 +248,11 @@
     }
 </style>
 
+<div id="character-sheet-container">
 {{if not .IsModal}}
 <div style="margin: 10px 0 20px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px;">
     <a href="/" style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️ Back to Home</a>
-    <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">🍔 CY_BORGER Operator Sheet</span>
+    <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">CY_BORG Operator Sheet</span>
 </div>
 {{end}}
 
@@ -261,7 +262,7 @@
         <div style="color: #00ff66; font-weight: bold; font-size: 1.1rem; text-transform: uppercase;">⚡ DRAFT CHARACTER PREVIEW</div>
         <div style="color: #aaa; font-size: 0.85rem; margin-top: 4px;">Reroll as many times as you like. Click "KEEP THIS CHARACTER" to save it permanently!</div>
     </div>
-    <form action="/character/{{.Character.ID}}/keep" method="POST" hx-post="/character/{{.Character.ID}}/keep" hx-target="body" hx-swap="outerHTML">
+    <form action="/character/{{.Character.ID}}/keep" method="POST" hx-post="/character/{{.Character.ID}}/keep" hx-target="#character-sheet-container" hx-swap="outerHTML">
         <button type="submit" class="btn-green" style="font-size: 1rem; padding: 10px 22px;">💾 KEEP THIS CHARACTER</button>
     </form>
 </div>
@@ -321,9 +322,28 @@
         {{end}}
 
         <button class="btn-outline" onclick="randomizeThemeColor()">🌈 Color</button>
-        <button class="btn" hx-post="/character/generate" hx-target="body" hx-push-url="true">
+        <button class="btn" hx-post="/character/generate" hx-target="#character-sheet-container" hx-push-url="true">
             🎲 REROLL NEW
         </button>
+        {{if .CanEdit}}
+        <button class="btn-danger-small" style="font-size: 0.8rem; padding: 7px 12px; margin-left: 5px;" onclick="toggleEditSection('delete-char', 'flex')">💣 DELETE</button>
+        
+        <div id="delete-char-edit" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#0a0a0a; border:2px solid #ff3366; max-width:450px; width:90%; padding:25px; box-shadow:0 0 20px rgba(255,51,102,0.4); text-align:center;">
+                <h2 style="color:#ff3366; margin-bottom:10px;">⚠️ PERMANENT DELETION</h2>
+                <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px; line-height:1.4;">
+                    This action cannot be undone. To delete <strong>{{.Character.Name}}</strong>, type the character name below:
+                </p>
+                <form action="/character/{{.Character.ID}}/delete" method="POST" hx-post="/character/{{.Character.ID}}/delete" style="display:flex; flex-direction:column; gap:12px;">
+                    <input type="text" name="confirm_name" placeholder="Type {{.Character.Name}} to confirm" required class="edit-input" style="border-color:#ff3366; text-align:center; font-size:1rem;">
+                    <div style="display:flex; gap:10px; justify-content:center; margin-top:5px;">
+                        <button type="button" class="btn-outline" onclick="toggleEditSection('delete-char')">Cancel</button>
+                        <button type="submit" class="btn" style="background:#ff3366; color:#fff;">💣 PERMANENTLY DELETE</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {{end}}
     </div>
 </div>
 
@@ -417,12 +437,12 @@
 
 <!-- Edit Form Toggle & Auto-Stretch Script -->
 <script>
-function toggleEditSection(sectionId) {
+function toggleEditSection(sectionId, displayStyle = 'block') {
     const editEl = document.getElementById(sectionId + '-edit');
     const viewEl = document.getElementById(sectionId + '-view');
     if (editEl) {
-        const isHidden = editEl.style.display === 'none';
-        editEl.style.display = isHidden ? 'block' : 'none';
+        const isHidden = editEl.style.display === 'none' || editEl.style.display === '';
+        editEl.style.display = isHidden ? displayStyle : 'none';
         if (viewEl) {
             viewEl.style.display = isHidden ? 'none' : 'block';
         }
@@ -470,86 +490,55 @@ document.addEventListener("input", function(e) {
         <!-- Editable Form (Hidden until Edit toggled) -->
         {{if .CanEdit}}
         <div id="identity-edit" style="display:none; margin-top:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT IDENTITY & BIO</span>
-                <button type="button" onclick="toggleEditSection('identity')" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;">Done</button>
-            </div>
-            <div style="margin-bottom: 8px;">
-                <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">NAME</label>
-                <input type="text" value="{{.Character.Name}}" class="edit-input" style="font-size: 1.2rem; font-weight:bold; color:var(--accent-color); width:100%;"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "name"}'
-                       hx-swap="none">
-            </div>
-            <div style="margin-bottom: 10px;">
-                <label style="font-size:0.75rem; color:var(--muted-color); font-weight:bold; display:block;">HANDLE</label>
-                <input type="text" value="{{.Character.Handle}}" class="edit-input" style="width:100%; color:var(--muted-color);"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "handle"}'
-                       hx-swap="none">
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
-                <div>
-                    <label style="font-size:0.75rem; color:#aaa; display:block;">STYLE</label>
-                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                              hx-put="/character/{{.Character.ID}}/update_field"
-                              hx-trigger="change, input delay:400ms"
-                              name="value"
-                              hx-vals='{"field": "style"}'
-                              hx-swap="none">{{.Character.Style}}</textarea>
+            <form action="/character/{{.Character.ID}}/update_field" method="POST" hx-post="/character/{{.Character.ID}}/update_field" hx-target="#character-sheet-container" hx-swap="outerHTML">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT IDENTITY & BIO</span>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" onclick="toggleEditSection('identity')" class="btn-outline" style="font-size:0.75rem; padding:2px 8px;">Cancel</button>
+                        <button type="submit" class="btn" style="font-size:0.75rem; padding:2px 8px;">💾 Save Changes</button>
+                    </div>
                 </div>
-                <div>
-                    <label style="font-size:0.75rem; color:#aaa; display:block;">FEATURE</label>
-                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                              hx-put="/character/{{.Character.ID}}/update_field"
-                              hx-trigger="change, input delay:400ms"
-                              name="value"
-                              hx-vals='{"field": "feature"}'
-                              hx-swap="none">{{.Character.Feature}}</textarea>
+                <div style="margin-bottom: 8px;">
+                    <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">NAME</label>
+                    <input type="text" name="name" value="{{.Character.Name}}" class="edit-input" style="font-size: 1.2rem; font-weight:bold; color:var(--accent-color); width:100%;">
                 </div>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
-                <div>
-                    <label style="font-size:0.75rem; color:#aaa; display:block;">WANT</label>
-                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                              hx-put="/character/{{.Character.ID}}/update_field"
-                              hx-trigger="change, input delay:400ms"
-                              name="value"
-                              hx-vals='{"field": "want"}'
-                              hx-swap="none">{{.Character.Want}}</textarea>
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size:0.75rem; color:var(--muted-color); font-weight:bold; display:block;">HANDLE</label>
+                    <input type="text" name="handle" value="{{.Character.Handle}}" class="edit-input" style="width:100%; color:var(--muted-color);">
                 </div>
-                <div>
-                    <label style="font-size:0.75rem; color:#aaa; display:block;">QUIRK</label>
-                    <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                              hx-put="/character/{{.Character.ID}}/update_field"
-                              hx-trigger="change, input delay:400ms"
-                              name="value"
-                              hx-vals='{"field": "quirk"}'
-                              hx-swap="none">{{.Character.Quirk}}</textarea>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                    <div>
+                        <label style="font-size:0.75rem; color:#aaa; display:block;">STYLE</label>
+                        <textarea name="style" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Style}}</textarea>
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem; color:#aaa; display:block;">FEATURE</label>
+                        <textarea name="feature" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Feature}}</textarea>
+                    </div>
                 </div>
-            </div>
-            <div style="margin-bottom:8px;">
-                <label style="font-size:0.75rem; color:#aaa; display:block;">OBSESSION</label>
-                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                          hx-put="/character/{{.Character.ID}}/update_field"
-                          hx-trigger="change, input delay:400ms"
-                          name="value"
-                          hx-vals='{"field": "obsession"}'
-                          hx-swap="none">{{.Character.Obsession}}</textarea>
-            </div>
-            <div>
-                <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">DEBT</label>
-                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)" style="color:var(--accent-color);"
-                          hx-put="/character/{{.Character.ID}}/update_field"
-                          hx-trigger="change, input delay:400ms"
-                          name="value"
-                          hx-vals='{"field": "debt"}'
-                          hx-swap="none">{{.Character.Debt}}</textarea>
-            </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                    <div>
+                        <label style="font-size:0.75rem; color:#aaa; display:block;">WANT</label>
+                        <textarea name="want" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Want}}</textarea>
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem; color:#aaa; display:block;">QUIRK</label>
+                        <textarea name="quirk" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Quirk}}</textarea>
+                    </div>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">OBSESSION</label>
+                    <textarea name="obsession" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Obsession}}</textarea>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">DEBT</label>
+                    <textarea name="debt" class="edit-input auto-stretch" style="color:var(--accent-color);" oninput="autoResizeTextarea(this)">{{.Character.Debt}}</textarea>
+                </div>
+                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                    <button type="button" onclick="toggleEditSection('identity')" class="btn-outline" style="font-size:0.8rem; padding:4px 10px;">Cancel</button>
+                    <button type="submit" class="btn" style="font-size:0.8rem; padding:4px 10px;">💾 Save Changes</button>
+                </div>
+            </form>
         </div>
         {{end}}
     </div>
@@ -580,55 +569,39 @@ document.addEventListener("input", function(e) {
         <!-- Editable Form (Hidden until Edit toggled) -->
         {{if .CanEdit}}
         <div id="class-edit" style="display:none; margin-top:10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT CLASS DETAILS</span>
-                <button type="button" onclick="toggleEditSection('class')" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;">Done</button>
-            </div>
-            <div style="margin-bottom:8px;">
-                <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">CLASS NAME</label>
-                <input type="text" value="{{.Character.Class.Name}}" class="edit-input" style="font-size:1.2rem; font-weight:bold; color:var(--accent-color); width:100%;"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "class_name"}'
-                       hx-swap="none">
-            </div>
-            <div style="margin-bottom:8px;">
-                <label style="font-size:0.75rem; color:var(--accent-color); display:block;">CLASS GLITCH</label>
-                <input type="text" value="{{.Character.Class.Glitch}}" class="edit-input" style="width:100%; color:var(--accent-color);"
-                       hx-put="/character/{{.Character.ID}}/update_field"
-                       hx-trigger="change, input delay:400ms"
-                       name="value"
-                       hx-vals='{"field": "class_glitch"}'
-                       hx-swap="none">
-            </div>
-            <div style="margin-bottom:8px;">
-                <label style="font-size:0.75rem; color:#aaa; display:block;">DESCRIPTION</label>
-                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                          hx-put="/character/{{.Character.ID}}/update_field"
-                          hx-trigger="change, input delay:400ms"
-                          name="value"
-                          hx-vals='{"field": "class_description"}'
-                          hx-swap="none">{{.Character.Class.Description}}</textarea>
-            </div>
-            <div style="margin-bottom:8px;">
-                <label style="font-size:0.75rem; color:#aaa; display:block;">ORIGIN</label>
-                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                          hx-put="/character/{{.Character.ID}}/update_field"
-                          hx-trigger="change, input delay:400ms"
-                          name="value"
-                          hx-vals='{"field": "class_origin"}'
-                          hx-swap="none">{{.Character.Class.Origin}}</textarea>
-            </div>
-            <div>
-                <label style="font-size:0.75rem; color:#aaa; display:block;">CLASS GIFT / WEAPON</label>
-                <textarea class="edit-input auto-stretch" oninput="autoResizeTextarea(this)"
-                          hx-put="/character/{{.Character.ID}}/update_field"
-                          hx-trigger="change, input delay:400ms"
-                          name="value"
-                          hx-vals='{"field": "class_gift"}'
-                          hx-swap="none">{{.Character.Class.Gift}}</textarea>
-            </div>
+            <form action="/character/{{.Character.ID}}/update_field" method="POST" hx-post="/character/{{.Character.ID}}/update_field" hx-target="#character-sheet-container" hx-swap="outerHTML">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT CLASS DETAILS</span>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" onclick="toggleEditSection('class')" class="btn-outline" style="font-size:0.75rem; padding:2px 8px;">Cancel</button>
+                        <button type="submit" class="btn" style="font-size:0.75rem; padding:2px 8px;">💾 Save Changes</button>
+                    </div>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem; color:var(--accent-color); font-weight:bold; display:block;">CLASS NAME</label>
+                    <input type="text" name="class_name" value="{{.Character.Class.Name}}" class="edit-input" style="font-size:1.2rem; font-weight:bold; color:var(--accent-color); width:100%;">
+                </div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem; color:var(--accent-color); display:block;">CLASS GLITCH</label>
+                    <input type="text" name="class_glitch" value="{{.Character.Class.Glitch}}" class="edit-input" style="width:100%; color:var(--accent-color);">
+                </div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">DESCRIPTION</label>
+                    <textarea name="class_description" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Class.Description}}</textarea>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">ORIGIN</label>
+                    <textarea name="class_origin" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Class.Origin}}</textarea>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:0.75rem; color:#aaa; display:block;">CLASS GIFT / WEAPON</label>
+                    <textarea name="class_gift" class="edit-input auto-stretch" oninput="autoResizeTextarea(this)">{{.Character.Class.Gift}}</textarea>
+                </div>
+                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                    <button type="button" onclick="toggleEditSection('class')" class="btn-outline" style="font-size:0.8rem; padding:4px 10px;">Cancel</button>
+                    <button type="submit" class="btn" style="font-size:0.8rem; padding:4px 10px;">💾 Save Changes</button>
+                </div>
+            </form>
         </div>
         {{end}}
     </div>
@@ -656,7 +629,7 @@ document.addEventListener("input", function(e) {
                     <td>
                         <form action="/character/{{$.Character.ID}}/delete_item" method="POST"
                               hx-post="/character/{{$.Character.ID}}/delete_item"
-                              hx-target="body" hx-swap="outerHTML"
+                              hx-target="#character-sheet-container" hx-swap="outerHTML"
                               hx-confirm="Are you sure you want to delete this weapon?"
                               style="display:inline;">
                             <input type="hidden" name="type" value="weapon">
@@ -676,7 +649,7 @@ document.addEventListener("input", function(e) {
                     <td>
                         <form action="/character/{{$.Character.ID}}/delete_item" method="POST"
                               hx-post="/character/{{$.Character.ID}}/delete_item"
-                              hx-target="body" hx-swap="outerHTML"
+                              hx-target="#character-sheet-container" hx-swap="outerHTML"
                               hx-confirm="Are you sure you want to delete this armor?"
                               style="display:inline;">
                             <input type="hidden" name="type" value="armor">
@@ -696,7 +669,7 @@ document.addEventListener("input", function(e) {
             <div id="gear-add-edit" style="display:none; margin-top:10px;">
                 <div style="background:#111; border:1px dashed #333; padding:10px; margin-bottom:10px;">
                     <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD WEAPON</div>
-                    <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
+                    <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="#character-sheet-container" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
                         <input type="hidden" name="type" value="weapon">
                         <input type="text" name="name" placeholder="Weapon Name" style="flex:1; min-width:120px;" class="edit-input" required>
                         <input type="text" name="damage" placeholder="Damage (e.g. d6)" style="width:90px;" class="edit-input">
@@ -706,7 +679,7 @@ document.addEventListener("input", function(e) {
                 </div>
                 <div style="background:#111; border:1px dashed #333; padding:10px;">
                     <div style="font-size:0.8rem; color:var(--accent-color); font-weight:bold; margin-bottom:6px;">+ ADD ARMOR</div>
-                    <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
+                    <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="#character-sheet-container" hx-swap="outerHTML" style="display:flex; gap:5px; flex-wrap:wrap;">
                         <input type="hidden" name="type" value="armor">
                         <input type="text" name="name" placeholder="Armor Name" style="flex:1; min-width:120px;" class="edit-input" required>
                         <input type="text" name="tier" placeholder="Tier (e.g. d4)" style="width:90px;" class="edit-input">
@@ -726,7 +699,7 @@ document.addEventListener("input", function(e) {
                 {{if $.CanEdit}}
                 <form action="/character/{{$.Character.ID}}/delete_item" method="POST"
                       hx-post="/character/{{$.Character.ID}}/delete_item"
-                      hx-target="body" hx-swap="outerHTML"
+                      hx-target="#character-sheet-container" hx-swap="outerHTML"
                       hx-confirm="Are you sure you want to delete this inventory item?"
                       style="display:inline;">
                     <input type="hidden" name="type" value="gear">
@@ -738,7 +711,7 @@ document.addEventListener("input", function(e) {
             {{end}}
         </ul>
         {{if .CanEdit}}
-        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px;">
+        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="#character-sheet-container" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px;">
             <input type="hidden" name="type" value="gear">
             <input type="text" name="item" placeholder="New inventory item..." class="edit-input" style="flex:1;" required>
             <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add Item</button>
@@ -758,7 +731,7 @@ document.addEventListener("input", function(e) {
                 {{if $.CanEdit}}
                 <form action="/character/{{$.Character.ID}}/delete_item" method="POST"
                       hx-post="/character/{{$.Character.ID}}/delete_item"
-                      hx-target="body" hx-swap="outerHTML"
+                      hx-target="#character-sheet-container" hx-swap="outerHTML"
                       hx-confirm="Are you sure you want to delete this cyberware?"
                       style="display:inline;">
                     <input type="hidden" name="type" value="cybertech">
@@ -772,7 +745,7 @@ document.addEventListener("input", function(e) {
             {{end}}
         </ul>
         {{if .CanEdit}}
-        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px; margin-bottom:15px;">
+        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="#character-sheet-container" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px; margin-bottom:15px;">
             <input type="hidden" name="type" value="cybertech">
             <input type="text" name="item" placeholder="New Cyberware..." class="edit-input" style="flex:1;" required>
             <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add Cybertech</button>
@@ -787,7 +760,7 @@ document.addEventListener("input", function(e) {
                 {{if $.CanEdit}}
                 <form action="/character/{{$.Character.ID}}/delete_item" method="POST"
                       hx-post="/character/{{$.Character.ID}}/delete_item"
-                      hx-target="body" hx-swap="outerHTML"
+                      hx-target="#character-sheet-container" hx-swap="outerHTML"
                       hx-confirm="Are you sure you want to delete this nano/app?"
                       style="display:inline;">
                     <input type="hidden" name="type" value="app">
@@ -801,11 +774,12 @@ document.addEventListener("input", function(e) {
             {{end}}
         </ul>
         {{if .CanEdit}}
-        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="body" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px;">
+        <form action="/character/{{.Character.ID}}/add_item" method="POST" hx-post="/character/{{.Character.ID}}/add_item" hx-target="#character-sheet-container" hx-swap="outerHTML" style="display:flex; gap:5px; margin-top:8px;">
             <input type="hidden" name="type" value="app">
             <input type="text" name="item" placeholder="New Nano/App..." class="edit-input" style="flex:1;" required>
             <button type="submit" class="btn" style="padding:4px 10px; font-size:0.8rem;">+ Add Nano/App</button>
         </form>
         {{end}}
     </div>
+</div>
 </div>

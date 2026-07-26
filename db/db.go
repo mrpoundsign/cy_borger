@@ -286,3 +286,9 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 	}
 	return chars, nil
 }
+
+func (d *DB) DeleteCharacter(id string) error {
+	query := `DELETE FROM characters WHERE id = ?`
+	_, err := d.conn.Exec(query, id)
+	return err
+}

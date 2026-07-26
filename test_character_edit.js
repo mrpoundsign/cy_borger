@@ -68,12 +68,11 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         // Click "✏️ Edit Text" to reveal input form
         await page.locator('button:has-text("Edit Text")').click();
 
-        const nameInput = page.locator('input[hx-vals*=\'"field": "name"\']');
+        const nameInput = page.locator('#identity-edit input[name="name"]');
         await nameInput.fill('CYBER_PUNK_X');
-        await nameInput.blur();
         
-        // Click Done to save form
-        await page.locator('#identity-edit button:has-text("Done")').click();
+        // Click Save Changes to save form
+        await page.locator('#identity-edit button:has-text("Save Changes")').first().click();
         await page.waitForLoadState('networkidle');
 
         // Reload page to confirm persistence in view

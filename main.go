@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mrpoundsign/cy_borger/chargen"
@@ -50,8 +51,10 @@ func main() {
 	mux.HandleFunc("PUT /character/{id}/update_glitches", handleUpdateGlitches)
 	mux.HandleFunc("PUT /character/{id}/update_stat", handleUpdateStat)
 	mux.HandleFunc("PUT /character/{id}/update_field", handleUpdateField)
+	mux.HandleFunc("POST /character/{id}/update_field", handleUpdateField)
 	mux.HandleFunc("POST /character/{id}/add_item", handleAddListItem)
 	mux.HandleFunc("POST /character/{id}/delete_item", handleDeleteListItem)
+	mux.HandleFunc("POST /character/{id}/delete", handleDeleteCharacter)
 
 	mux.HandleFunc("POST /game/create", handleCreateGame)
 	mux.HandleFunc("GET /game/{id}", handleViewGame)
@@ -778,4 +781,44 @@ func handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+}
+
+func handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := database.GetCharacter(id)
+	if err != nil || c == nil {
+		http.Error(w, "Character not found", http.StatusNotFound)
+		return
+	}
+
+	sessionCode := getCookie(r, "char_edit_"+c.ID)
+	canEdit := sessionCode != "" && sessionCode == c.EditCode
+	if !canEdit {
+		http.Error(w, "Unauthorized: Only the character owner can delete this character", http.StatusForbidden)
+		return
+	}
+
+	confirmName := r.FormValue("confirm_name")
+	if strings.TrimSpace(confirmName) != strings.TrimSpace(c.Name) {
+		http.Error(w, fmt.Sprintf("Character name mismatch. You typed '%s', expected '%s'.", confirmName, c.Name), http.StatusBadRequest)
+		return
+	}
+
+	if err := database.DeleteCharacter(id); err != nil {
+		http.Error(w, "Failed to delete character", http.StatusInternalServerError)
+		return
+	}
+
+	ws.GlobalHub.Broadcast("char_"+c.ID, "char_deleted:"+c.ID)
+	if c.GameID != "" {
+		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
