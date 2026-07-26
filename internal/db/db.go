@@ -36,6 +36,7 @@ type Game struct {
 	InviteCode string    `json:"invite_code"`
 	Name       string    `json:"name"`
 	OwnerID    string    `json:"owner_id"`
+	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 
@@ -270,48 +271,97 @@ func (d *DB) CreateGame(name string, ownerID string) (*Game, error) {
 	gmCode := chargen.GenerateRandomID(6)
 	inviteCode := chargen.GenerateRandomID(4)
 
-	query := `INSERT INTO games (id, gm_code, invite_code, name, owner_id, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+	query := `INSERT INTO games (id, gm_code, invite_code, name, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
 	_, err := d.conn.Exec(query, id, gmCode, inviteCode, name, ownerID)
 	if err != nil {
 		return nil, err
 	}
 
+	now := time.Now()
 	return &Game{
 		ID:         id,
 		GMCode:     gmCode,
 		InviteCode: inviteCode,
 		Name:       name,
 		OwnerID:    ownerID,
-		UpdatedAt:  time.Now(),
+		CreatedAt:  now,
+		UpdatedAt:  now,
 	}, nil
 }
 
 func (d *DB) GetGame(id string) (*Game, error) {
-	query := `SELECT id, gm_code, invite_code, name, owner_id, updated_at FROM games WHERE id = ?`
+	query := `SELECT id, gm_code, invite_code, name, owner_id, created_at, updated_at FROM games WHERE id = ?`
 	row := d.conn.QueryRow(query, id)
 
 	var g Game
-	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &g.UpdatedAt); err != nil {
+	var createdAt sql.NullTime
+	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &createdAt, &g.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
+	}
+	if createdAt.Valid {
+		g.CreatedAt = createdAt.Time
+	} else {
+		g.CreatedAt = g.UpdatedAt
 	}
 	return &g, nil
 }
 
 func (d *DB) GetGameByInviteCode(code string) (*Game, error) {
-	query := `SELECT id, gm_code, invite_code, name, owner_id, updated_at FROM games WHERE invite_code = ?`
+	query := `SELECT id, gm_code, invite_code, name, owner_id, created_at, updated_at FROM games WHERE invite_code = ?`
 	row := d.conn.QueryRow(query, code)
 
 	var g Game
-	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &g.UpdatedAt); err != nil {
+	var createdAt sql.NullTime
+	if err := row.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &createdAt, &g.UpdatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
+	if createdAt.Valid {
+		g.CreatedAt = createdAt.Time
+	} else {
+		g.CreatedAt = g.UpdatedAt
+	}
 	return &g, nil
+}
+
+func (d *DB) GetGamesForUser(userID string) ([]Game, error) {
+	query := `
+	SELECT g.id, g.gm_code, g.invite_code, g.name, g.owner_id, g.created_at, g.updated_at
+	FROM games g
+	JOIN characters c ON c.game_id = g.id
+	WHERE c.owner_id = ?
+	GROUP BY g.id
+	ORDER BY g.updated_at DESC
+	`
+	rows, err := d.conn.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var games []Game
+	for rows.Next() {
+		var g Game
+		var createdAt sql.NullTime
+		if err := rows.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &createdAt, &g.UpdatedAt); err != nil {
+			return nil, err
+		}
+		if createdAt.Valid {
+			g.CreatedAt = createdAt.Time
+		} else {
+			g.CreatedAt = g.UpdatedAt
+		}
+		games = append(games, g)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return games, nil
 }
 
 func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
@@ -361,7 +411,7 @@ func (d *DB) GetCharactersForGame(gameID string) ([]chargen.Character, error) {
 }
 
 func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
-	query := `SELECT id, gm_code, invite_code, name, owner_id, updated_at FROM games WHERE owner_id = ?`
+	query := `SELECT id, gm_code, invite_code, name, owner_id, created_at, updated_at FROM games WHERE owner_id = ?`
 	rows, err := d.conn.Query(query, ownerID)
 	if err != nil {
 		return nil, err
@@ -371,8 +421,14 @@ func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
 	var games []Game
 	for rows.Next() {
 		var g Game
-		if err := rows.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &g.UpdatedAt); err != nil {
+		var createdAt sql.NullTime
+		if err := rows.Scan(&g.ID, &g.GMCode, &g.InviteCode, &g.Name, &g.OwnerID, &createdAt, &g.UpdatedAt); err != nil {
 			return nil, err
+		}
+		if createdAt.Valid {
+			g.CreatedAt = createdAt.Time
+		} else {
+			g.CreatedAt = g.UpdatedAt
 		}
 		games = append(games, g)
 	}
@@ -384,9 +440,10 @@ func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
 
 func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 	query := `
-	SELECT c.owner_id, c.game_id, c.is_saved, c.is_dead, c.death_note, c.died_at, c.data_json, c.updated_at, COALESCE(u.username, '') AS owner_username
+	SELECT c.owner_id, c.game_id, c.is_saved, c.is_dead, c.death_note, c.died_at, c.data_json, c.updated_at, COALESCE(u.username, '') AS owner_username, COALESCE(g.name, '') AS game_name
 	FROM characters c
 	LEFT JOIN users u ON c.owner_id = u.id
+	LEFT JOIN games g ON c.game_id = g.id
 	WHERE c.owner_id = ?
 	ORDER BY c.is_dead ASC, c.died_at DESC, c.updated_at DESC
 	`
@@ -398,11 +455,11 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 
 	var chars []chargen.Character
 	for rows.Next() {
-		var ownerIDVal, gameID, deathNote, dataStr, ownerUsername string
+		var ownerIDVal, gameID, deathNote, dataStr, ownerUsername, gameName string
 		var isSavedInt, isDeadInt int
 		var diedAt sql.NullTime
 		var updatedAt time.Time
-		if err := rows.Scan(&ownerIDVal, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt, &ownerUsername); err != nil {
+		if err := rows.Scan(&ownerIDVal, &gameID, &isSavedInt, &isDeadInt, &deathNote, &diedAt, &dataStr, &updatedAt, &ownerUsername, &gameName); err != nil {
 			return nil, err
 		}
 		var c chargen.Character
@@ -410,6 +467,7 @@ func (d *DB) GetCharactersByOwner(ownerID string) ([]chargen.Character, error) {
 			c.OwnerID = ownerIDVal
 			c.OwnerUsername = ownerUsername
 			c.GameID = gameID
+			c.GameName = gameName
 			c.IsSaved = isSavedInt == 1 || c.IsSaved
 			c.IsDead = isDeadInt == 1 || c.IsDead
 			if deathNote != "" {

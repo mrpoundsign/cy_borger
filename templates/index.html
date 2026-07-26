@@ -326,7 +326,7 @@
                 <h3 style="color: #00ff66; margin-bottom: 10px; font-size:1.1rem;">MY GAMES (GM)</h3>
                 <ul id="my-gm-games-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
                     {{range .MyGames}}
-                    <li data-game-id="{{.ID}}"><a href="/game/{{.ID}}" style="color:#00ff66; text-decoration:none;">⚡ <strong>{{.Name}}</strong> [GM Mode]</a></li>
+                    <li data-game-id="{{.ID}}"><a href="/game/{{.ID}}" style="color:#00ff66; text-decoration:none;">⚡ <strong>{{.Name}}</strong> [GM Mode] <span style="color:var(--muted-color); font-size:0.85rem;">— Created: {{.CreatedAt.Format "Jan 02, 2006"}}</span></a></li>
                     {{end}}
                 </ul>
             </div>
@@ -338,11 +338,11 @@
                 <li data-char-id="{{.ID}}">
                     {{if .IsDead}}
                     <a href="/character/{{.ID}}" style="color:#ff0055; text-decoration:none;">
-                        🪦 <strong>{{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</strong> [FLATLINED]
+                        🪦 <strong>{{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</strong> — {{.Class.Name}}{{if .GameName}} [{{.GameName}}]{{end}} [FLATLINED]
                     </a>
                     {{else}}
                     <a href="/character/{{.ID}}" style="color:var(--accent-color); text-decoration:none;">
-                        👤 <strong>{{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</strong> [Saved]
+                        👤 <strong>{{if .Name}}{{.Name}}{{else}}[UNNAMED OPERATOR]{{end}}</strong> — {{.Class.Name}}{{if .GameName}} [{{.GameName}}]{{end}}
                     </a>
                     {{end}}
                 </li>
@@ -355,7 +355,7 @@
             <ul id="my-drafts-list" style="list-style:none; padding:0; line-height:1.5;">
                 {{range .DraftCharacters}}
                 <li data-char-id="{{.ID}}"><a href="/character/{{.ID}}" style="color:#ff9900; text-decoration:none;">⚡
-                        <strong>{{.Name}}</strong> [Draft Preview]</a></li>
+                        <strong>{{.Name}}</strong> — {{.Class.Name}}{{if .GameName}} [{{.GameName}}]{{end}} [Draft Preview]</a></li>
                 {{end}}
             </ul>
             {{end}}

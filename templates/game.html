@@ -220,6 +220,7 @@
     <div class="header">
         <div>
             <h1>GAME: {{.Game.Name}}</h1>
+            <div style="color:var(--muted-color); font-size:0.9rem; margin-bottom: 10px;">Created: {{.Game.CreatedAt.Format "Jan 02, 2006 15:04 MST"}}</div>
             {{if .IsGM}}
             <span style="color: #00ff66; font-weight: bold;">[GM MODE ACTIVE]</span>
             <button class="btn-outline" style="font-size:0.8rem; margin-left:10px;"
