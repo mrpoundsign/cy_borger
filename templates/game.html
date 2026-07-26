@@ -99,7 +99,23 @@
         }
     </style>
     <script>
+        function randomizeThemeColor() {
+            const colors = ['#ffe600', '#ff0055', '#00f0ff', '#00ff66', '#9d00ff', '#ff5500'];
+            let current = localStorage.getItem('cy_theme_accent') || '#ffe600';
+            let next = colors[Math.floor(Math.random() * colors.length)];
+            while (next === current) {
+                next = colors[Math.floor(Math.random() * colors.length)];
+            }
+            localStorage.setItem('cy_theme_accent', next);
+            document.documentElement.style.setProperty('--accent-color', next);
+            document.documentElement.style.setProperty('--border-color', next);
+        }
+
         (function() {
+            const accent = localStorage.getItem('cy_theme_accent') || '#ffe600';
+            document.documentElement.style.setProperty('--accent-color', accent);
+            document.documentElement.style.setProperty('--border-color', accent);
+
             let uid = localStorage.getItem('cy_user_id');
             if (!uid) {
                 uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
@@ -199,6 +215,7 @@
                 });
             </script>
             {{end}}
+            <button onclick="randomizeThemeColor()" class="btn-outline" style="font-size:0.8rem; margin-left:8px;">🌈 Color</button>
         </div>
         <div class="invite-box">
             <span>PLAYER INVITE CODE: <strong style="color: #fff">{{.Game.InviteCode}}</strong></span>

@@ -153,7 +153,23 @@
             return name1 + name2 + "#" + num;
         }
 
+        function randomizeThemeColor() {
+            const colors = ['#ffe600', '#ff0055', '#00f0ff', '#00ff66', '#9d00ff', '#ff5500'];
+            let current = localStorage.getItem('cy_theme_accent') || '#ffe600';
+            let next = colors[Math.floor(Math.random() * colors.length)];
+            while (next === current) {
+                next = colors[Math.floor(Math.random() * colors.length)];
+            }
+            localStorage.setItem('cy_theme_accent', next);
+            document.documentElement.style.setProperty('--accent-color', next);
+            document.documentElement.style.setProperty('--border-color', next);
+        }
+
         (function() {
+            const accent = localStorage.getItem('cy_theme_accent') || '#ffe600';
+            document.documentElement.style.setProperty('--accent-color', accent);
+            document.documentElement.style.setProperty('--border-color', accent);
+
             let uid = localStorage.getItem('cy_user_id');
             if (!uid) {
                 uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
@@ -196,6 +212,9 @@
         <div class="user-banner">
             {{if .User}}
             <span>OPERATOR HANDLE: <strong style="color:var(--accent-color)">{{.User.Username}}</strong></span>
+            <div>
+                <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
+            </div>
             <script>
                 if (window.cyStore) {
                     cyStore.setUserName('{{.User.Username}}');
@@ -204,14 +223,15 @@
             </script>
             {{else}}
             <span>OPERATOR HANDLE: <strong id="user-handle-display" style="color:var(--accent-color)"></strong></span>
-            <div id="handle-editor-area">
-                <div style="font-size: 0.75rem; color: #ff3366; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; text-align: right;">⚠️ Warning: Can only be edited ONCE!</div>
+            <div id="handle-editor-area" style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <div style="font-size: 0.75rem; color: #ff3366; font-weight: bold; text-transform: uppercase;">⚠️ Warning: Can only be edited ONCE!</div>
                 <form id="handle-form" hx-post="/user/update" hx-trigger="submit" hx-swap="none" style="display:inline-flex; gap:5px; align-items:center;">
                     <input type="hidden" name="user_id" id="user-id-input">
                     <input type="text" name="username" id="user-handle-input" style="width:230px; padding:4px; font-size:0.9rem; margin-bottom:0;" placeholder="Change handle">
                     <button type="button" onclick="randomizeInputName()" class="btn-outline-small" title="Randomize name">🎲</button>
                     <button type="submit" onclick="saveHandle()" class="btn-small">Save</button>
                 </form>
+                <button onclick="randomizeThemeColor()" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
             </div>
             <script>
                 // Database was wiped or user is new; reset client local storage state
