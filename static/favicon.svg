@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+    <rect width="64" height="64" rx="12" fill="#050505"/>
+    <!-- Outer Cyber Frame -->
+    <rect x="4" y="4" width="56" height="56" rx="8" fill="none" stroke="#ffe600" stroke-width="2" stroke-dasharray="10 4 16 4"/>
+    
+    <!-- Top Bun (Cyber Dome) -->
+    <path d="M 16 26 C 16 15, 48 15, 48 26 Z" fill="#ffe600"/>
+    <!-- Cyber Microchips on Bun -->
+    <rect x="23" y="19" width="4" height="2" fill="#050505" rx="0.5"/>
+    <rect x="37" y="18" width="4" height="2" fill="#050505" rx="0.5"/>
+    <rect x="30" y="22" width="4" height="2" fill="#050505" rx="0.5"/>
+
+    <!-- Glowing Green Lettuce Line -->
+    <path d="M 12 28 Q 20 32, 28 28 T 44 28 T 52 28" fill="none" stroke="#00ff66" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Chrome Mechanical Patty -->
+    <rect x="14" y="32" width="36" height="6" rx="2" fill="#222" stroke="#ff0055" stroke-width="1.5"/>
+    <line x1="20" y1="35" x2="44" y2="35" stroke="#ff0055" stroke-width="1" stroke-dasharray="2 2"/>
+
+    <!-- Melted Cyber Cheese -->
+    <path d="M 15 39 L 49 39 L 45 45 L 37 41 L 29 46 L 22 41 Z" fill="#ffe600"/>
+
+    <!-- Bottom Bun -->
+    <path d="M 16 45 C 16 52, 48 52, 48 45 Z" fill="#ffe600"/>
+
+    <!-- Circuit Side Wires -->
+    <path d="M 8 35 L 14 35 M 50 35 L 56 35" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+</svg>

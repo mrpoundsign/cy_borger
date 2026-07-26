@@ -60,6 +60,18 @@ func main() {
 	mux.HandleFunc("GET /game/{id}", handleViewGame)
 	mux.HandleFunc("POST /game/{id}/auth", handleAuthGame)
 
+	// Static Files & Favicon
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/favicon.png")
+	})
+	mux.HandleFunc("GET /favicon.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/favicon.png")
+	})
+	mux.HandleFunc("GET /favicon.svg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/favicon.svg")
+	})
+
 	// WebSockets (Go stdlib http.Hijacker)
 	mux.HandleFunc("GET /ws/game/{id}", handleWSGame)
 	mux.HandleFunc("GET /ws/character/{id}", handleWSCharacter)

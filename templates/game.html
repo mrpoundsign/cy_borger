@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game: {{.Game.Name}} - 🍔 CY_BORGER</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" type="image/png" href="/favicon.png">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         :root {
@@ -188,8 +190,10 @@
         <a href="/"
             style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️
             Back to Home</a>
-        <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">🍔 CY_BORGER Game
-            Terminal</span>
+        <span style="font-size: 0.85rem; color: var(--muted-color); text-transform: uppercase; display:inline-flex; align-items:center; gap:6px;">
+            <img src="/favicon.png" alt="logo" style="height:20px; width:20px; border-radius:3px; border:1px solid var(--accent-color);">
+            CY_BORGER Game Terminal
+        </span>
     </div>
 
     <!-- Container for GM Inline Character Modal -->

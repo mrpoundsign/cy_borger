@@ -252,7 +252,10 @@
 {{if not .IsModal}}
 <div style="margin: 10px 0 20px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px;">
     <a href="/" style="color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.85rem; text-transform: uppercase;">⬅️ Back to Home</a>
-    <span style="font-size: 0.8rem; color: var(--muted-color); text-transform: uppercase;">CY_BORG Operator Sheet</span>
+    <span style="font-size: 0.85rem; color: var(--muted-color); text-transform: uppercase; display:inline-flex; align-items:center; gap:6px;">
+        <img src="/favicon.png" alt="logo" style="height:20px; width:20px; border-radius:3px; border:1px solid var(--accent-color);">
+        CY_BORGER Operator Sheet
+    </span>
 </div>
 {{end}}
 
@@ -496,7 +499,7 @@ document.addEventListener("input", function(e) {
         <!-- Editable Form (Hidden until Edit toggled) -->
         {{if .CanEdit}}
         <div id="identity-edit" style="display:none; margin-top:10px;">
-            <form hx-post="/character/{{.Character.ID}}/update_field" hx-target="#character-sheet-container" hx-swap="outerHTML">
+            <form hx-post="/character/{{.Character.ID}}/update_field" hx-target="#character-sheet-container" hx-swap="outerHTML" onsubmit="return false;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">EDIT IDENTITY & BIO</span>
                     <div style="display:flex; gap:6px;">
