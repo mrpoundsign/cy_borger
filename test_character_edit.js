@@ -27,7 +27,7 @@ test.describe('Character editing & Draft/Keep workflow', () => {
 
         await expect(page).toHaveURL(/\/character\//);
         await expect(page.locator('#identity-view h1')).toContainText('UNNAMED OPERATOR');
-        await expect(page.locator('#identity-view .sub-title')).toContainText('@operator');
+        await expect(page.locator('#identity-view .sub-title')).toContainText('[No Handle]');
     });
 
     test('roll random character shows draft banner, keeping it saves it', async ({ page }) => {
@@ -73,7 +73,10 @@ test.describe('Character editing & Draft/Keep workflow', () => {
         
         // Click Save Changes to save form
         await page.locator('#identity-edit button:has-text("Save Changes")').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(500);
+
+        // Confirm text updated in live view immediately
+        await expect(page.locator('#identity-view h1')).toContainText('CYBER_PUNK_X');
 
         // Reload page to confirm persistence in view
         await page.reload();

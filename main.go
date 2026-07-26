@@ -568,47 +568,47 @@ func handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseForm()
 
 	// Handle section multi-field form updates
-	if r.Form.Has("name") {
-		c.Name = r.FormValue("name")
+	if val := r.FormValue("name"); val != "" {
+		c.Name = val
 	}
-	if r.Form.Has("handle") {
-		c.Handle = r.FormValue("handle")
+	if val := r.FormValue("handle"); val != "" {
+		c.Handle = val
 	}
-	if r.Form.Has("style") {
-		c.Style = r.FormValue("style")
+	if val := r.FormValue("style"); val != "" {
+		c.Style = val
 	}
-	if r.Form.Has("feature") {
-		c.Feature = r.FormValue("feature")
+	if val := r.FormValue("feature"); val != "" {
+		c.Feature = val
 	}
-	if r.Form.Has("want") {
-		c.Want = r.FormValue("want")
+	if val := r.FormValue("want"); val != "" {
+		c.Want = val
 	}
-	if r.Form.Has("quirk") {
-		c.Quirk = r.FormValue("quirk")
+	if val := r.FormValue("quirk"); val != "" {
+		c.Quirk = val
 	}
-	if r.Form.Has("obsession") {
-		c.Obsession = r.FormValue("obsession")
+	if val := r.FormValue("obsession"); val != "" {
+		c.Obsession = val
 	}
-	if r.Form.Has("debt") {
-		c.Debt = r.FormValue("debt")
+	if val := r.FormValue("debt"); val != "" {
+		c.Debt = val
 	}
-	if r.Form.Has("class_name") {
-		c.Class.Name = r.FormValue("class_name")
+	if val := r.FormValue("class_name"); val != "" {
+		c.Class.Name = val
 	}
-	if r.Form.Has("class_glitch") {
-		c.Class.Glitch = r.FormValue("class_glitch")
+	if val := r.FormValue("class_glitch"); val != "" {
+		c.Class.Glitch = val
 	}
-	if r.Form.Has("class_description") {
-		c.Class.Description = r.FormValue("class_description")
+	if val := r.FormValue("class_description"); val != "" {
+		c.Class.Description = val
 	}
-	if r.Form.Has("class_origin") {
-		c.Class.Origin = r.FormValue("class_origin")
+	if val := r.FormValue("class_origin"); val != "" {
+		c.Class.Origin = val
 	}
-	if r.Form.Has("class_gift") {
-		c.Class.Gift = r.FormValue("class_gift")
+	if val := r.FormValue("class_gift"); val != "" {
+		c.Class.Gift = val
 	}
-	if r.Form.Has("creds") {
-		if num, err := strconv.Atoi(r.FormValue("creds")); err == nil {
+	if val := r.FormValue("creds"); val != "" {
+		if num, err := strconv.Atoi(val); err == nil {
 			c.Creds = num
 		}
 	}
@@ -651,7 +651,10 @@ func handleUpdateField(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ownerID := getCookie(r, "cy_user_id")
-	_ = database.SaveCharacter(c, ownerID)
+	if err := database.SaveCharacter(c, ownerID); err != nil {
+		http.Error(w, "Failed to save character", http.StatusInternalServerError)
+		return
+	}
 
 	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
 	if c.GameID != "" {
