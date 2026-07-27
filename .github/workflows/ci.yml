@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Unit & E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install templ
+        run: go install github.com/a-h/templ/cmd/templ@latest
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers & Dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Go Tests
+        run: go test -v ./...
+
+      - name: Build Application
+        run: ./build.sh -o ./tmp/cy_borger
+
+      - name: Start Server & Wait for Ready
+        run: |
+          ./tmp/cy_borger &
+          echo "Waiting for server on http://localhost:8080..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            sleep 0.5
+          done
+
+      - name: Run Playwright E2E Tests
+        run: npm test
+
+      - name: Upload Playwright Test Artifacts (On Failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: tmp/test-results/
+          retention-days: 7

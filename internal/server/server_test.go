@@ -38,7 +38,7 @@ func TestIndex(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	if !strings.Contains(rr.Body.String(), "INDEX") {
+	if !strings.Contains(rr.Body.String(), "CY_BORGER") {
 		t.Errorf("handler returned unexpected body: got %v", rr.Body.String())
 	}
 }
