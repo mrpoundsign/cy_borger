@@ -1,5 +1,12 @@
 package templates
 
+import (
+	"fmt"
+	"time"
+)
+
+var AppStartTime = fmt.Sprint(time.Now().Unix())
+
 templ Base(title string, head templ.Component, content templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -10,8 +17,8 @@ templ Base(title string, head templ.Component, content templ.Component) {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 		<link rel="alternate icon" type="image/png" href="/favicon.svg"/>
 		<script src="https://unpkg.com/htmx.org@1.9.10"></script>
-		<link rel="stylesheet" href="/static/css/style.min.css?v=2"/>
-		<script src="/static/js/app.js?v=2"></script>
+		<link rel="stylesheet" href={ "/static/css/style.min.css?v=" + AppStartTime }/>
+		<script src={ "/static/js/app.js?v=" + AppStartTime }></script>
 		if head != nil {
 			@head
 		}

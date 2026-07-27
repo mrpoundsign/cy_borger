@@ -279,6 +279,25 @@ input[type="text"]:focus, input[type="password"]:focus {
     background: rgba(255, 230, 0, 0.1);
 }
 
+.btn-danger-small {
+    background: transparent;
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-danger-small:hover {
+    background: var(--color-danger);
+    color: #ffffff;
+}
+
 /* Modal Overlay */
 .modal-overlay {
     position: fixed;
@@ -299,4 +318,14 @@ input[type="text"]:focus, input[type="password"]:focus {
     padding: 25px;
     box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
     text-align: center;
+}
+
+/* Responsive Mobile Viewport Adjustments */
+@media (max-width: 600px) {
+    body {
+        padding: 10px 8px;
+    }
+    .char-modal-content, .container {
+        padding: 15px 10px !important;
+    }
 }
