@@ -9,13 +9,33 @@ CY_BORGER is designed for the [CY_BORG](https://cy-borg.com/) tabletop roleplayi
 
 ## Features
 
-- **Character Generation & Management**: Instantly roll fully fleshed-out cyberpunk operators, edit their stats, track HP/glitches, and manage their inventory.
-- **Campaign Management**: Create shared game lobbies where GMs can oversee active party members and manage their flatlined characters in the graveyard.
-- **Real-Time Updates**: WebSockets provide instantaneous syncing for all players in a game session—when you take damage, the GM sees it instantly.
-- **Blazing Fast**: Server-rendered HTMX architecture eliminates the need for heavy client-side JavaScript frameworks.
-- **Persistent Data**: Lightweight, CGO-free `modernc.org/sqlite` database backend.
-- **Docker Ready**: Fully containerized multi-stage build makes deployment a breeze.
+- **Character Generation & Management**: Instantly roll fully fleshed-out cyberpunk operators, edit stats, track HP/glitches, and manage inventory.
+- **Campaign Management**: Create shared game lobbies where GMs can oversee active party members and manage flatlined characters in the graveyard.
+- **Real-Time Activity Log**: Live-streaming event terminal in the Game View that automatically logs stat updates, inventory changes, and operator flatlines without page refresh.
+- **Real-Time Sync**: Instant live updating from your party members during campaign sessions. When an operator takes damage or flatlines, everyone sees it immediately.
 - **Cyberpunk Aesthetic**: Highly thematic dark mode UI with neon accents and glitch elements.
+
+## Interface Showcase
+
+| Desktop Operator Sheet | Game Terminal & Graveyard |
+| :---: | :---: |
+| ![Desktop Operator Sheet](docs/character_sheet_desktop.png) | ![Game Terminal View](docs/game_terminal_desktop.png) |
+
+<p align="center">
+  <div style="max-height: 520px; overflow-y: auto; width: 360px; margin: 0 auto; border: 2px solid #ffe600; box-shadow: 0 0 15px rgba(255, 230, 0, 0.3);">
+    <img src="docs/character_sheet_mobile.png" alt="Mobile Operator View" width="340"/>
+  </div>
+  <br/>
+  <em>Responsive Mobile Viewport (375px - Scrollable)</em>
+</p>
+
+## Technical Details
+
+- **Server-Rendered HTMX**: Built with Go HTML templates and HTMX for zero-framework, low-latency UI interactivity and partial DOM swaps.
+- **WebSocket Streaming Event Engine**: Real-time event bus broadcasts character updates and activity logs across connected client sessions instantly.
+- **CGO-Free SQLite Backend**: Persistent embedded database powered by `modernc.org/sqlite` for effortless zero-dependency deployment.
+- **Containerized Build Pipeline**: Multi-stage Docker build producing lightweight production container images.
+- **Automated E2E Testing**: Full Playwright test suite validating authentication, real-time sync, character workflows, and responsive layouts.
 
 ## Getting Started
 
@@ -46,13 +66,6 @@ docker compose up -d --build
 
 This will run the CY_BORGER server on port `8080` (or `9090` depending on your `docker-compose.yml` config) and mount a local volume to persist the SQLite database.
 
-## Architecture
-
-- **Backend**: Go `net/http` standard library.
-- **Database**: SQLite (via `modernc.org/sqlite`).
-- **Frontend**: Go HTML templates with HTMX for interactivity.
-- **Tests**: Playwright is used for end-to-end E2E testing.
-
 ## License
 
-CY_BORGER is released under the GNU General Public License v3.0 (GPLv3). See the `LICENSE` file for details.
+CY_BORGER is released under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE) file for details.
