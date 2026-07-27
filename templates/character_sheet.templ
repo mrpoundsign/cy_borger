@@ -320,11 +320,12 @@ document.addEventListener("input", function(e) {
 </script>
 		<!-- 2x2 Grid Layout -->
 		<div class={ "flex flex-wrap gap-lg", templ.KV("can-edit", canEdit) }>
+						<div class="flex-1 flex flex-col" style="min-width: 450px;">
 			<!-- Top Left: Identity -->
 			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px; position:relative;">
 				if canEdit {
 					<div style="position:absolute; top:15px; right:15px;">
-						<button type="button" id={ "btn-toggle-identity-edit-" + character.ID } onclick="toggleEditSection('identity')" class="btn-outline-small p-xs text-xs">✏️ Edit Text</button>
+						<button type="button" id={ "btn-toggle-identity-edit-" + character.ID } onclick="toggleEditSection('identity')" class="btn-outline-small p-xs text-xs">✏️ EDIT</button>
 					</div>
 				}
 				<!-- Clean Text View (Default) -->
@@ -342,7 +343,7 @@ document.addEventListener("input", function(e) {
 							A <span class="font-bold text-white">{ character.Style }</span> <span class="font-bold text-white">{ character.Class.Name }</span>; 
 							{ character.Feature }. { character.Want } { character.Quirk } { character.Obsession }
 						} else {
-							<span class="text-muted font-italic">No bio or background details entered yet. Click "✏️ Edit Text" to customize.</span>
+							<span class="text-muted font-italic">No bio or background details entered yet. Click "✏️ EDIT" to customize.</span>
 						}
 					</p>
 					if character.Debt != "" {
@@ -406,11 +407,120 @@ document.addEventListener("input", function(e) {
 					</div>
 				}
 			</div>
+
+			<!-- Bottom Left: Gear (Formatted as Table!) -->
+			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px;">
+				<h2 class="text-accent text-2xl text-uppercase mb-sm pb-xs" style="border-bottom:1px solid var(--accent-color); letter-spacing:1px;">GEAR & ARSENAL</h2>
+				<table class="w-full mb-md text-left" style="border-collapse: collapse;">
+					<thead>
+						<tr>
+							<th colspan="2" class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">ITEM / WEAPON</th>
+							<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">DAMAGE / TIER</th>
+							<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">NOTES & EFFECT</th>
+							if canEdit {
+								<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">ACTIONS</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						for i, w := range character.Weapons {
+							<tr>
+								<td class="p-sm text-center" style="border-bottom:1px solid #222; width:1%; white-space:nowrap; padding-right:4px;">⚔️</td>
+								<td class="font-bold text-white p-sm" style="border-bottom:1px solid #222; padding-left:0;">{ w.Name }</td>
+								<td class="p-sm" style="border-bottom:1px solid #222;">
+									<span class="bg-dark border-accent text-accent font-bold text-sm px-xs py-xs" style="border-width:1px; border-style:solid;">{ w.Damage }</span>
+									if w.Hands != "" {
+										<span class="text-xs text-muted ml-xs">[{ w.Hands }]</span>
+									}
+								</td>
+								<td class="p-sm" style="border-bottom:1px solid #222;">{ w.Description }</td>
+								if canEdit {
+									<td class="p-sm" style="border-bottom:1px solid #222;">
+										<form hx-post={ string(templ.URL("/character/" + character.ID + "/delete_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" hx-confirm="Are you sure you want to delete this weapon?" class="m-0 inline-block">
+											<input type="hidden" name="type" value="weapon"/>
+											<input type="hidden" name="index" value={ fmt.Sprint(i) }/>
+											<button type="submit" id={ "btn-delete-weapon-" + character.ID + "-" + fmt.Sprint(i) } class="btn-danger-small border-danger text-danger bg-transparent p-xs text-xs" title="Delete weapon">🗑️</button>
+										</form>
+									</td>
+								}
+							</tr>
+						}
+						for i, a := range character.Armor {
+							<tr>
+								<td class="p-sm text-center" style="border-bottom:1px solid #222; width:1%; white-space:nowrap; padding-right:4px;">🛡️</td>
+								<td class="font-bold text-white p-sm" style="border-bottom:1px solid #222; padding-left:0;">{ a.Name }</td>
+								<td class="p-sm" style="border-bottom:1px solid #222;"><span class="bg-dark border-accent text-accent font-bold text-sm px-xs py-xs" style="border-width:1px; border-style:solid;">{ a.Tier }</span></td>
+								<td class="p-sm" style="border-bottom:1px solid #222;">{ a.Reduction }</td>
+								if canEdit {
+									<td class="p-sm" style="border-bottom:1px solid #222;">
+										<form hx-post={ string(templ.URL("/character/" + character.ID + "/delete_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" hx-confirm="Are you sure you want to delete this armor?" class="m-0 inline-block">
+											<input type="hidden" name="type" value="armor"/>
+											<input type="hidden" name="index" value={ fmt.Sprint(i) }/>
+											<button type="submit" id={ "btn-delete-armor-" + character.ID + "-" + fmt.Sprint(i) } class="btn-danger-small border-danger text-danger bg-transparent p-xs text-xs" title="Delete armor">🗑️</button>
+										</form>
+									</td>
+								}
+							</tr>
+						}
+					</tbody>
+				</table>
+				if canEdit {
+					<div class="mt-sm mb-md">
+						<button type="button" id={ "btn-toggle-gear-add-" + character.ID } onclick="toggleEditSection('gear-add')" class="btn-outline-small p-xs text-xs">+ Add Weapon / Armor</button>
+						<div id="gear-add-edit" style="display:none; margin-top:10px;">
+							<div class="bg-black p-sm mb-sm" style="border:1px dashed #333;">
+								<div class="text-accent font-bold text-xs mb-xs">+ ADD WEAPON</div>
+								<form hx-post={ string(templ.URL("/character/" + character.ID + "/add_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex gap-xs flex-wrap m-0">
+									<input type="hidden" name="type" value="weapon"/>
+									<input type="text" name="name" placeholder="Weapon Name" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;" required/>
+									<input type="text" name="damage" placeholder="Damage (e.g. d6)" class="w-full bg-dark text-white border-accent p-xs" style="width:90px;"/>
+									<input type="text" name="description" placeholder="Notes" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;"/>
+									<button type="submit" id={ "btn-add-weapon-" + character.ID } class="btn-small p-xs text-xs">+ Add</button>
+								</form>
+							</div>
+							<div class="bg-black p-sm" style="border:1px dashed #333;">
+								<div class="text-accent font-bold text-xs mb-xs">+ ADD ARMOR</div>
+								<form hx-post={ string(templ.URL("/character/" + character.ID + "/add_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex gap-xs flex-wrap m-0">
+									<input type="hidden" name="type" value="armor"/>
+									<input type="text" name="name" placeholder="Armor Name" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;" required/>
+									<input type="text" name="tier" placeholder="Tier (e.g. d4)" class="w-full bg-dark text-white border-accent p-xs" style="width:90px;"/>
+									<input type="text" name="reduction" placeholder="Notes/Reduction" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;"/>
+									<button type="submit" id={ "btn-add-armor-" + character.ID } class="btn-small p-xs text-xs">+ Add</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				}
+				<h3 class="text-accent text-lg mt-md mb-sm">INVENTORY</h3>
+				<ul style="list-style-type: square; padding-left: 20px; line-height: 1.8;">
+					for i, item := range character.Gear {
+						<li class="flex justify-between items-center mb-xs">
+							<span>{ item }</span>
+							if canEdit {
+								<form hx-post={ string(templ.URL("/character/" + character.ID + "/delete_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" hx-confirm="Are you sure you want to delete this inventory item?" class="m-0 inline-block">
+									<input type="hidden" name="type" value="gear"/>
+									<input type="hidden" name="index" value={ fmt.Sprint(i) }/>
+									<button type="submit" id={ "btn-delete-gear-" + character.ID + "-" + fmt.Sprint(i) } class="btn-danger-small border-danger text-danger bg-transparent p-xs text-xs" title="Delete item">🗑️</button>
+								</form>
+							}
+						</li>
+					}
+				</ul>
+				if canEdit {
+					<form hx-post={ string(templ.URL("/character/" + character.ID + "/add_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex gap-xs mt-sm m-0">
+						<input type="hidden" name="type" value="gear"/>
+						<input type="text" name="item" placeholder="New inventory item..." class="w-full bg-black border-accent text-white p-xs flex-1" required/>
+						<button type="submit" id={ "btn-add-gear-" + character.ID } class="btn-small p-xs text-xs">+ Add Item</button>
+					</form>
+				}
+			</div>
+			</div>
+			<div class="flex-1 flex flex-col" style="min-width: 450px;">
 			<!-- Top Right: Class -->
 			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px; position:relative;">
 				if canEdit {
 					<div style="position:absolute; top:15px; right:15px;">
-						<button type="button" id={ "btn-toggle-class-edit-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline-small p-xs text-xs">✏️ Edit Class</button>
+						<button type="button" id={ "btn-toggle-class-edit-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline-small p-xs text-xs">✏️ EDIT</button>
 					</div>
 				}
 				<!-- Clean Text View (Default) -->
@@ -480,110 +590,7 @@ document.addEventListener("input", function(e) {
 					</div>
 				}
 			</div>
-			<!-- Bottom Left: Gear (Formatted as Table!) -->
-			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px;">
-				<h2 class="text-accent text-2xl text-uppercase mb-sm pb-xs" style="border-bottom:1px solid var(--accent-color); letter-spacing:1px;">GEAR & ARSENAL</h2>
-				<table class="w-full mb-md text-left" style="border-collapse: collapse;">
-					<thead>
-						<tr>
-							<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">ITEM / WEAPON</th>
-							<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">DAMAGE / TIER</th>
-							<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">NOTES & EFFECT</th>
-							if canEdit {
-								<th class="text-accent p-sm text-sm border-accent" style="border-bottom-width:2px; border-bottom-style:solid;">ACTIONS</th>
-							}
-						</tr>
-					</thead>
-					<tbody>
-						for i, w := range character.Weapons {
-							<tr>
-								<td class="font-bold text-white p-sm" style="border-bottom:1px solid #222;">⚔️ { w.Name }</td>
-								<td class="p-sm" style="border-bottom:1px solid #222;">
-									<span class="bg-dark border-accent text-accent font-bold text-sm px-xs py-xs" style="border-width:1px; border-style:solid;">{ w.Damage }</span>
-									if w.Hands != "" {
-										<span class="text-xs text-muted ml-xs">[{ w.Hands }]</span>
-									}
-								</td>
-								<td class="p-sm" style="border-bottom:1px solid #222;">{ w.Description }</td>
-								if canEdit {
-									<td class="p-sm" style="border-bottom:1px solid #222;">
-										<form hx-post={ string(templ.URL("/character/" + character.ID + "/delete_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" hx-confirm="Are you sure you want to delete this weapon?" class="m-0 inline-block">
-											<input type="hidden" name="type" value="weapon"/>
-											<input type="hidden" name="index" value={ fmt.Sprint(i) }/>
-											<button type="submit" id={ "btn-delete-weapon-" + character.ID + "-" + fmt.Sprint(i) } class="btn-danger-small border-danger text-danger bg-transparent p-xs text-xs" title="Delete weapon">🗑️</button>
-										</form>
-									</td>
-								}
-							</tr>
-						}
-						for i, a := range character.Armor {
-							<tr>
-								<td class="font-bold text-white p-sm" style="border-bottom:1px solid #222;">🛡️ { a.Name }</td>
-								<td class="p-sm" style="border-bottom:1px solid #222;"><span class="bg-dark border-accent text-accent font-bold text-sm px-xs py-xs" style="border-width:1px; border-style:solid;">{ a.Tier }</span></td>
-								<td class="p-sm" style="border-bottom:1px solid #222;">{ a.Reduction }</td>
-								if canEdit {
-									<td class="p-sm" style="border-bottom:1px solid #222;">
-										<form hx-post={ string(templ.URL("/character/" + character.ID + "/delete_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" hx-confirm="Are you sure you want to delete this armor?" class="m-0 inline-block">
-											<input type="hidden" name="type" value="armor"/>
-											<input type="hidden" name="index" value={ fmt.Sprint(i) }/>
-											<button type="submit" id={ "btn-delete-armor-" + character.ID + "-" + fmt.Sprint(i) } class="btn-danger-small border-danger text-danger bg-transparent p-xs text-xs" title="Delete armor">🗑️</button>
-										</form>
-									</td>
-								}
-							</tr>
-						}
-					</tbody>
-				</table>
-				if canEdit {
-					<div class="mt-sm mb-md">
-						<button type="button" id={ "btn-toggle-gear-add-" + character.ID } onclick="toggleEditSection('gear-add')" class="btn-outline-small p-xs text-xs">+ Add Weapon / Armor</button>
-						<div id="gear-add-edit" style="display:none; margin-top:10px;">
-							<div class="bg-black p-sm mb-sm" style="border:1px dashed #333;">
-								<div class="text-accent font-bold text-xs mb-xs">+ ADD WEAPON</div>
-								<form hx-post={ string(templ.URL("/character/" + character.ID + "/add_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex gap-xs flex-wrap m-0">
-									<input type="hidden" name="type" value="weapon"/>
-									<input type="text" name="name" placeholder="Weapon Name" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;" required/>
-									<input type="text" name="damage" placeholder="Damage (e.g. d6)" class="w-full bg-dark text-white border-accent p-xs" style="width:90px;"/>
-									<input type="text" name="description" placeholder="Notes" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;"/>
-									<button type="submit" id={ "btn-add-weapon-" + character.ID } class="btn-small p-xs text-xs">+ Add</button>
-								</form>
-							</div>
-							<div class="bg-black p-sm" style="border:1px dashed #333;">
-								<div class="text-accent font-bold text-xs mb-xs">+ ADD ARMOR</div>
-								<form hx-post={ string(templ.URL("/character/" + character.ID + "/add_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex gap-xs flex-wrap m-0">
-									<input type="hidden" name="type" value="armor"/>
-									<input type="text" name="name" placeholder="Armor Name" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;" required/>
-									<input type="text" name="tier" placeholder="Tier (e.g. d4)" class="w-full bg-dark text-white border-accent p-xs" style="width:90px;"/>
-									<input type="text" name="reduction" placeholder="Notes/Reduction" class="w-full bg-dark text-white border-accent p-xs flex-1" style="min-width:120px;"/>
-									<button type="submit" id={ "btn-add-armor-" + character.ID } class="btn-small p-xs text-xs">+ Add</button>
-								</form>
-							</div>
-						</div>
-					</div>
-				}
-				<h3 class="text-accent text-lg mt-md mb-sm">INVENTORY</h3>
-				<ul style="list-style-type: square; padding-left: 20px; line-height: 1.8;">
-					for i, item := range character.Gear {
-						<li class="flex justify-between items-center mb-xs">
-							<span>{ item }</span>
-							if canEdit {
-								<form hx-post={ string(templ.URL("/character/" + character.ID + "/delete_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" hx-confirm="Are you sure you want to delete this inventory item?" class="m-0 inline-block">
-									<input type="hidden" name="type" value="gear"/>
-									<input type="hidden" name="index" value={ fmt.Sprint(i) }/>
-									<button type="submit" id={ "btn-delete-gear-" + character.ID + "-" + fmt.Sprint(i) } class="btn-danger-small border-danger text-danger bg-transparent p-xs text-xs" title="Delete item">🗑️</button>
-								</form>
-							}
-						</li>
-					}
-				</ul>
-				if canEdit {
-					<form hx-post={ string(templ.URL("/character/" + character.ID + "/add_item")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex gap-xs mt-sm m-0">
-						<input type="hidden" name="type" value="gear"/>
-						<input type="text" name="item" placeholder="New inventory item..." class="w-full bg-black border-accent text-white p-xs flex-1" required/>
-						<button type="submit" id={ "btn-add-gear-" + character.ID } class="btn-small p-xs text-xs">+ Add Item</button>
-					</form>
-				}
-			</div>
+
 			<!-- Bottom Right: Cybertech & Apps -->
 			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px;">
 				<h2 class="text-accent text-2xl text-uppercase mb-sm pb-xs" style="border-bottom:1px solid var(--accent-color); letter-spacing:1px;">CYBERTECH & APPS</h2>
@@ -634,4 +641,6 @@ document.addEventListener("input", function(e) {
 			</div>
 		</div>
 	</div>
+			</div>
+		
 }
