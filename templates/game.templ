@@ -1,0 +1,161 @@
+package templates
+
+import (
+	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+)
+
+templ Game(game *db.Game, characters []chargen.Character, isGM bool, currentUserID string, logs []db.GameLog) {
+	@Base("Game: " + game.Name + " - 🍔 CY_BORGER", GameHead(game), GameContent(game, characters, isGM, currentUserID, logs))
+}
+
+templ GameHead(game *db.Game) {
+	<script>
+		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		let gameId = document.getElementById('game-data').dataset.id;
+		const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/game/' + gameId);
+		socket.onmessage = function (e) {
+			const parts = e.data.split(":");
+			const type = parts[0];
+			const charId = parts[1];
+
+			if (type === "log_entry") {
+				const eventType = parts[1];
+				const charName = parts[2];
+				const msg = atob(parts[3]);
+				
+				const timeString = new Date().toLocaleTimeString('en-US', { hour12: false });
+				const html = `
+				<div class="log-entry flex gap-sm mb-sm p-sm" data-type="${eventType}" style="border-bottom:1px solid #222;">
+					<div class="text-muted" style="white-space:nowrap;">[${timeString}]</div>
+					<div class="text-white">
+						<strong class="text-accent">${charName}</strong>
+						<span style="color:#aaa;">${msg}</span>
+					</div>
+				</div>`;
+				
+				const logBox = document.getElementById("activity-log-box");
+				if (logBox) {
+					const filterCheckbox = document.querySelector(`input[name="type"][value="${eventType}"]`);
+					if (!filterCheckbox || filterCheckbox.checked) {
+						const noLogs = logBox.querySelector('.no-logs');
+						if (noLogs) noLogs.remove();
+						logBox.insertAdjacentHTML("afterbegin", html);
+					}
+				}
+				return;
+			}
+
+			document.body.dispatchEvent(new Event('party-update'));
+
+			const modal = document.getElementById("char-modal");
+			if (modal && modal.dataset.charId === charId) {
+				if (document.activeElement && document.activeElement.closest('.modal-content')) {
+					return;
+				}
+				if (typeof htmx !== 'undefined') {
+					htmx.ajax('GET', '/character/' + charId + '?modal=true', {
+						target: '#char-modal-container',
+						swap: 'innerHTML'
+					});
+				}
+			}
+		};
+
+		function toggleEditSection(sectionId, displayStyle = 'block') {
+			const editEl = document.getElementById(sectionId + '-edit');
+			const viewEl = document.getElementById(sectionId + '-view');
+			if (editEl) {
+				const isHidden = editEl.style.display === 'none' || editEl.style.display === '';
+				editEl.style.display = isHidden ? displayStyle : 'none';
+				if (viewEl) {
+					viewEl.style.display = isHidden ? 'none' : 'block';
+				}
+			}
+		}
+	</script>
+	<span id="game-data" data-id={ game.ID } style="display:none;"></span>
+}
+
+templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, currentUserID string, logs []db.GameLog) {
+	<div class="w-full" style="max-width:1200px; margin:0 auto;">
+		<div class="flex justify-between items-center mb-lg pb-sm" style="border-bottom: 1px solid #222;">
+			<a href="/" class="text-accent no-decoration font-bold text-sm text-uppercase">⬅️ Back to Home</a>
+			<span class="text-sm text-muted text-uppercase flex items-center gap-sm">
+				<img src="/favicon.svg" alt="logo" class="border-accent" style="height:20px; width:20px; border-radius:3px;"/>
+				CY_BORGER Game Terminal
+			</span>
+		</div>
+
+		<div id="char-modal-container"></div>
+
+		<div class="flex justify-between items-center flex-wrap gap-md mb-lg pb-md border-accent" style="border-bottom-width: 2px; border-bottom-style: solid;">
+			<div>
+				<h1 class="text-accent text-2xl">GAME: { game.Name }</h1>
+				<div class="text-muted text-sm mb-sm">Created: { game.CreatedAt.Format("Jan 02, 2006 15:04 MST") }</div>
+				if isGM {
+					<span class="text-success font-bold">[GM MODE ACTIVE]</span>
+					<button id={ "btn-copy-gmlink-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(window.location.origin + '/game/' + document.getElementById('game-data-gm').dataset.id + '?gm_code=' + document.getElementById('game-data-gm').dataset.code, this)">Copy GM Link</button>
+					<button id={ "btn-copy-gmcode-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(document.getElementById('game-data-gm').dataset.code, this)">Copy GM Code</button>
+					<script>
+						if (window.cyStore) {
+							let gmEl = document.getElementById('game-data-gm');
+							cyStore.saveGMGame(gmEl.dataset.id, gmEl.dataset.code, gmEl.dataset.name);
+						}
+					</script>
+					<span id="game-data-gm" data-id={ game.ID } data-code={ game.GMCode } data-name={ game.Name } style="display:none;"></span>
+				} else {
+					<span class="text-muted">[PLAYER PARTY VIEW]</span>
+					<script>
+						document.addEventListener("DOMContentLoaded", function () {
+							if (window.cyStore) {
+								let gmEl = document.getElementById('game-data-gm-player');
+								const games = cyStore.getGMGames();
+								if (games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {
+									const code = games[gmEl.dataset.id].gmCode;
+									const form = document.querySelector('form[action="/game/' + gmEl.dataset.id + '/auth"]');
+									if (form) {
+										form.querySelector('input[name="gm_code"]').value = code;
+										form.submit();
+									}
+								}
+							}
+						});
+					</script>
+					<span id="game-data-gm-player" data-id={ game.ID } style="display:none;"></span>
+				}
+				<button id={ "btn-random-color-" + game.ID } onclick="randomizeThemeColor()" class="btn-outline-small ml-sm">🌈 Color</button>
+			</div>
+			<div class="bg-dark border-accent text-accent font-bold flex items-center gap-sm flex-wrap p-sm" style="border-style: dashed;">
+				<span>PLAYER INVITE CODE: <strong class="text-white">{ game.InviteCode }</strong></span>
+				<button id={ "btn-copy-invite-" + game.ID } class="btn-outline-small" onclick="copyText(document.getElementById('game-data-invite').dataset.code, this)">Copy Code</button>
+				<span id="game-data-invite" data-code={ game.InviteCode } style="display:none;"></span>
+			</div>
+		</div>
+
+		if !isGM {
+			<div class="mb-lg">
+				<form hx-post={ string(templ.URL("/game/" + game.ID + "/auth")) } class="flex gap-sm">
+					<input type="text" name="gm_code" placeholder="Enter GM Code" class="bg-dark border-accent text-white p-sm m-0" style="width:auto;"/>
+					<button type="submit" id={ "btn-unlock-gm-" + game.ID } class="btn-outline m-0 p-sm text-sm">Unlock GM Controls</button>
+				</form>
+			</div>
+		}
+
+		@PartyGrid(game, characters, isGM, currentUserID)
+
+		<div class="mt-xl pt-lg border-accent" style="border-top-width: 2px; border-top-style: dashed;">
+			<div class="flex justify-between items-center">
+				<h2 class="text-accent flex items-center gap-sm">📡 ACTIVITY LOG</h2>
+				<form id="log-filter-form" hx-get={ string(templ.URL("/game/" + game.ID + "/logs")) } hx-target="#activity-log-box" hx-swap="outerHTML" hx-trigger="change" class="flex gap-sm items-center">
+					<label class="text-accent text-sm" style="cursor:pointer;"><input type="checkbox" name="type" value="stats" checked/> STATS & HP</label>
+					<label class="text-accent text-sm" style="cursor:pointer;"><input type="checkbox" name="type" value="inventory" checked/> INVENTORY</label>
+					<label class="text-accent text-sm" style="cursor:pointer;"><input type="checkbox" name="type" value="death" checked/> DEATH</label>
+				</form>
+			</div>
+			
+			@GameLogs(game, characters, logs)
+
+		</div>
+	</div>
+}

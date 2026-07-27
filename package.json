@@ -4,9 +4,14 @@
   "description": "CY_BORG character sheet — Playwright tests",
   "scripts": {
     "test": "npx playwright test",
-    "test:inject": "npx playwright test tests/test_inject.js"
+    "test:inject": "npx playwright test tests/test_inject.js",
+    "build:css": "esbuild static/css/style.css --minify --outfile=static/css/style.min.css",
+    "watch:css": "esbuild static/css/style.css --minify --outfile=static/css/style.min.css --watch",
+    "validate:html": "html-validate 'templates/**/*.html' 'templates/**/*.tmpl'"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.0"
+    "@playwright/test": "^1.62.0",
+    "esbuild": "^0.28.1",
+    "html-validate": "^11.5.6"
   }
 }

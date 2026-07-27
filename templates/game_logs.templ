@@ -1,0 +1,35 @@
+package templates
+
+import (
+	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+)
+
+templ GameLogs(game *db.Game, characters []chargen.Character, logs []db.GameLog) {
+	<div id="activity-log-box" class="mt-md bg-black p-md" style="border:1px solid #333; max-height:300px; overflow-y:auto; font-family:monospace; font-size:0.85rem;" 
+		hx-include="#log-filter-form"
+		hx-get={ string(templ.URL("/game/" + game.ID + "/logs")) } hx-swap="outerHTML">
+		for _, logEntry := range logs {
+			<div class="log-entry flex gap-sm mb-sm p-sm" data-type={ logEntry.EventType } style="border-bottom:1px solid #222;">
+				<div class="text-muted" style="white-space:nowrap;">[{ logEntry.CreatedAt.Format("15:04:05") }]</div>
+				<div class="text-white">
+					for _, c := range characters {
+						if c.ID == logEntry.CharacterID {
+							<strong class="text-accent">
+								if c.Name != "" {
+									{ c.Name }
+								} else {
+									[UNNAMED]
+								}
+							</strong>
+						}
+					}
+					<span style="color:#aaa;">{ logEntry.Message }</span>
+				</div>
+			</div>
+		}
+		if len(logs) == 0 {
+			<div class="no-logs text-italic" style="color:#555;">No logged activity yet...</div>
+		}
+	</div>
+}

@@ -1,0 +1,25 @@
+package templates
+
+templ Base(title string, head templ.Component, content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title }</title>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+		<link rel="alternate icon" type="image/png" href="/favicon.svg"/>
+		<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+		<link rel="stylesheet" href="/static/css/style.min.css"/>
+		<script src="/static/js/app.js"></script>
+		if head != nil {
+			@head
+		}
+	</head>
+	<body>
+		if content != nil {
+			@content
+		}
+	</body>
+	</html>
+}

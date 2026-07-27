@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"github.com/mrpoundsign/cy_borger/internal/db"
 	"github.com/mrpoundsign/cy_borger/internal/server"
 	"github.com/mrpoundsign/cy_borger/static"
-	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 func main() {
@@ -25,12 +23,7 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	tmpl, err := template.ParseFS(templates.FS, "*.html", "*.tmpl")
-	if err != nil {
-		log.Fatalf("Failed to parse templates: %v", err)
-	}
-
-	appServer := server.NewServer(database, tmpl)
+	appServer := server.NewServer(database)
 
 	mux := http.NewServeMux()
 

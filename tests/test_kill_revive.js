@@ -60,8 +60,8 @@ const { chromium } = require('@playwright/test');
     await page.waitForTimeout(1000);
     
     // 5. Kill the character FROM THE GAME PAGE
-    console.log("Clicking KILL button on the game page...");
-    await page.click('button:has-text("💀 KILL")');
+    console.log("Clicking FLATLINE button on the game page...");
+    await page.click('button:has-text("💀 FLATLINE")');
     await page.waitForTimeout(500); // Wait for modal
     await page.click('button:has-text("💀 FLATLINE")'); // Submit the kill form
     await page.waitForTimeout(2000); // Wait for HTMX and WebSockets to process

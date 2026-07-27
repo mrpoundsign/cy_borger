@@ -1,0 +1,266 @@
+package templates
+
+import (
+	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+)
+
+templ Index(user *db.User, myGames []db.Game, myChars []chargen.Character, draftChars []chargen.Character, errMsg string) {
+	@Base("🍔 CY_BORGER Character Generator", IndexHead(), IndexContent(user, myGames, myChars, draftChars, errMsg))
+}
+
+templ IndexHead() {
+	<script>
+	</script>
+}
+
+templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character, draftChars []chargen.Character, errMsg string) {
+	<div class="container">
+		<h1 class="flex items-center gap-md text-2xl text-accent">
+			<img src="/favicon.svg" alt="CY_BORGER logo" class="border-accent" style="height:54px; width:54px; border-radius:6px; box-shadow:0 0 12px rgba(255,230,0,0.4);"/>
+			CY_BORGER
+		</h1>
+		<p class="text-muted mb-lg">KILL THE CORPORATIONS. LIVE FAST. DIE CHROME. BBQ.</p>
+
+		<div class="user-banner">
+			if user != nil {
+				<div class="flex justify-between items-center flex-wrap w-full gap-sm">
+					<div>
+						<span>LOGIN: <strong class="text-accent">{ user.Username }</strong></span>
+						<span class="ml-md text-muted">| HANDLE: <strong class="text-success">
+							if user.Handle != "" {
+								{ user.Handle }
+							} else {
+								{ user.Username }
+							}
+						</strong></span>
+					</div>
+					<div class="flex gap-sm items-center">
+						<form hx-post="/auth/logout" style="display:inline;">
+							<button type="submit" id="btn-logout-index" class="btn-outline-small border-danger text-danger">🚪 LOGOUT</button>
+						</form>
+						<button onclick="randomizeThemeColor()" id="btn-random-color-index" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
+					</div>
+				</div>
+				<script>
+					if (window.cyStore) {
+						let handle = document.getElementById('user-handle-data').innerText;
+						cyStore.setUserName(handle);
+						cyStore.setEditedName();
+					}
+				</script>
+				<span id="user-handle-data" style="display:none;">
+					if user.Handle != "" {
+						{ user.Handle }
+					} else {
+						{ user.Username }
+					}
+				</span>
+			} else {
+				<div class="w-full text-center">
+					<div class="flex justify-center gap-md mb-md">
+						<button type="button" onclick="showAuthTab('login')" id="tab-btn-login" class="btn-small">LOGIN</button>
+						<button type="button" onclick="showAuthTab('register')" id="tab-btn-register" class="btn-outline-small">REGISTER ACCOUNT</button>
+						<button onclick="randomizeThemeColor()" id="btn-random-color-auth" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
+					</div>
+
+					if errMsg != "" {
+						<div class="bg-danger text-white p-sm mb-md font-bold text-sm" style="border-radius:4px;">
+							⚠ { errMsg }
+						</div>
+					}
+
+					<!-- Login Form -->
+					<form id="auth-login-form" hx-post="/auth/login" class="flex flex-col gap-sm max-w-xs m-0" style="margin:0 auto;">
+						<input type="text" name="username" placeholder="Login Name (e.g. cybersam)" required class="w-full text-sm p-sm bg-black border-accent text-white"/>
+						<input type="password" name="password" placeholder="Password" required class="w-full text-sm p-sm bg-black border-accent text-white"/>
+						<button type="submit" id="btn-submit-login-index" class="btn-small p-sm text-sm">⚡ LOG IN</button>
+					</form>
+
+					<!-- Register Form -->
+					<form id="auth-register-form" hx-post="/auth/register" class="flex-col gap-sm max-w-xs m-0" style="display:none; margin:0 auto;">
+						<input type="text" name="username" placeholder="Choose Login Name (e.g. cybersam)" required class="w-full text-sm p-sm bg-black border-success text-white"/>
+						<input type="password" name="password" placeholder="Choose Password" required class="w-full text-sm p-sm bg-black border-success text-white"/>
+						<button type="submit" id="btn-submit-register-index" class="btn-small p-sm text-sm bg-success text-black">🔑 REGISTER ACCOUNT</button>
+					</form>
+				</div>
+				<script>
+					function showAuthTab(tab) {
+						const loginForm = document.getElementById('auth-login-form');
+						const regForm = document.getElementById('auth-register-form');
+						const loginBtn = document.getElementById('tab-btn-login');
+						const regBtn = document.getElementById('tab-btn-register');
+
+						if (tab === 'login') {
+							loginForm.style.display = 'flex';
+							regForm.style.display = 'none';
+							loginBtn.className = 'btn-small';
+							regBtn.className = 'btn-outline-small';
+						} else {
+							loginForm.style.display = 'none';
+							regForm.style.display = 'flex';
+							loginBtn.className = 'btn-outline-small';
+							regBtn.className = 'btn-small';
+						}
+					}
+				</script>
+			}
+		</div>
+
+		if user != nil {
+			<div class="flex justify-center gap-sm flex-wrap mb-lg">
+				<form hx-post="/character/generate" style="display:inline;">
+					<button type="submit" id="btn-generate-character-index" class="btn">🎲 Roll Random Character</button>
+				</form>
+				<form hx-post="/character/create_blank" style="display:inline;">
+					<button type="submit" id="btn-create-blank-character-index" class="btn bg-success text-black">📝 Create Blank Character</button>
+				</form>
+			</div>
+
+			<div class="card">
+				<h3 class="text-accent mb-md">START A GAME</h3>
+				<form hx-post="/game/create">
+					<input type="text" name="name" placeholder="Game Name (e.g. Sector 4 Heist)" required/><br/>
+					<button type="submit" id="btn-create-game-index" class="btn p-md text-sm">Create Game as GM</button>
+				</form>
+			</div>
+		} else {
+			<div class="card border-warning bg-warning-dark text-center">
+				<h3 class="text-warning mb-sm">🔒 AUTHENTICATION REQUIRED</h3>
+				<p class="text-muted text-sm m-0">You can browse public games or character sheets via direct links. Log in or register an account above to roll characters or start campaigns.</p>
+			</div>
+		}
+
+		if len(myGames) > 0 || len(myChars) > 0 || len(draftChars) > 0 {
+			<div class="card text-left" id="my-stuff-card">
+				if len(myGames) > 0 {
+					<div id="my-gm-games-section">
+						<h3 class="text-success mb-sm text-lg">MY GAMES (GM)</h3>
+						<ul id="my-gm-games-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
+							for _, g := range myGames {
+								<li data-game-id={ g.ID }><a href={ templ.URL("/game/" + g.ID) } class="text-success no-decoration">⚡ <strong>{ g.Name }</strong> [GM Mode] <span class="text-muted text-sm">— Created: { g.CreatedAt.Format("Jan 02, 2006") }</span></a></li>
+							}
+						</ul>
+					</div>
+				} else {
+					<div id="my-gm-games-section" style="display:none;"></div>
+				}
+
+				if len(myChars) > 0 {
+					<h3 class="text-accent mb-sm text-lg">MY CHARACTERS (SAVED)</h3>
+					<ul id="my-chars-list" style="list-style:none; padding:0; margin-bottom:15px; line-height:1.5;">
+						for _, c := range myChars {
+							<li data-char-id={ c.ID }>
+								if c.IsDead {
+									<a href={ templ.URL("/character/" + c.ID) } class="text-danger no-decoration">
+										🪦 <strong>
+										if c.Name != "" {
+											{ c.Name }
+										} else {
+											[UNNAMED OPERATOR]
+										}
+										</strong> — { c.Class.Name }
+										if c.GameName != "" {
+											[{ c.GameName }]
+										}
+										[FLATLINED]
+									</a>
+								} else {
+									<a href={ templ.URL("/character/" + c.ID) } class="text-accent no-decoration">
+										👤 <strong>
+										if c.Name != "" {
+											{ c.Name }
+										} else {
+											[UNNAMED OPERATOR]
+										}
+										</strong> — { c.Class.Name }
+										if c.GameName != "" {
+											[{ c.GameName }]
+										}
+									</a>
+								}
+							</li>
+						}
+					</ul>
+				}
+
+				if len(draftChars) > 0 {
+					<h3 class="text-warning mb-sm text-lg">DRAFT / UNKEPT CHARACTERS</h3>
+					<ul id="my-drafts-list" style="list-style:none; padding:0; line-height:1.5;">
+						for _, c := range draftChars {
+							<li data-char-id={ c.ID }><a href={ templ.URL("/character/" + c.ID) } class="text-warning no-decoration">⚡
+									<strong>{ c.Name }</strong> — { c.Class.Name }
+									if c.GameName != "" {
+										[{ c.GameName }]
+									}
+									[Draft Preview]</a></li>
+						}
+					</ul>
+				}
+			</div>
+		} else {
+			<div class="card text-left" id="my-stuff-card" style="display:none;"></div>
+		}
+	</div>
+
+	<script>
+		function randomizeInputName() {
+			const randomName = generateRandomUsername();
+			document.getElementById("user-handle-input").value = randomName;
+		}
+
+		function saveHandle() {
+			let input = document.getElementById("user-handle-input").value.trim();
+			if (input) {
+				if (/\s/.test(input)) {
+					alert("No spaces or whitespace allowed in handles.");
+					return;
+				}
+				const regex = /^[^\s#]+#\d{4}$/;
+				if (!regex.test(input)) {
+					const hashIndex = input.indexOf('#');
+					let baseName = input;
+					if (hashIndex !== -1) {
+						baseName = input.substring(0, hashIndex).trim();
+					}
+					if (!baseName) {
+						alert("Invalid handle. Name cannot be empty.");
+						return;
+					}
+					const num = Math.floor(1000 + Math.random() * 9000);
+					input = baseName + "#" + num;
+				}
+
+				cyStore.setUserName(input);
+				cyStore.setEditedName();
+				document.getElementById("user-handle-display").innerText = input;
+				document.getElementById("handle-editor-area").style.display = "none";
+				document.getElementById("user-handle-input").value = input;
+			}
+		}
+
+		document.addEventListener("DOMContentLoaded", function () {
+			if (!window.cyStore) return;
+
+			// Sync client-side localStorage GM games so they are ALWAYS visible
+			const localGames = cyStore.getGMGames();
+			const listEl = document.getElementById("my-gm-games-list");
+			const sectionEl = document.getElementById("my-gm-games-section");
+			const containerEl = document.getElementById("my-stuff-card");
+
+			if (localGames && Object.keys(localGames).length > 0) {
+				if (sectionEl) sectionEl.style.display = "block";
+				if (containerEl) containerEl.style.display = "block";
+
+				for (const [id, game] of Object.entries(localGames)) {
+					if (listEl && !listEl.querySelector(`[data-game-id="${id}"]`)) {
+						const li = document.createElement("li");
+						li.setAttribute("data-game-id", id);
+						li.innerHTML = `<a href="/game/${id}" class="text-success no-decoration">⚡ <strong>${game.name || 'Campaign'}</strong> [GM Mode]</a>`;
+						listEl.appendChild(li);
+					}
+				}
+			}
+		});
+	</script>
+}

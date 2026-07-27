@@ -1,0 +1,150 @@
+package templates
+
+import (
+	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+	"fmt"
+)
+
+templ PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, currentUserID string) {
+	<div class="party-container" hx-get={ string(templ.URL("/game/" + game.ID + "/party")) } hx-target="this" hx-swap="outerHTML" hx-trigger="party-update from:body">
+		<div class="flex justify-between items-center mb-md">
+			<h2 class="text-accent">ACTIVE PARTY MEMBERS</h2>
+			<div class="flex flex-col gap-sm items-end">
+				<form hx-post="/character/generate" class="m-0">
+					<input type="hidden" name="game_id" value={ game.ID }/>
+					<button type="submit" id={ "btn-generate-character-party-" + game.ID } class="btn w-full">🎲 Roll New Character</button>
+				</form>
+				<form hx-post="/character/create_blank" class="m-0">
+					<input type="hidden" name="game_id" value={ game.ID }/>
+					<button type="submit" id={ "btn-create-blank-party-" + game.ID } class="btn-outline w-full">📝 Create Blank</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="party-grid">
+			for _, c := range characters {
+				if !c.IsDead {
+					<div class="char-card" 
+						if currentUserID != "" && c.OwnerID == currentUserID {
+							style="border-color: var(--accent-color); box-shadow: 0 0 12px rgba(255,230,0,0.25);"
+						}>
+						<div class="flex justify-between items-center">
+							<div class="char-name">
+								if c.Name != "" {
+									{ c.Name }
+								} else {
+									[UNNAMED OPERATOR]
+								}
+							</div>
+							if currentUserID != "" && c.OwnerID == currentUserID {
+								<span class="bg-accent text-black font-bold text-xs p-xs" style="border-radius:3px;">⚡ YOU!</span>
+							}
+						</div>
+						<div class="text-muted text-sm mb-sm">
+							Player: 
+							if c.OwnerUsername != "" {
+								<strong class="text-accent">{ c.OwnerUsername }</strong>
+							} else if c.Handle != "" {
+								{ "@" + c.Handle }
+							} else {
+								<span style="color:#777;">[Unnamed Player]</span>
+							}
+							— { c.Class.Name }
+						</div>
+						<div><strong>HP:</strong> { fmt.Sprint(c.HP.Current) }/{ fmt.Sprint(c.HP.Max) } | <strong>Glitches:</strong> { fmt.Sprint(c.Glitches.Current) }/{ fmt.Sprint(c.Glitches.Max) }</div>
+						<div class="mt-sm"><strong>Weapons:</strong> 
+							for _, w := range c.Weapons {
+								{ w.Name } ({ w.Damage }
+								if w.Hands != "" {
+									, { w.Hands }
+								}), 
+							}
+						</div>
+
+						<div class="mt-md flex gap-sm items-center flex-wrap">
+							<button id={ "btn-inspect-" + c.ID + "-card" } class="btn" hx-get={ string(templ.URL("/character/" + c.ID + "?modal=true")) } hx-target="#char-modal-container" hx-swap="innerHTML" hx-select=".modal-overlay">
+								⚡ INSPECT SHEET
+							</button>
+							<a href={ templ.URL("/character/" + c.ID) } id={ "link-full-sheet-" + c.ID + "-card" } class="btn-outline">Full Sheet</a>
+
+							if isGM || (currentUserID != "" && c.OwnerID == currentUserID) {
+								<button id={ "btn-flatline-" + c.ID + "-card" } class="btn-outline-small border-danger text-danger bg-danger-dark" onclick="toggleEditSection('kill-game-' + this.dataset.id, 'flex')" data-id={ c.ID }>💀 FLATLINE</button>
+
+								<div id={ "kill-game-" + c.ID + "-edit" } class="modal-overlay" style="display:none;">
+									<div class="modal-content">
+										<h2 class="text-danger mb-sm">💀 FLATLINE OPERATOR</h2>
+										<p class="text-muted text-sm mb-md" style="line-height:1.4;">
+											Mark <strong>{ c.Name }</strong> as deceased. Add a death note or final words:
+										</p>
+										<form hx-post={ string(templ.URL("/character/" + c.ID + "/kill")) } hx-swap="none" class="flex flex-col gap-md" onsubmit="toggleEditSection('kill-game-' + this.dataset.id)" data-id={ c.ID }>
+											<textarea name="death_note" placeholder="e.g. Flatlined by Cy-Spider in Sector 4" class="w-full bg-dark text-white p-sm border-danger text-sm" style="min-height:60px; font-family:inherit;"></textarea>
+											<div class="flex gap-sm justify-center mt-sm">
+												<button type="button" id={ "btn-cancel-flatline-" + c.ID + "-modal" } class="btn-outline" onclick="toggleEditSection('kill-game-' + this.dataset.id)" data-id={ c.ID }>Cancel</button>
+												<button type="submit" id={ "btn-submit-flatline-" + c.ID + "-modal" } class="btn bg-danger text-white border-danger">💀 FLATLINE</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			}
+		</div>
+
+		<div class="mt-xl pt-lg border-danger" style="border-top-width: 2px; border-top-style: dashed;">
+			<h2 class="text-danger flex items-center gap-sm">🪦 GRAVEYARD / FLATLINED OPERATORS</h2>
+			<div class="party-grid mt-md">
+				for _, c := range characters {
+					if c.IsDead {
+						<div class="char-card border-danger bg-danger-dark" style="opacity: 0.9;">
+							<div class="flex justify-between items-center">
+								<div class="char-name text-danger line-through">☠️ 
+									if c.Name != "" {
+										{ c.Name }
+									} else {
+										[UNNAMED OPERATOR]
+									}
+								</div>
+								<div>
+									if currentUserID != "" && c.OwnerID == currentUserID {
+										<span class="bg-accent text-black font-bold text-xs p-xs mr-xs" style="border-radius:3px;">⚡ YOU!</span>
+									}
+									<span class="bg-danger text-white font-bold text-xs p-xs" style="border-radius:3px;">FLATLINED</span>
+								</div>
+							</div>
+							<div class="text-muted text-sm mt-xs">
+								Player: 
+								if c.OwnerUsername != "" {
+									<strong class="text-danger-muted">{ c.OwnerUsername }</strong>
+								} else if c.Handle != "" {
+									{ "@" + c.Handle }
+								} else {
+									<span style="color:#777;">[Unnamed Player]</span>
+								}
+								— { c.Class.Name }
+							</div>
+							if !c.DiedAt.IsZero() {
+								<div class="text-xs text-danger-muted mt-xs font-bold">🪦 DIED: { c.DiedAt.Format("2006-01-02 15:04:05") }</div>
+							}
+							<div class="text-danger-muted font-italic text-sm my-sm p-sm bg-danger-light border-danger" style="border-left-width: 3px; border-left-style: solid;">
+								"{ c.DeathNote }"
+							</div>
+							<div class="flex gap-sm items-center mt-sm">
+								<button id={ "btn-inspect-" + c.ID + "-card" } class="btn bg-danger-light border-danger text-danger p-xs text-xs" hx-get={ string(templ.URL("/character/" + c.ID + "?modal=true")) } hx-target="#char-modal-container" hx-swap="innerHTML" hx-select=".modal-overlay">
+									⚡ INSPECT SHEET
+								</button>
+								if isGM || (currentUserID != "" && c.OwnerID == currentUserID) {
+									<form hx-post={ string(templ.URL("/character/" + c.ID + "/revive")) } hx-swap="none" style="display:inline;">
+										<button type="submit" id={ "btn-revive-" + c.ID + "-card" } class="btn-outline-small border-success text-success p-xs text-xs">⚡ REVIVE</button>
+									</form>
+								}
+							</div>
+						</div>
+					}
+				}
+			</div>
+		</div>
+	</div>
+}

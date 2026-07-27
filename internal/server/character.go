@@ -12,6 +12,7 @@ import (
 	"github.com/mrpoundsign/cy_borger/internal/db"
 	"github.com/mrpoundsign/cy_borger/internal/ws"
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 func (s *Server) logAndBroadcastGameEvent(c *chargen.Character, eventType, message string) {
@@ -108,27 +109,19 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	data := map[string]interface{}{
-		"Character":  c,
-		"CanEdit":    canEdit,
-		"IsGM":       isGM,
-		"Game":       game,
-		"ActiveGame": activeGame,
-		"IsModal":    r.URL.Query().Get("modal") == "true",
-	}
+	isModal := r.URL.Query().Get("modal") == "true"
+	isHTMX := r.Header.Get("HX-Request") == "true"
 
 	// Render in modal if requested
-	if r.URL.Query().Get("modal") == "true" {
-		if err := s.Templates.ExecuteTemplate(w, "character_modal.html", data); err != nil {
-			log.Printf("Template execution error (character_modal.html): %v", err)
+	if isModal {
+		if err := templates.CharacterModal(c, canEdit, isGM, game, activeGame, isModal, isHTMX).Render(r.Context(), w); err != nil {
+			log.Printf("Template error (character_modal.templ): %v", err)
 		}
 		return
 	}
 
-	if err := s.Templates.ExecuteTemplate(w, "character.html", data); err != nil {
-
-		log.Printf("Template execution error (character.html): %v", err)
-
+	if err := templates.Base("CY_BORGER - "+c.Name, nil, templates.Character(c, canEdit, isGM, game, activeGame, isModal, isHTMX)).Render(r.Context(), w); err != nil {
+		log.Printf("Template error (character.templ): %v", err)
 	}
 }
 

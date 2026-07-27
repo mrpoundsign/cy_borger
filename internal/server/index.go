@@ -6,13 +6,14 @@ import (
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		w.WriteHeader(http.StatusNotFound)
-		if err := s.Templates.ExecuteTemplate(w, "404.html", nil); err != nil {
-			log.Printf("Template execution error (404.html): %v", err)
+		if err := templates.Base("CY_BORGER - 404", nil, templates.NotFound()).Render(r.Context(), w); err != nil {
+			log.Printf("Template execution error (404.templ): %v", err)
 		}
 		return
 	}
@@ -46,17 +47,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 	errMsg := r.URL.Query().Get("error")
 
-	data := map[string]interface{}{
-		"User":            user,
-		"MyGames":         myGames,
-		"MyCharacters":    myChars,
-		"DraftCharacters": draftChars,
-		"ErrorMessage":    errMsg,
-	}
-
-	if err := s.Templates.ExecuteTemplate(w, "index.html", data); err != nil {
-
-		log.Printf("Template execution error (index.html): %v", err)
-
+	if err := templates.Base("CY_BORGER - Home", nil, templates.Index(user, myGames, myChars, draftChars, errMsg)).Render(r.Context(), w); err != nil {
+		log.Printf("Template execution error (index.templ): %v", err)
 	}
 }
