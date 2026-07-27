@@ -34,16 +34,20 @@ const { chromium } = require('@playwright/test');
     // 2. Create a Game
     console.log("Creating a game...");
     await page.fill('input[name="name"]', 'Test Game');
-    await page.click('button:has-text("Create Game as GM")');
-    await page.waitForTimeout(1000);
+    await Promise.all([
+        page.waitForNavigation(),
+        page.locator('button:has-text("Create Game as GM")').click()
+    ]);
     const gameUrl = page.url();
     console.log(`Game created: ${gameUrl}`);
     
     // 3. Create a Character
     console.log("Creating a character...");
     await page.goto('http://localhost:8080/');
-    await page.click('text=Create Blank Character');
-    await page.waitForTimeout(1000);
+    await Promise.all([
+        page.waitForNavigation(),
+        page.locator('text=Create Blank Character').click()
+    ]);
     const charUrl = page.url();
     console.log(`Character created: ${charUrl}`);
     

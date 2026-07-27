@@ -3,12 +3,8 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  args_bin = []
-  bin = "./tmp/main"
-  cmd = "go run github.com/a-h/templ/cmd/templ@latest generate && go build -o ./tmp/main cmd/cy_borger/main.go"
-  delay = 1000
-  exclude_dir = ["local", "tests", "tmp", "vendor", "testdata", "node_modules"]
-  exclude_file = ["playwright.config.js", "package.json", "package-lock.json"]
+  cmd = "./build.sh -o ./tmp/cy_borger --run"
+  exclude_file = ["static/css/style.min.css","playwright.config.js", "package.json", "package-lock.json" ]
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
   follow_symlink = false
@@ -16,13 +12,13 @@ tmp_dir = "tmp"
   include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html", "js", "css", "templ"]
   include_file = []
-  kill_delay = "0s"
+  kill_delay = "5s"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
   rerun = false
   rerun_delay = 500
-  send_interrupt = false
+  send_interrupt = true
   stop_on_error = true
 
 [color]

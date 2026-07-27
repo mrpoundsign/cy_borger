@@ -27,8 +27,10 @@ test.describe('Graveyard & Flatline Workflow', () => {
     test('owner or GM can flatline a character with death note, moving to Graveyard', async ({ page }) => {
         await loginUser(page);
 
-        await page.locator('button:has-text("Create Blank Character")').click();
-        await page.waitForLoadState('networkidle');
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('button:has-text("Create Blank Character")').click()
+        ]);
 
         // Get character ID
         const url = page.url();
@@ -63,8 +65,10 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await loginUser(page);
 
         await page.locator('input[name="name"]').fill('Sector 4 Campaign');
-        await page.locator('.card button:has-text("Create Game as GM")').click();
-        await page.waitForLoadState('networkidle');
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('.card button:has-text("Create Game as GM")').click()
+        ]);
 
         const gameUrl = page.url();
 
