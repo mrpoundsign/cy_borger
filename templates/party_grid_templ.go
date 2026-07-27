@@ -334,7 +334,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" hx-target=\"#char-modal-container\" hx-swap=\"innerHTML\" hx-select=\".modal-overlay\">⚡ INSPECT SHEET</button> <a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" hx-target=\"#char-modal-container\" hx-swap=\"innerHTML\" hx-select=\".char-modal-overlay\">⚡ INSPECT SHEET</button> <a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -646,7 +646,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" hx-target=\"#char-modal-container\" hx-swap=\"innerHTML\" hx-select=\".modal-overlay\">⚡ INSPECT SHEET</button> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" hx-target=\"#char-modal-container\" hx-swap=\"innerHTML\" hx-select=\".char-modal-overlay\">⚡ INSPECT SHEET</button> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

@@ -63,7 +63,7 @@ templ PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, curren
 						</div>
 
 						<div class="mt-md flex gap-sm items-center flex-wrap">
-							<button id={ "btn-inspect-" + c.ID + "-card" } class="btn" hx-get={ string(templ.URL("/character/" + c.ID + "?modal=true")) } hx-target="#char-modal-container" hx-swap="innerHTML" hx-select=".modal-overlay">
+							<button id={ "btn-inspect-" + c.ID + "-card" } class="btn" hx-get={ string(templ.URL("/character/" + c.ID + "?modal=true")) } hx-target="#char-modal-container" hx-swap="innerHTML" hx-select=".char-modal-overlay">
 								⚡ INSPECT SHEET
 							</button>
 							<a href={ templ.URL("/character/" + c.ID) } id={ "link-full-sheet-" + c.ID + "-card" } class="btn-outline">Full Sheet</a>
@@ -132,7 +132,7 @@ templ PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, curren
 								"{ c.DeathNote }"
 							</div>
 							<div class="flex gap-sm items-center mt-sm">
-								<button id={ "btn-inspect-" + c.ID + "-card" } class="btn bg-danger-light border-danger text-danger p-xs text-xs" hx-get={ string(templ.URL("/character/" + c.ID + "?modal=true")) } hx-target="#char-modal-container" hx-swap="innerHTML" hx-select=".modal-overlay">
+								<button id={ "btn-inspect-" + c.ID + "-card" } class="btn bg-danger-light border-danger text-danger p-xs text-xs" hx-get={ string(templ.URL("/character/" + c.ID + "?modal=true")) } hx-target="#char-modal-container" hx-swap="innerHTML" hx-select=".char-modal-overlay">
 									⚡ INSPECT SHEET
 								</button>
 								if isGM || (currentUserID != "" && c.OwnerID == currentUserID) {

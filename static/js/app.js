@@ -1,6 +1,6 @@
-const firstNames = ["SPICE", "CHROME", "RAZOR", "HEX", "VOIX", "KILOWATT", "NULL", "CYPHER", "VEX", "ASH", "CINDER", "NEXUS", "RIPPED", "GLITCH", "STATIC", "ZERO", "SHADOW", "BLADE", "VIPER", "VENOM", "HAWK", "ECHO", "GHOST", "SPECTRE"];
+var firstNames = ["SPICE", "CHROME", "RAZOR", "HEX", "VOIX", "KILOWATT", "NULL", "CYPHER", "VEX", "ASH", "CINDER", "NEXUS", "RIPPED", "GLITCH", "STATIC", "ZERO", "SHADOW", "BLADE", "VIPER", "VENOM", "HAWK", "ECHO", "GHOST", "SPECTRE"];
 
-function toTitleCase(str) {
+var toTitleCase = function(str) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 

@@ -10,6 +10,7 @@ templ Character(character *chargen.Character, canEdit bool, isGM bool, game *db.
 }
 
 templ CharacterHead(charID string) {
+	<span id="char-data-id" data-id={ charID } style="display:none;"></span>
 	<script>
 		(function () {
 			const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -28,7 +29,6 @@ templ CharacterHead(charID string) {
 			};
 		})();
 	</script>
-	<span id="char-data-id" data-id={ charID } style="display:none;"></span>
 }
 
 templ CharacterContent(character *chargen.Character, canEdit bool, isGM bool, game *db.Game, activeGame *db.Game, isModal bool, isHTMX bool) {

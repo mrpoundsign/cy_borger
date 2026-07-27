@@ -64,10 +64,10 @@ func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request)
 	// Set edit session cookie automatically for creator
 	setCookie(w, "char_edit_"+c.ID, c.EditCode)
 
-	// If HTMX request, render the character template directly with HX-Push-Url header!
+	// If HTMX request, render the character template directly with HX-Redirect header!
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
-		s.renderCharacterViewWithChar(w, r, &c)
+		w.Header().Set("HX-Redirect", "/character/"+c.ID)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -353,8 +353,8 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 	setCookie(w, "char_edit_"+c.ID, c.EditCode)
 
 	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
-		s.renderCharacterViewWithChar(w, r, &c)
+		w.Header().Set("HX-Redirect", "/character/"+c.ID)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 

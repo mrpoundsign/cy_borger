@@ -42,13 +42,7 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 						<button onclick="randomizeThemeColor()" id="btn-random-color-index" class="btn-outline-small" title="Randomize theme color">🌈 COLOR</button>
 					</div>
 				</div>
-				<script>
-					if (window.cyStore) {
-						let handle = document.getElementById('user-handle-data').innerText;
-						cyStore.setUserName(handle);
-						cyStore.setEditedName();
-					}
-				</script>
+
 				<span id="user-handle-data" style="display:none;">
 					if user.Handle != "" {
 						{ user.Handle }
@@ -56,6 +50,13 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 						{ user.Username }
 					}
 				</span>
+				<script>
+					if (window.cyStore) {
+						let handle = document.getElementById('user-handle-data').innerText;
+						cyStore.setUserName(handle);
+						cyStore.setEditedName();
+					}
+				</script>
 			} else {
 				<div class="w-full text-center">
 					<div class="flex justify-center gap-md mb-md">

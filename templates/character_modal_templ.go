@@ -34,20 +34,20 @@ func CharacterModal(character *chargen.Character, canEdit bool, isGM bool, game 
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"char-modal\" data-char-id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"char-modal-overlay\" id=\"char-modal\" data-char-id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/character_modal.templ`, Line: 9, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/character_modal.templ`, Line: 9, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" onclick=\"if(event.target === this) this.remove();\"><div class=\"modal-content\"><button class=\"btn-outline\" style=\"float:right; color:#ff3366; border-color:#ff3366;\" onclick=\"document.getElementById('char-modal').remove()\">✕ CLOSE</button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" onclick=\"if(event.target === this) this.remove();\"><div class=\"char-modal-content\"><button class=\"btn-outline\" style=\"float:right; color:#ff3366; border-color:#ff3366;\" onclick=\"document.getElementById('char-modal').remove()\">✕ CLOSE</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -55,7 +55,7 @@ func CharacterModal(character *chargen.Character, canEdit bool, isGM bool, game 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></div><style>\n\t\t.modal-overlay {\n\t\t\tposition: fixed;\n\t\t\ttop: 0;\n\t\t\tleft: 0;\n\t\t\twidth: 100vw;\n\t\t\theight: 100vh;\n\t\t\tbackground: rgba(0, 0, 0, 0.85);\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tz-index: 9999;\n\t\t\toverflow-y: auto;\n\t\t\tpadding: 20px;\n\t\t}\n\n\t\t.modal-content {\n\t\t\tbackground: #050505;\n\t\t\tborder: 2px solid var(--accent-color);\n\t\t\tmax-width: 1100px;\n\t\t\twidth: 100%;\n\t\t\tmax-height: 90vh;\n\t\t\toverflow-y: auto;\n\t\t\tpadding: 25px;\n\t\t\tbox-shadow: 0 0 30px rgba(255, 230, 0, 0.4);\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

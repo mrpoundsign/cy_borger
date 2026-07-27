@@ -10,6 +10,7 @@ templ Game(game *db.Game, characters []chargen.Character, isGM bool, currentUser
 }
 
 templ GameHead(game *db.Game) {
+	<span id="game-data" data-id={ game.ID } style="display:none;"></span>
 	<script>
 		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 		let gameId = document.getElementById('game-data').dataset.id;
@@ -74,7 +75,6 @@ templ GameHead(game *db.Game) {
 			}
 		}
 	</script>
-	<span id="game-data" data-id={ game.ID } style="display:none;"></span>
 }
 
 templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, currentUserID string, logs []db.GameLog) {

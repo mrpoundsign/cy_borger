@@ -63,20 +63,20 @@ func CharacterHead(charID string) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script>\n\t\t(function () {\n\t\t\tconst protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';\n\t\t\tlet charId = document.getElementById('char-data-id').dataset.id;\n\t\t\tconst socket = new WebSocket(protocol + '//' + window.location.host + '/ws/character/' + charId);\n\t\t\tsocket.onmessage = function (e) {\n\t\t\t\tif (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (document.querySelector('[id$=\"-edit\"]:not([style*=\"display: none\"])')) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.ajax('GET', '/character/' + charId, { target: 'body', swap: 'innerHTML' });\n\t\t\t\t}\n\t\t\t};\n\t\t})();\n\t</script><span id=\"char-data-id\" data-id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<span id=\"char-data-id\" data-id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(charID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/character.templ`, Line: 31, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/character.templ`, Line: 13, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" style=\"display:none;\"></span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" style=\"display:none;\"></span><script>\n\t\t(function () {\n\t\t\tconst protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';\n\t\t\tlet charId = document.getElementById('char-data-id').dataset.id;\n\t\t\tconst socket = new WebSocket(protocol + '//' + window.location.host + '/ws/character/' + charId);\n\t\t\tsocket.onmessage = function (e) {\n\t\t\t\tif (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (document.querySelector('[id$=\"-edit\"]:not([style*=\"display: none\"])')) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.ajax('GET', '/character/' + charId, { target: 'body', swap: 'innerHTML' });\n\t\t\t\t}\n\t\t\t};\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
