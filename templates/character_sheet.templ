@@ -157,140 +157,6 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 				}
 			</div>
 		</div>
-		<!-- Top Stats Bar (Strength, Agility, Presence, Toughness, Knowledge) -->
-		<div class="flex flex-wrap justify-center items-center p-md mb-lg bg-dark font-bold text-lg border-accent">
-			for name, stat := range character.Abilities {
-				<div class="flex items-center gap-sm text-accent px-sm py-xs">
-					<span>{ name }:</span>
-					if canEdit {
-						<form id={ "stat-form-" + name } class="inline-flex items-center gap-xs m-0">
-							<input type="hidden" name="stat_name" value={ name }/>
-							<input
-								type="number"
-								name="stat_current"
-								value={ fmt.Sprint(stat.Current) }
-								class="bg-black border-accent text-accent text-center text-md p-xs"
-								style="width: 52px;"
-								hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
-								hx-include={ "#stat-form-" + name }
-								hx-trigger="change, input delay:300ms"
-								hx-swap="none"
-							/> / 
-							<input
-								type="number"
-								name="stat_max"
-								value={ fmt.Sprint(stat.Max) }
-								class="bg-black border-accent text-accent text-center text-md p-xs"
-								style="width: 52px;"
-								hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
-								hx-include={ "#stat-form-" + name }
-								hx-trigger="change, input delay:300ms"
-								hx-swap="none"
-							/>
-						</form>
-					} else {
-						<span class="text-white">
-							if stat.Current > 0 {
-								+{ fmt.Sprint(stat.Current) }
-							} else {
-								{ fmt.Sprint(stat.Current) }
-							}
-							(max { fmt.Sprint(stat.Max) })
-						</span>
-					}
-				</div>
-			}
-		</div>
-		<!-- Dedicated Vitals & Glitches Box -->
-		<div class="bg-dark border-accent p-lg mb-lg flex justify-around items-center flex-wrap gap-lg" style="box-shadow: 0 0 10px rgba(255, 230, 0, 0.15);">
-			<div class="text-center">
-				<div class="text-accent text-lg font-bold mb-sm text-uppercase font-spacing-sm">❤️ HIT POINTS (HP)</div>
-				if canEdit {
-					<form id="hp-form" class="inline-flex items-center gap-xs m-0">
-						<input
-							type="number"
-							name="hp_current"
-							value={ fmt.Sprint(character.HP.Current) }
-							class="bg-black border-accent text-accent text-center text-xl p-xs"
-							style="width:58px;"
-							hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
-							hx-include="#hp-form"
-							hx-trigger="change, input delay:300ms"
-							hx-swap="none"
-						/>
-						<span class="text-xl">/</span>
-						<input
-							type="number"
-							name="hp_max"
-							value={ fmt.Sprint(character.HP.Max) }
-							class="bg-black border-accent text-accent text-center text-xl p-xs"
-							style="width:58px;"
-							hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
-							hx-include="#hp-form"
-							hx-trigger="change, input delay:300ms"
-							hx-swap="none"
-						/>
-					</form>
-				} else {
-					<div class="text-2xl font-bold">{ fmt.Sprint(character.HP.Current) } / { fmt.Sprint(character.HP.Max) }</div>
-				}
-			</div>
-			<div class="text-center">
-				<div class="text-accent text-lg font-bold mb-sm text-uppercase font-spacing-sm">⚡ GLITCHES</div>
-				if canEdit {
-					<form id="glitches-form" class="inline-flex items-center gap-xs m-0">
-						<input
-							type="number"
-							name="glitches_current"
-							value={ fmt.Sprint(character.Glitches.Current) }
-							class="bg-black border-accent text-accent text-center text-xl p-xs"
-							style="width:58px;"
-							hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
-							hx-include="#glitches-form"
-							hx-trigger="change, input delay:300ms"
-							hx-swap="none"
-						/>
-						<span class="text-xl">/</span>
-						<input
-							type="number"
-							name="glitches_max"
-							value={ fmt.Sprint(character.Glitches.Max) }
-							class="bg-black border-accent text-accent text-center text-xl p-xs"
-							style="width:58px;"
-							hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
-							hx-include="#glitches-form"
-							hx-trigger="change, input delay:300ms"
-							hx-swap="none"
-						/>
-						<span class="text-muted">({ character.GlitchDie })</span>
-					</form>
-				} else {
-					<div class="text-2xl font-bold">{ fmt.Sprint(character.Glitches.Current) } / { fmt.Sprint(character.Glitches.Max) } <span class="text-md text-muted">({ character.GlitchDie })</span></div>
-				}
-			</div>
-			<div class="text-center">
-				<div class="text-accent text-lg font-bold mb-sm text-uppercase font-spacing-sm">💰 CREDITS</div>
-				if canEdit {
-					<form id="creds-form" class="inline-flex items-center gap-xs m-0">
-						<input
-							type="number"
-							name="value"
-							value={ fmt.Sprint(character.Creds) }
-							class="bg-black border-accent text-accent text-center text-xl p-xs"
-							style="width:95px;"
-							hx-put={ string(templ.URL("/character/" + character.ID + "/update_field")) }
-							hx-include="#creds-form"
-							hx-trigger="change, input delay:300ms"
-							hx-vals='{"field": "creds"}'
-							hx-swap="none"
-						/> <span class="text-xl text-accent">¤</span>
-					</form>
-				} else {
-					<div class="text-2xl font-bold text-accent">{ fmt.Sprint(character.Creds) }¤</div>
-				}
-			</div>
-		</div>
-		<!-- Edit Form Toggle & Auto-Stretch Script -->
 		<script>
 function toggleEditSection(sectionId, displayStyle = 'block') {
     const editEl = document.getElementById(sectionId + '-edit');
@@ -318,25 +184,114 @@ document.addEventListener("input", function(e) {
     }
 });
 </script>
-		<!-- 2x2 Grid Layout -->
-		<div class={ "flex flex-wrap gap-lg", templ.KV("can-edit", canEdit) }>
-						<div class="flex-1 flex flex-col" style="min-width: 450px;">
-			<!-- Top Left: Identity -->
-			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px; position:relative;">
+		<!-- Top Row: Identity/Desc, Stats, Class -->
+		<div class={ "flex flex-wrap gap-lg mb-lg", templ.KV("can-edit", canEdit) }>
+			<!-- Top Left: Identity & Bio -->
+			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:300px; position:relative; padding-top: 30px;">
 				if canEdit {
-					<div style="position:absolute; top:15px; right:15px;">
-						<button type="button" id={ "btn-toggle-identity-edit-" + character.ID } onclick="toggleEditSection('identity')" class="btn-outline-small p-xs text-xs">✏️ EDIT</button>
+					<div style="position:absolute; top:15px; right:15px; z-index:10;">
+						<button type="button" id={ "btn-toggle-identity-edit-" + character.ID } onclick="toggleEditSection('identity')" class="btn-outline-small p-xs text-xs">✏️ Edit Text</button>
 					</div>
 				}
 				<!-- Clean Text View (Default) -->
 				<div id="identity-view">
-					<h1 class="text-accent text-2xl mb-xs">YOU ARE { character.Name }</h1>
+					<h1 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">YOU ARE { character.Name }</h1>
 					<div class="text-muted text-sm mb-md">
 						if character.Handle != "" {
 							{ "@" + character.Handle }
 						} else {
 							<span class="text-muted">[No Handle]</span>
 						}
+					</div>
+
+					<!-- Dedicated Vitals & Glitches Box -->
+					<div class="bg-black border-accent p-md mb-md flex justify-around items-center flex-wrap gap-lg" style="box-shadow: 0 0 10px rgba(255, 230, 0, 0.15);">
+						<div class="text-center">
+							<div class="text-accent text-lg font-bold mb-sm text-uppercase font-spacing-sm">❤️ HIT POINTS (HP)</div>
+							if canEdit {
+								<form id="hp-form" class="inline-flex items-center gap-xs m-0">
+									<input
+										type="number"
+										name="hp_current"
+										value={ fmt.Sprint(character.HP.Current) }
+										class="bg-black border-accent text-accent text-center text-xl p-xs"
+										style="width:58px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
+										hx-include="#hp-form"
+										hx-trigger="change, input delay:300ms"
+										hx-swap="none"
+									/>
+									<span class="text-xl">/</span>
+									<input
+										type="number"
+										name="hp_max"
+										value={ fmt.Sprint(character.HP.Max) }
+										class="bg-black border-accent text-accent text-center text-xl p-xs"
+										style="width:58px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
+										hx-include="#hp-form"
+										hx-trigger="change, input delay:300ms"
+										hx-swap="none"
+									/>
+								</form>
+							} else {
+								<div class="text-2xl font-bold">{ fmt.Sprint(character.HP.Current) } / { fmt.Sprint(character.HP.Max) }</div>
+							}
+						</div>
+						<div class="text-center">
+							<div class="text-accent text-lg font-bold mb-sm text-uppercase font-spacing-sm">⚡ GLITCHES</div>
+							if canEdit {
+								<form id="glitches-form" class="inline-flex items-center gap-xs m-0">
+									<input
+										type="number"
+										name="glitches_current"
+										value={ fmt.Sprint(character.Glitches.Current) }
+										class="bg-black border-accent text-accent text-center text-xl p-xs"
+										style="width:58px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
+										hx-include="#glitches-form"
+										hx-trigger="change, input delay:300ms"
+										hx-swap="none"
+									/>
+									<span class="text-xl">/</span>
+									<input
+										type="number"
+										name="glitches_max"
+										value={ fmt.Sprint(character.Glitches.Max) }
+										class="bg-black border-accent text-accent text-center text-xl p-xs"
+										style="width:58px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
+										hx-include="#glitches-form"
+										hx-trigger="change, input delay:300ms"
+										hx-swap="none"
+									/>
+									<span class="text-muted">({ character.GlitchDie })</span>
+								</form>
+							} else {
+								<div class="text-2xl font-bold">{ fmt.Sprint(character.Glitches.Current) } / { fmt.Sprint(character.Glitches.Max) } <span class="text-md text-muted">({ character.GlitchDie })</span></div>
+							}
+						</div>
+						<div class="text-center">
+							<div class="text-accent text-lg font-bold mb-sm text-uppercase font-spacing-sm">💰 CREDITS</div>
+							if canEdit {
+								<form id="creds-form" class="inline-flex items-center gap-xs m-0">
+									<input
+										type="number"
+										name="value"
+										value={ fmt.Sprint(character.Creds) }
+										class="bg-black border-accent text-accent text-center text-xl p-xs"
+										style="width:95px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_field")) }
+										hx-include="#creds-form"
+										hx-trigger="change, input delay:300ms"
+										hx-vals='{"field": "creds"}'
+										hx-swap="none"
+									/> <span class="text-xl text-accent">¤</span>
+								</form>
+							} else {
+								<div class="text-2xl font-bold text-accent">{ fmt.Sprint(character.Creds) }¤</div>
+							}
+						</div>
 					</div>
 					<p class="mb-md" style="line-height: 1.7;">
 						if character.Style != "" || character.Feature != "" || character.Want != "" || character.Quirk != "" || character.Obsession != "" {
@@ -408,9 +363,136 @@ document.addEventListener("input", function(e) {
 				}
 			</div>
 
-			<!-- Bottom Left: Gear (Formatted as Table!) -->
-			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px;">
-				<h2 class="text-accent text-2xl text-uppercase mb-sm pb-xs" style="border-bottom:1px solid var(--accent-color); letter-spacing:1px;">GEAR & ARSENAL</h2>
+			<!-- Top Center: Vertical Stats Block -->
+			<div class="bg-dark p-lg border-muted flex flex-col" style="border-width:1px; border-style:solid; min-width:240px; position:relative; padding-top: 30px;">
+				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">STATS</h2>
+				<div class="flex flex-col gap-sm justify-around flex-1 py-xs">
+					for name, stat := range character.Abilities {
+						<div class="flex items-center justify-between gap-sm text-accent bg-black p-xs border-accent" style="border-width:1px; border-style:solid;">
+							<span class="font-bold text-uppercase text-md">{ name }:</span>
+							if canEdit {
+								<form id={ "stat-form-" + name } class="inline-flex items-center gap-xs m-0">
+									<input type="hidden" name="stat_name" value={ name }/>
+									<input
+										type="number"
+										name="stat_current"
+										value={ fmt.Sprint(stat.Current) }
+										class="bg-black border-accent text-accent text-center text-md p-xs"
+										style="width: 48px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
+										hx-include={ "#stat-form-" + name }
+										hx-trigger="change, input delay:300ms"
+										hx-swap="none"
+									/>
+									<span class="text-muted text-sm">/</span>
+									<input
+										type="number"
+										name="stat_max"
+										value={ fmt.Sprint(stat.Max) }
+										class="bg-black border-accent text-accent text-center text-md p-xs"
+										style="width: 48px;"
+										hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
+										hx-include={ "#stat-form-" + name }
+										hx-trigger="change, input delay:300ms"
+										hx-swap="none"
+									/>
+								</form>
+							} else {
+								<span class="text-white font-bold text-md">
+									if stat.Current > 0 {
+										+{ fmt.Sprint(stat.Current) }
+									} else {
+										{ fmt.Sprint(stat.Current) }
+									}
+									<span class="text-xs text-muted font-normal ml-xs">(max { fmt.Sprint(stat.Max) })</span>
+								</span>
+							}
+						</div>
+					}
+				</div>
+			</div>
+
+			<!-- Top Right: Class -->
+			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:300px; position:relative; padding-top: 30px;">
+				if canEdit {
+					<div style="position:absolute; top:15px; right:15px; z-index:10;">
+						<button type="button" id={ "btn-toggle-class-edit-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline-small p-xs text-xs">✏️ Edit Text</button>
+					</div>
+				}
+				<!-- Clean Text View (Default) -->
+				<div id="class-view">
+					<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">{ character.Class.Name }</h2>
+					<div class="text-accent font-bold text-sm mb-md">{ character.Class.Glitch }</div>
+					<p class="font-italic mb-md" style="line-height: 1.7;">
+						{ character.Class.Description }
+					</p>
+					if character.Class.Origin != "" {
+						<p class="mb-sm" style="line-height:1.5;"><strong>Origin:</strong> { character.Class.Origin }</p>
+					}
+					if character.Class.Gift != "" {
+						<p class="mb-sm" style="line-height:1.5;"><strong>Class Gift/Weapon:</strong> { character.Class.Gift }</p>
+					}
+				</div>
+				<!-- Editable Form (Hidden until Edit toggled) -->
+				if canEdit {
+					<div id="class-edit" style="display:none; margin-top:10px;">
+						<div class="flex justify-between items-center mb-sm">
+							<span class="text-accent font-bold text-xs">EDIT CLASS DETAILS</span>
+							<div class="flex gap-xs">
+								<button type="button" id={ "btn-cancel-class-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline-small p-xs text-xs">Cancel</button>
+								<button
+									type="button"
+									id={ "btn-save-class-" + character.ID }
+									class="btn-small p-xs text-xs"
+									hx-post={ string(templ.URL("/character/" + character.ID + "/update_field")) }
+									hx-include="#class-edit"
+									hx-target="#character-sheet-container"
+									hx-swap="outerHTML"
+								>💾 Save Changes</button>
+							</div>
+						</div>
+						<div class="mb-sm">
+							<label class="text-accent font-bold text-xs block">CLASS NAME</label>
+							<input type="text" name="class_name" value={ character.Class.Name } class="w-full bg-black border-accent text-accent font-bold text-lg p-xs"/>
+						</div>
+						<div class="mb-sm">
+							<label class="text-accent text-xs block">CLASS GLITCH</label>
+							<input type="text" name="class_glitch" value={ character.Class.Glitch } class="w-full bg-black border-accent text-accent p-xs"/>
+						</div>
+						<div class="mb-sm">
+							<label class="text-muted text-xs block">DESCRIPTION</label>
+							<textarea name="class_description" class="w-full bg-black border-accent text-white p-xs auto-stretch" oninput="autoResizeTextarea(this)">{ character.Class.Description }</textarea>
+						</div>
+						<div class="mb-sm">
+							<label class="text-muted text-xs block">ORIGIN</label>
+							<textarea name="class_origin" class="w-full bg-black border-accent text-white p-xs auto-stretch" oninput="autoResizeTextarea(this)">{ character.Class.Origin }</textarea>
+						</div>
+						<div class="mb-md">
+							<label class="text-muted text-xs block">CLASS GIFT / WEAPON</label>
+							<textarea name="class_gift" class="w-full bg-black border-accent text-white p-xs auto-stretch" oninput="autoResizeTextarea(this)">{ character.Class.Gift }</textarea>
+						</div>
+						<div class="flex gap-sm justify-end">
+							<button type="button" id={ "btn-cancel-class-bottom-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline text-sm">Cancel</button>
+							<button
+								type="button"
+								id={ "btn-save-class-bottom-" + character.ID }
+								class="btn text-sm"
+								hx-post={ string(templ.URL("/character/" + character.ID + "/update_field")) }
+								hx-include="#class-edit"
+								hx-target="#character-sheet-container"
+								hx-swap="outerHTML"
+							>💾 Save Changes</button>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<!-- Bottom Row: Gear & Arsenal, Cybertech & Apps -->
+		<div class="flex flex-wrap gap-lg">
+			<!-- Bottom Left: Gear -->
+			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:450px; position:relative; padding-top: 30px;">
+				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">GEAR & ARSENAL</h2>
 				<table class="w-full mb-md text-left" style="border-collapse: collapse;">
 					<thead>
 						<tr>
@@ -514,86 +596,10 @@ document.addEventListener("input", function(e) {
 					</form>
 				}
 			</div>
-			</div>
-			<div class="flex-1 flex flex-col" style="min-width: 450px;">
-			<!-- Top Right: Class -->
-			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px; position:relative;">
-				if canEdit {
-					<div style="position:absolute; top:15px; right:15px;">
-						<button type="button" id={ "btn-toggle-class-edit-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline-small p-xs text-xs">✏️ EDIT</button>
-					</div>
-				}
-				<!-- Clean Text View (Default) -->
-				<div id="class-view">
-					<h2 class="text-accent text-2xl text-uppercase mb-sm pb-xs" style="border-bottom:1px solid var(--accent-color); letter-spacing:1px;">{ character.Class.Name }</h2>
-					<div class="text-accent font-bold text-sm mb-md">{ character.Class.Glitch }</div>
-					<p class="font-italic mb-md" style="line-height: 1.7;">
-						{ character.Class.Description }
-					</p>
-					if character.Class.Origin != "" {
-						<p class="mb-sm" style="line-height:1.5;"><strong>Origin:</strong> { character.Class.Origin }</p>
-					}
-					if character.Class.Gift != "" {
-						<p class="mb-sm" style="line-height:1.5;"><strong>Class Gift/Weapon:</strong> { character.Class.Gift }</p>
-					}
-				</div>
-				<!-- Editable Form (Hidden until Edit toggled) -->
-				if canEdit {
-					<div id="class-edit" style="display:none; margin-top:10px;">
-						<div class="flex justify-between items-center mb-sm">
-							<span class="text-accent font-bold text-xs">EDIT CLASS DETAILS</span>
-							<div class="flex gap-xs">
-								<button type="button" id={ "btn-cancel-class-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline-small p-xs text-xs">Cancel</button>
-								<button
-									type="button"
-									id={ "btn-save-class-" + character.ID }
-									class="btn-small p-xs text-xs"
-									hx-post={ string(templ.URL("/character/" + character.ID + "/update_field")) }
-									hx-include="#class-edit"
-									hx-target="#character-sheet-container"
-									hx-swap="outerHTML"
-								>💾 Save Changes</button>
-							</div>
-						</div>
-						<div class="mb-sm">
-							<label class="text-accent font-bold text-xs block">CLASS NAME</label>
-							<input type="text" name="class_name" value={ character.Class.Name } class="w-full bg-black border-accent text-accent font-bold text-lg p-xs"/>
-						</div>
-						<div class="mb-sm">
-							<label class="text-accent text-xs block">CLASS GLITCH</label>
-							<input type="text" name="class_glitch" value={ character.Class.Glitch } class="w-full bg-black border-accent text-accent p-xs"/>
-						</div>
-						<div class="mb-sm">
-							<label class="text-muted text-xs block">DESCRIPTION</label>
-							<textarea name="class_description" class="w-full bg-black border-accent text-white p-xs auto-stretch" oninput="autoResizeTextarea(this)">{ character.Class.Description }</textarea>
-						</div>
-						<div class="mb-sm">
-							<label class="text-muted text-xs block">ORIGIN</label>
-							<textarea name="class_origin" class="w-full bg-black border-accent text-white p-xs auto-stretch" oninput="autoResizeTextarea(this)">{ character.Class.Origin }</textarea>
-						</div>
-						<div class="mb-md">
-							<label class="text-muted text-xs block">CLASS GIFT / WEAPON</label>
-							<textarea name="class_gift" class="w-full bg-black border-accent text-white p-xs auto-stretch" oninput="autoResizeTextarea(this)">{ character.Class.Gift }</textarea>
-						</div>
-						<div class="flex gap-sm justify-end">
-							<button type="button" id={ "btn-cancel-class-bottom-" + character.ID } onclick="toggleEditSection('class')" class="btn-outline text-sm">Cancel</button>
-							<button
-								type="button"
-								id={ "btn-save-class-bottom-" + character.ID }
-								class="btn text-sm"
-								hx-post={ string(templ.URL("/character/" + character.ID + "/update_field")) }
-								hx-include="#class-edit"
-								hx-target="#character-sheet-container"
-								hx-swap="outerHTML"
-							>💾 Save Changes</button>
-						</div>
-					</div>
-				}
-			</div>
 
 			<!-- Bottom Right: Cybertech & Apps -->
-			<div class="bg-dark p-lg mb-lg flex-1 border-muted" style="border-width:1px; border-style:solid; min-width:300px;">
-				<h2 class="text-accent text-2xl text-uppercase mb-sm pb-xs" style="border-bottom:1px solid var(--accent-color); letter-spacing:1px;">CYBERTECH & APPS</h2>
+			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:450px; position:relative; padding-top: 30px;">
+				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">CYBERTECH & APPS</h2>
 				<h3 class="text-accent text-lg mb-sm">CYBERWARE</h3>
 				<ul style="list-style-type: square; padding-left: 20px; line-height: 1.8;">
 					for i, item := range character.Cybertech {
@@ -641,6 +647,4 @@ document.addEventListener("input", function(e) {
 			</div>
 		</div>
 	</div>
-			</div>
-		
 }

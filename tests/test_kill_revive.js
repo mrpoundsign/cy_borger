@@ -36,7 +36,7 @@ const { chromium } = require('@playwright/test');
     await page.fill('input[name="name"]', 'Test Game');
     await Promise.all([
         page.waitForNavigation(),
-        page.locator('button:has-text("Create Game as GM")').click()
+        page.click('#btn-create-game-index')
     ]);
     const gameUrl = page.url();
     console.log(`Game created: ${gameUrl}`);

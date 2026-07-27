@@ -1,23 +1,40 @@
 const { test, expect } = require('@playwright/test');
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
+
+async function loginUser(page) {
+    await page.goto(BASE_URL + '/');
+    await page.waitForLoadState('networkidle');
+
+    if (await page.locator('button:has-text("🚪 LOGOUT")').isVisible()) {
+        await page.locator('button:has-text("🚪 LOGOUT")').click();
+        await page.waitForLoadState('networkidle');
+    }
+
+    if (await page.locator('#tab-btn-register').isVisible()) {
+        await page.locator('#tab-btn-register').click();
+        await page.waitForTimeout(200);
+        const name = 'LayoutUser' + Math.floor(1000 + Math.random() * 9000);
+        await page.locator('#auth-register-form input[name="username"]').fill(name);
+        await page.locator('#auth-register-form input[name="password"]').fill('pass123');
+        await page.locator('#auth-register-form button[type="submit"]').click();
+        await page.waitForLoadState('networkidle');
+    }
+}
+
 test('Verify modal layout and flex classes', async ({ page }) => {
-    // Navigate to homepage and create a new game
-    await page.goto('http://localhost:8080/');
+    await loginUser(page);
     
     await page.fill('input[name="name"]', 'Test Game');
-    await Promise.all([
-        page.waitForNavigation(),
-        page.locator('button:has-text("Create Game as GM")').click()
-    ]);
+    await page.click('#btn-create-game-index');
+    await page.waitForURL(/\/game\//);
     
     // Give time for WebSocket to connect and logs to load
     await page.waitForTimeout(1000);
 
     // Create a blank character in the game
-    await Promise.all([
-        page.waitForNavigation(),
-        page.locator('button:has-text("CREATE BLANK")').click()
-    ]);
+    await page.locator('button:has-text("Create Blank")').first().click();
+    await page.waitForURL(/\/character\//);
 
     // Go back to the game page
     await Promise.all([

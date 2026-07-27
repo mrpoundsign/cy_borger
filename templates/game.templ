@@ -89,47 +89,49 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 
 		<div id="char-modal-container"></div>
 
-		<div class="flex justify-between items-center flex-wrap gap-md mb-lg pb-md border-accent" style="border-bottom-width: 2px; border-bottom-style: solid;">
-			<div>
-				<h1 class="text-accent text-2xl">GAME: { game.Name }</h1>
-				<div class="text-muted text-sm mb-sm">Created: { game.CreatedAt.Format("Jan 02, 2006 15:04 MST") }</div>
-				if isGM {
-					<span class="text-success font-bold">[GM MODE ACTIVE]</span>
-					<button id={ "btn-copy-gmlink-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(window.location.origin + '/game/' + document.getElementById('game-data-gm').dataset.id + '?gm_code=' + document.getElementById('game-data-gm').dataset.code, this)">Copy GM Link</button>
-					<button id={ "btn-copy-gmcode-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(document.getElementById('game-data-gm').dataset.code, this)">Copy GM Code</button>
-					<script>
-						if (window.cyStore) {
-							let gmEl = document.getElementById('game-data-gm');
-							cyStore.saveGMGame(gmEl.dataset.id, gmEl.dataset.code, gmEl.dataset.name);
-						}
-					</script>
-					<span id="game-data-gm" data-id={ game.ID } data-code={ game.GMCode } data-name={ game.Name } style="display:none;"></span>
-				} else {
-					<span class="text-muted">[PLAYER PARTY VIEW]</span>
-					<script>
-						document.addEventListener("DOMContentLoaded", function () {
+		<div class="bg-dark p-lg mb-lg border-muted" style="border-width:1px; border-style:solid; position:relative; padding-top: 30px;">
+			<h1 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">GAME: { game.Name }</h1>
+			<div class="flex justify-between items-center flex-wrap gap-md">
+				<div>
+					<div class="text-muted text-sm mb-sm">Created: { game.CreatedAt.Format("Jan 02, 2006 15:04 MST") }</div>
+					if isGM {
+						<span class="text-success font-bold">[GM MODE ACTIVE]</span>
+						<button id={ "btn-copy-gmlink-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(window.location.origin + '/game/' + document.getElementById('game-data-gm').dataset.id + '?gm_code=' + document.getElementById('game-data-gm').dataset.code, this)">Copy GM Link</button>
+						<button id={ "btn-copy-gmcode-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(document.getElementById('game-data-gm').dataset.code, this)">Copy GM Code</button>
+						<script>
 							if (window.cyStore) {
-								let gmEl = document.getElementById('game-data-gm-player');
-								const games = cyStore.getGMGames();
-								if (games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {
-									const code = games[gmEl.dataset.id].gmCode;
-									const form = document.querySelector('form[action="/game/' + gmEl.dataset.id + '/auth"]');
-									if (form) {
-										form.querySelector('input[name="gm_code"]').value = code;
-										form.submit();
+								let gmEl = document.getElementById('game-data-gm');
+								cyStore.saveGMGame(gmEl.dataset.id, gmEl.dataset.code, gmEl.dataset.name);
+							}
+						</script>
+						<span id="game-data-gm" data-id={ game.ID } data-code={ game.GMCode } data-name={ game.Name } style="display:none;"></span>
+					} else {
+						<span class="text-muted">[PLAYER PARTY VIEW]</span>
+						<script>
+							document.addEventListener("DOMContentLoaded", function () {
+								if (window.cyStore) {
+									let gmEl = document.getElementById('game-data-gm-player');
+									const games = cyStore.getGMGames();
+									if (games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {
+										const code = games[gmEl.dataset.id].gmCode;
+										const form = document.querySelector('form[action="/game/' + gmEl.dataset.id + '/auth"]');
+										if (form) {
+											form.querySelector('input[name="gm_code"]').value = code;
+											form.submit();
+										}
 									}
 								}
-							}
-						});
-					</script>
-					<span id="game-data-gm-player" data-id={ game.ID } style="display:none;"></span>
-				}
-				<button id={ "btn-random-color-" + game.ID } onclick="randomizeThemeColor()" class="btn-outline-small ml-sm">🌈 Color</button>
-			</div>
-			<div class="bg-dark border-accent text-accent font-bold flex items-center gap-sm flex-wrap p-sm" style="border-style: dashed;">
-				<span>PLAYER INVITE CODE: <strong class="text-white">{ game.InviteCode }</strong></span>
-				<button id={ "btn-copy-invite-" + game.ID } class="btn-outline-small" onclick="copyText(document.getElementById('game-data-invite').dataset.code, this)">Copy Code</button>
-				<span id="game-data-invite" data-code={ game.InviteCode } style="display:none;"></span>
+							});
+						</script>
+						<span id="game-data-gm-player" data-id={ game.ID } style="display:none;"></span>
+					}
+					<button id={ "btn-random-color-" + game.ID } onclick="randomizeThemeColor()" class="btn-outline-small ml-sm">🌈 Color</button>
+				</div>
+				<div class="bg-dark border-accent text-accent font-bold flex items-center gap-sm flex-wrap p-sm" style="border-style: dashed;">
+					<span>PLAYER INVITE CODE: <strong class="text-white">{ game.InviteCode }</strong></span>
+					<button id={ "btn-copy-invite-" + game.ID } class="btn-outline-small" onclick="copyText(document.getElementById('game-data-invite').dataset.code, this)">Copy Code</button>
+					<span id="game-data-invite" data-code={ game.InviteCode } style="display:none;"></span>
+				</div>
 			</div>
 		</div>
 
@@ -144,9 +146,9 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 
 		@PartyGrid(game, characters, isGM, currentUserID)
 
-		<div class="mt-xl pt-lg border-accent" style="border-top-width: 2px; border-top-style: dashed;">
-			<div class="flex justify-between items-center">
-				<h2 class="text-accent flex items-center gap-sm">📡 ACTIVITY LOG</h2>
+		<div class="bg-dark p-lg mt-xl mb-lg border-muted" style="border-width:1px; border-style:solid; position:relative; padding-top: 30px;">
+			<h2 class="text-accent text-uppercase m-0 px-sm flex items-center gap-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">📡 ACTIVITY LOG</h2>
+			<div style="position:absolute; top:15px; right:15px; z-index:10;">
 				<form id="log-filter-form" hx-get={ string(templ.URL("/game/" + game.ID + "/logs")) } hx-target="#activity-log-box" hx-swap="outerHTML" hx-trigger="change" class="flex gap-sm items-center">
 					<label class="text-accent text-sm" style="cursor:pointer;"><input type="checkbox" name="type" value="stats" checked/> STATS & HP</label>
 					<label class="text-accent text-sm" style="cursor:pointer;"><input type="checkbox" name="type" value="inventory" checked/> INVENTORY</label>
@@ -155,7 +157,6 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 			</div>
 			
 			@GameLogs(game, characters, logs)
-
 		</div>
 	</div>
 }
