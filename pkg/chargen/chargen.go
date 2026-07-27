@@ -10,7 +10,10 @@ import (
 // GenerateRandomID returns a unique random string ID.
 func GenerateRandomID(bytesLen int) string {
 	b := make([]byte, bytesLen)
-	_, _ = crand.Read(b)
+	_, err := crand.Read(b)
+	if err != nil {
+		panic(err)
+	}
 	return hex.EncodeToString(b)
 }
 
@@ -157,7 +160,10 @@ func CryptoRandomCode(length int) string {
 	const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 	result := make([]byte, length)
 	for i := range result {
-		num, _ := crand.Int(crand.Reader, big.NewInt(int64(len(charset))))
+		num, err := crand.Int(crand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			panic(err)
+		}
 		result[i] = charset[num.Int64()]
 	}
 	return string(result)

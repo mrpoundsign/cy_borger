@@ -48,7 +48,7 @@ test.describe('Character editing & Draft/Keep workflow', () => {
     test('random character roll creates saved character for logged-in user', async ({ page }) => {
         await loginUser(page);
 
-        await page.locator('button:has-text("Roll Random Character")').click();
+        await page.locator('button:has-text("Roll Random Character")').first().click();
         await page.waitForLoadState('networkidle');
 
         await expect(page).toHaveURL(/\/character\//);
@@ -63,8 +63,8 @@ test.describe('Character editing & Draft/Keep workflow', () => {
 
         const newName = 'CyberGhost_' + Math.floor(Math.random() * 1000);
 
-        // Edit Name by clicking ✏️ Edit Text button
-        await page.locator('button:has-text("✏️ Edit Text")').first().click();
+        // Edit Name by clicking ✏️ EDIT button
+        await page.locator('button:has-text("✏️ EDIT")').first().click();
         await page.locator('#identity-edit input[name="name"]').fill(newName);
         await page.locator('#identity-edit button[type="submit"]').first().click();
         await page.waitForLoadState('networkidle');
@@ -75,7 +75,7 @@ test.describe('Character editing & Draft/Keep workflow', () => {
     test('inventory list workflow › add and delete weapon items', async ({ page }) => {
         await loginUser(page);
 
-        await page.locator('button:has-text("Create Blank Character")').click();
+        await page.locator('button:has-text("Create Blank Character")').first().click();
         await page.waitForLoadState('networkidle');
 
         // Add Weapon

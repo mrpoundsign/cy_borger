@@ -30,8 +30,10 @@ test.describe('INSPECT SHEET modal injection', () => {
 
         // Create a game as GM
         await page.locator('input[name="name"]').fill('Inspect Test Game');
-        await page.locator('.card button:has-text("Create Game as GM")').click();
-        await page.waitForLoadState('networkidle');
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('.card button:has-text("Create Game as GM")').click()
+        ]);
 
         const gameUrl = page.url();
 

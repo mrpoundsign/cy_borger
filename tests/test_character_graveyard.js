@@ -27,8 +27,10 @@ test.describe('Graveyard & Flatline Workflow', () => {
     test('owner or GM can flatline a character with death note, moving to Graveyard', async ({ page }) => {
         await loginUser(page);
 
-        await page.locator('button:has-text("Create Blank Character")').click();
-        await page.waitForLoadState('networkidle');
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('button:has-text("Create Blank Character")').click()
+        ]);
 
         // Get character ID
         const url = page.url();
@@ -36,7 +38,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
         expect(charID).toBeTruthy();
 
         // 2. Click 💀 FLATLINE button in toolbar
-        await page.locator('button.btn-danger-small[onclick*="kill-char"]').click();
+        await page.locator('button[id^="btn-flatline-sheet-"]').click();
         await page.waitForTimeout(300);
 
         // Fill death note
@@ -59,12 +61,14 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await expect(page.locator('text=OPERATOR FLATLINED')).not.toBeVisible();
     });
 
-    test('kill button on game page opens modal and moves character to Graveyard', async ({ page }) => {
+    test('flatline button on game page opens modal and moves character to Graveyard', async ({ page }) => {
         await loginUser(page);
 
         await page.locator('input[name="name"]').fill('Sector 4 Campaign');
-        await page.locator('.card button:has-text("Create Game as GM")').click();
-        await page.waitForLoadState('networkidle');
+        await Promise.all([
+            page.waitForNavigation(),
+            page.locator('.card button:has-text("Create Game as GM")').click()
+        ]);
 
         const gameUrl = page.url();
 
@@ -83,8 +87,8 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await page.goto(gameUrl);
         await page.waitForLoadState('networkidle');
 
-        // 3. Click 💀 KILL button on game page
-        const killBtn = page.locator('button:has-text("💀 KILL")').first();
+        // 3. Click 💀 FLATLINE button on game page
+        const killBtn = page.locator('button:has-text("💀 FLATLINE")').first();
         await expect(killBtn).toBeVisible({ timeout: 10000 });
         await killBtn.click();
         await page.waitForTimeout(300);

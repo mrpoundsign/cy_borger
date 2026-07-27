@@ -6,13 +6,14 @@ import (
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		w.WriteHeader(http.StatusNotFound)
-		if err := s.Templates.ExecuteTemplate(w, "404.html", nil); err != nil {
-			log.Printf("Template execution error (404.html): %v", err)
+		if err := templates.Base("CY_BORGER - 404", nil, templates.NotFound()).Render(r.Context(), w); err != nil {
+			log.Printf("Template execution error (404.templ): %v", err)
 		}
 		return
 	}
@@ -24,8 +25,17 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	var draftChars []chargen.Character
 
 	if user != nil {
-		myGames, _ = s.DB.GetGamesByOwner(user.ID)
-		allChars, _ := s.DB.GetCharactersByOwner(user.ID)
+		games, err := s.DB.GetGamesByOwner(user.ID)
+		if err != nil {
+			log.Printf("Failed to get games for user %s: %v", user.ID, err)
+		} else {
+			myGames = games
+		}
+
+		allChars, err := s.DB.GetCharactersByOwner(user.ID)
+		if err != nil {
+			log.Printf("Failed to get characters for user %s: %v", user.ID, err)
+		}
 		for _, c := range allChars {
 			if c.IsSaved {
 				myChars = append(myChars, c)
@@ -37,17 +47,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 	errMsg := r.URL.Query().Get("error")
 
-	data := map[string]interface{}{
-		"User":            user,
-		"MyGames":         myGames,
-		"MyCharacters":    myChars,
-		"DraftCharacters": draftChars,
-		"ErrorMessage":    errMsg,
-	}
-
-	if err := s.Templates.ExecuteTemplate(w, "index.html", data); err != nil {
-
-		log.Printf("Template execution error (index.html): %v", err)
-
+	if err := templates.Base("CY_BORGER - Home", nil, templates.Index(user, myGames, myChars, draftChars, errMsg)).Render(r.Context(), w); err != nil {
+		log.Printf("Template execution error (index.templ): %v", err)
 	}
 }

@@ -16,9 +16,10 @@ func setupTestServer(t *testing.T) (*Server, *http.ServeMux) {
 		t.Fatalf("Failed to initialize memory DB: %v", err)
 	}
 
-	tmpl := template.Must(template.New("test").Parse(`{{define "index.html"}}INDEX{{end}}`))
-
-	srv := NewServer(database, tmpl)
+	tmpls := make(map[string]*template.Template)
+	dummy := template.Must(template.New("test").Parse(`{{define "base"}}INDEX{{end}}`))
+	tmpls["index.html"] = dummy
+	srv := NewServer(database)
 	mux := http.NewServeMux()
 	srv.RegisterRoutes(mux)
 

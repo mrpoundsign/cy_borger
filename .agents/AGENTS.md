@@ -13,3 +13,12 @@
   - Be precise with Playwright selectors and text assertions, especially regarding UI elements with emojis (e.g., `💀 FLATLINE`).
 - **Go Handlers & Forms**:
   - Always call `r.ParseForm()` before accessing values via `r.FormValue()` in POST requests.
+- **Error Handling**:
+  - Never ignore errors using `_ = err` or `_, _ = func()`. Explicitly handle all errors (log them, return HTTP 500s, or handle them gracefully).
+
+- **Frontend & UI Guidelines**:
+  - **HTMX over Page Reloads**: Prefer HTMX (`hx-get`, `hx-post`, etc.) for forms and interactive elements to prevent full page reloads and maintain SPA-like performance.
+  - **Micro-updates**: Favor swapping specific, minimal DOM elements or using `hx-swap-oob` for targeted updates rather than replacing entire containers (e.g. don't redraw an entire character sheet just to change a status badge).
+  - **CSS Consolidation**: Avoid inline `style="..."` attributes. Use utility classes from the central stylesheet (`style.css`) and rely on predefined CSS variables for colors (e.g., `var(--color-danger)`).
+  - **Unique Element IDs**: Ensure interactive elements have unique, descriptive IDs containing entity IDs (e.g., `btn-flatline-{{.ID}}-modal`) to differentiate clicks between contexts (like cards vs modals) for Playwright testing.
+  - **Consistent Terminology**: Use uniform terminology across the UI for actions (e.g., always use "FLATLINE", do not mix "Kill" and "Flatline").

@@ -1,22 +1,21 @@
 package server
 
 import (
-	"html/template"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 type Server struct {
-	DB        *db.DB
-	Templates *template.Template
+	DB *db.DB
 }
 
-func NewServer(database *db.DB, templates *template.Template) *Server {
+func NewServer(database *db.DB) *Server {
 	return &Server{
-		DB:        database,
-		Templates: templates,
+		DB: database,
 	}
 }
 
@@ -46,6 +45,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("POST /game/create", s.handleCreateGame)
 	mux.HandleFunc("GET /game/{id}", s.handleViewGame)
+	mux.HandleFunc("GET /game/{id}/party", s.handleGameParty)
+	mux.HandleFunc("GET /game/{id}/logs", s.handleGetGameLogs)
 	mux.HandleFunc("POST /game/{id}/auth", s.handleAuthGame)
 
 	// WebSockets
@@ -90,11 +91,7 @@ func (s *Server) renderError(w http.ResponseWriter, r *http.Request, message str
 		return
 	}
 	w.WriteHeader(statusCode)
-	data := map[string]interface{}{
-		"ErrorMessage": message,
-		"StatusCode":   statusCode,
-	}
-	if err := s.Templates.ExecuteTemplate(w, "error.html", data); err != nil {
-		log.Printf("Template execution error (error.html): %v", err)
+	if err := templates.Base(fmt.Sprintf("CY_BORGER - Error %d", statusCode), nil, templates.Error(statusCode, message)).Render(r.Context(), w); err != nil {
+		log.Printf("Template execution error (error.templ): %v", err)
 	}
 }

@@ -1,0 +1,15 @@
+package templates
+
+import (
+	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/pkg/chargen"
+)
+
+templ CharacterModal(character *chargen.Character, canEdit bool, isGM bool, game *db.Game, activeGame *db.Game, isModal bool, isHTMX bool) {
+	<div class="char-modal-overlay" id="char-modal" data-char-id={ character.ID } onclick="if(event.target === this) this.remove();">
+		<div class="char-modal-content">
+			<button class="btn-outline" style="float:right; color:#ff3366; border-color:#ff3366;" onclick="document.getElementById('char-modal').remove()">✕ CLOSE</button>
+			@CharacterSheet(character, canEdit, isGM, game, activeGame, isModal, isHTMX)
+		</div>
+	</div>
+}
