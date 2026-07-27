@@ -619,7 +619,6 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	switch listType {
 	case "weapon":
 		if idx < len(c.Weapons) {
@@ -680,7 +679,7 @@ func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	sessionCode := getCookie(r, "char_edit_"+c.ID)
 	user := s.getUserFromSession(r)
 	isOwner := (sessionCode != "" && sessionCode == c.EditCode) || (user != nil && user.ID != "" && c.OwnerID == user.ID)
-	
+
 	isGM := false
 	if c.GameID != "" {
 		g, _ := s.DB.GetGame(c.GameID)
@@ -696,7 +695,6 @@ func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 		s.renderError(w, r, "Unauthorized: Only the character owner or GM can delete this character", http.StatusForbidden)
 		return
 	}
-
 
 	confirmName := r.FormValue("confirm_name")
 	if strings.TrimSpace(confirmName) != strings.TrimSpace(c.Name) {

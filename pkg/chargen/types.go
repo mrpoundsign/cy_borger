@@ -43,24 +43,24 @@ type Character struct {
 	OwnerID       string          `json:"owner_id,omitempty"`
 	OwnerUsername string          `json:"owner_username,omitempty"`
 	Name          string          `json:"name"`
-	Handle    string          `json:"handle"`
-	Class     ClassInfo       `json:"class"`
-	Style     string          `json:"style"`
-	Feature   string          `json:"feature"`
-	Quirk     string          `json:"quirk"`
-	Obsession string          `json:"obsession"`
-	Want      string          `json:"want"`
-	Debt      string          `json:"debt"`
-	Abilities map[string]Stat `json:"abilities"` // Strength, Agility, Presence, Toughness, Knowledge
-	HP        Stat            `json:"hp"`
-	Glitches  Stat            `json:"glitches"`
-	GlitchDie string          `json:"glitch_die"`
-	Gear      []string        `json:"gear"`
-	Weapons   []Weapon        `json:"weapons"`
-	Armor     []Armor         `json:"armor"`
-	Cybertech []string        `json:"cybertech"`
-	Apps      []string        `json:"apps"`
-	Creds     int             `json:"creds"`
+	Handle        string          `json:"handle"`
+	Class         ClassInfo       `json:"class"`
+	Style         string          `json:"style"`
+	Feature       string          `json:"feature"`
+	Quirk         string          `json:"quirk"`
+	Obsession     string          `json:"obsession"`
+	Want          string          `json:"want"`
+	Debt          string          `json:"debt"`
+	Abilities     map[string]Stat `json:"abilities"` // Strength, Agility, Presence, Toughness, Knowledge
+	HP            Stat            `json:"hp"`
+	Glitches      Stat            `json:"glitches"`
+	GlitchDie     string          `json:"glitch_die"`
+	Gear          []string        `json:"gear"`
+	Weapons       []Weapon        `json:"weapons"`
+	Armor         []Armor         `json:"armor"`
+	Cybertech     []string        `json:"cybertech"`
+	Apps          []string        `json:"apps"`
+	Creds         int             `json:"creds"`
 	GameID        string          `json:"game_id,omitempty"`
 	GameName      string          `json:"game_name,omitempty"`
 	UpdatedAt     time.Time       `json:"updated_at,omitempty"`

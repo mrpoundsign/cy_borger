@@ -31,7 +31,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		} else {
 			myGames = games
 		}
-		
+
 		allChars, err := s.DB.GetCharactersByOwner(user.ID)
 		if err != nil {
 			log.Printf("Failed to get characters for user %s: %v", user.ID, err)
