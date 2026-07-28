@@ -122,6 +122,10 @@ body {
 }
 
 /* Backgrounds & Borders */
+.bg-accent {
+    background-color: var(--accent-color);
+}
+
 .bg-black {
     background-color: #000000;
 }
