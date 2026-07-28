@@ -183,7 +183,7 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 								if (window.cyStore) {
 									let gmEl = document.getElementById('game-data-gm-player');
 									const games = cyStore.getGMGames();
-									if (games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {
+									if (gmEl && games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {
 										const code = games[gmEl.dataset.id].gmCode;
 										const form = document.querySelector('form[action="/game/' + gmEl.dataset.id + '/auth"]');
 										if (form) {
@@ -208,7 +208,7 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 		</div>
 		
 		if isGM {
-			@OperatorsModal(game, players, gms)
+			@OperatorsModal(game, players, gms, currentUserID)
 		}
 
 		if !isGM {

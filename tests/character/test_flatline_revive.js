@@ -43,7 +43,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
     // 3. Create a Character
     console.log("Creating a character...");
     await page.goto(BASE_URL + '/');
-    await page.locator('text=Create Blank Character').click();
+    await page.locator('#btn-create-blank-character-index').click();
     await page.waitForLoadState('networkidle');
     const charUrl = page.url();
     console.log(`Character created: ${charUrl}`);

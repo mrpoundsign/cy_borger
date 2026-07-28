@@ -80,4 +80,19 @@ func TestDB(t *testing.T) {
 	if err != nil || len(myChars) != 1 {
 		t.Errorf("Expected myChars size 1, got %d", len(myChars))
 	}
+
+	// 5. Test Delete Game
+	if err := database.DeleteGame(g.ID); err != nil {
+		t.Fatalf("DeleteGame failed: %v", err)
+	}
+
+	deletedGame, _ := database.GetGame(g.ID)
+	if deletedGame != nil {
+		t.Fatalf("Expected game to be deleted, but it still exists")
+	}
+
+	charAfterDelete, _ := database.GetCharacter(c.ID)
+	if charAfterDelete == nil || charAfterDelete.GameID != "" {
+		t.Fatalf("Expected character to be unlinked from game, got GameID: %s", charAfterDelete.GameID)
+	}
 }

@@ -194,7 +194,7 @@ func (s *Server) handleRenameGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
 		http.NotFound(w, r)
@@ -210,7 +210,7 @@ func (s *Server) handleRenameGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to rename", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("HX-Refresh", "true")
 	w.WriteHeader(http.StatusOK)
 }
@@ -223,7 +223,7 @@ func (s *Server) handleToggleLock(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
 		http.NotFound(w, r)
@@ -240,7 +240,7 @@ func (s *Server) handleToggleLock(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to toggle lock", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("HX-Refresh", "true")
 	w.WriteHeader(http.StatusOK)
 }
@@ -254,7 +254,7 @@ func (s *Server) handleKickUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
 		http.NotFound(w, r)
@@ -282,7 +282,7 @@ func (s *Server) handleKickUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to kick", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("HX-Refresh", "true")
 	w.WriteHeader(http.StatusOK)
 }
@@ -296,7 +296,7 @@ func (s *Server) handleBanUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
 		http.NotFound(w, r)
@@ -328,7 +328,7 @@ func (s *Server) handleBanUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to kick from games", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("HX-Refresh", "true")
 	w.WriteHeader(http.StatusOK)
 }
@@ -342,7 +342,7 @@ func (s *Server) handlePromoteGM(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
 		http.NotFound(w, r)
@@ -358,7 +358,7 @@ func (s *Server) handlePromoteGM(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to promote", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("HX-Refresh", "true")
 	w.WriteHeader(http.StatusOK)
 }
@@ -372,7 +372,7 @@ func (s *Server) handleDemoteGM(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	
+
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
 		http.NotFound(w, r)
@@ -388,7 +388,36 @@ func (s *Server) handleDemoteGM(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to demote", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("HX-Refresh", "true")
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) handleDeleteGame(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	user := s.getUserFromSession(r)
+	if user == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	g, err := s.DB.GetGame(id)
+	if err != nil || g == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	if g.OwnerID != user.ID {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	if err := s.DB.DeleteGame(id); err != nil {
+		http.Error(w, "Failed to delete game", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/")
 	w.WriteHeader(http.StatusOK)
 }

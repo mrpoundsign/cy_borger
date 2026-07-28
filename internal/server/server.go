@@ -59,6 +59,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /game/{id}/ban", s.handleBanUser)
 	mux.HandleFunc("POST /game/{id}/promote_gm", s.handlePromoteGM)
 	mux.HandleFunc("POST /game/{id}/demote_gm", s.handleDemoteGM)
+	mux.HandleFunc("POST /game/{id}/delete", s.handleDeleteGame)
 }
 
 // Helpers for Session Cookies

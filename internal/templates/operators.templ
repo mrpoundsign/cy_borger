@@ -4,7 +4,7 @@ import (
 	"github.com/mrpoundsign/cy_borger/internal/db"
 )
 
-templ OperatorsModal(game *db.Game, players []db.User, gms []db.User) {
+templ OperatorsModal(game *db.Game, players []db.User, gms []db.User, currentUserID string) {
 	<div id="operators-modal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.8);">
 		<div class="modal-content bg-dark border-accent p-lg" style="margin:5% auto; width:90%; max-width:800px; border-style:solid; border-width:2px;">
 			<div class="flex justify-between items-center mb-md border-muted pb-sm" style="border-bottom:1px solid;">
@@ -93,6 +93,16 @@ templ OperatorsModal(game *db.Game, players []db.User, gms []db.User) {
 					}
 				</div>
 			</div>
+			
+			if game.OwnerID == currentUserID {
+				<div class="mt-xl p-md border-danger bg-danger-dark" style="border-width:1px; border-style:solid; border-radius:4px;">
+					<h3 class="text-danger m-0 mb-sm">DANGER ZONE</h3>
+					<p class="text-muted text-sm mb-md">These actions are permanent and cannot be undone.</p>
+					<form hx-post={ string(templ.URL("/game/" + game.ID + "/delete")) } class="m-0">
+						<button type="submit" id={ "btn-delete-campaign-" + game.ID } class="btn text-white bg-danger border-danger p-sm w-full" onclick="return confirm('WARNING: Are you sure you want to permanently delete this campaign? All logs and game settings will be lost. Characters will remain but be unlinked.')">💀 DELETE CAMPAIGN</button>
+					</form>
+				</div>
+			}
 		</div>
 	</div>
 }

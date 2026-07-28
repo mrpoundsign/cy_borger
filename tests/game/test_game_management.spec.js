@@ -111,4 +111,32 @@ test.describe('Game Management (Operators UI)', () => {
         // Close pages
         await player1Page.close();
     });
+
+    test('GM can delete a campaign', async ({ page, context }) => {
+        // Create GM User
+        const gmName = await loginUser(page, 'GM_DEL_');
+
+        // Create Game
+        await page.locator('input[name="name"]').fill('Game To Delete');
+        await page.locator('.card button:has-text("Create Game as GM")').click();
+        await page.waitForSelector('#game-data', { state: 'attached', timeout: 10000 });
+        const gameId = await page.locator('#game-data').getAttribute('data-id');
+        
+        // Open Operators modal
+        await page.locator('button:has-text("⚙️ OPERATORS")').click();
+        await expect(page.locator('#operators-modal')).toBeVisible();
+
+        // Click delete campaign and accept dialog
+        page.on('dialog', dialog => dialog.accept());
+        await page.locator(`#btn-delete-campaign-${gameId}`).click();
+        
+        // Wait for redirect to home
+        await expect(page).toHaveURL(BASE_URL + '/');
+        
+        // Wait for page to finish loading/swapping (since HTMX redirect)
+        await page.waitForLoadState('networkidle');
+        
+        // Verify game is no longer in the GM Games list
+        await expect(page.locator('a', { hasText: 'Game To Delete' })).toHaveCount(0);
+    });
 });

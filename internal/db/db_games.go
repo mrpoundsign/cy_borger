@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
@@ -208,4 +209,31 @@ func (d *DB) ToggleGameLock(gameID string, isLocked bool) error {
 	query := `UPDATE games SET is_locked = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
 	_, err := d.conn.Exec(query, lockedInt, gameID)
 	return err
+}
+
+func (d *DB) DeleteGame(id string) error {
+	tx, err := d.conn.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			log.Printf("Failed to rollback transaction in DeleteGame: %v", err)
+		}
+	}()
+
+	if _, err := tx.Exec(`DELETE FROM game_gms WHERE game_id = ?`, id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`DELETE FROM game_logs WHERE game_id = ?`, id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`UPDATE characters SET game_id = '' WHERE game_id = ?`, id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`DELETE FROM games WHERE id = ?`, id); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

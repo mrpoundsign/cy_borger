@@ -245,7 +245,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<span class=\"text-muted\">[PLAYER PARTY VIEW]</span><script>\n\t\t\t\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", function () {\n\t\t\t\t\t\t\t\tif (window.cyStore) {\n\t\t\t\t\t\t\t\t\tlet gmEl = document.getElementById('game-data-gm-player');\n\t\t\t\t\t\t\t\t\tconst games = cyStore.getGMGames();\n\t\t\t\t\t\t\t\t\tif (games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {\n\t\t\t\t\t\t\t\t\t\tconst code = games[gmEl.dataset.id].gmCode;\n\t\t\t\t\t\t\t\t\t\tconst form = document.querySelector('form[action=\"/game/' + gmEl.dataset.id + '/auth\"]');\n\t\t\t\t\t\t\t\t\t\tif (form) {\n\t\t\t\t\t\t\t\t\t\t\tform.querySelector('input[name=\"gm_code\"]').value = code;\n\t\t\t\t\t\t\t\t\t\t\tform.submit();\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t</script> <span id=\"game-data-gm-player\" data-id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<span class=\"text-muted\">[PLAYER PARTY VIEW]</span><script>\n\t\t\t\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", function () {\n\t\t\t\t\t\t\t\tif (window.cyStore) {\n\t\t\t\t\t\t\t\t\tlet gmEl = document.getElementById('game-data-gm-player');\n\t\t\t\t\t\t\t\t\tconst games = cyStore.getGMGames();\n\t\t\t\t\t\t\t\t\tif (gmEl && games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {\n\t\t\t\t\t\t\t\t\t\tconst code = games[gmEl.dataset.id].gmCode;\n\t\t\t\t\t\t\t\t\t\tconst form = document.querySelector('form[action=\"/game/' + gmEl.dataset.id + '/auth\"]');\n\t\t\t\t\t\t\t\t\t\tif (form) {\n\t\t\t\t\t\t\t\t\t\t\tform.querySelector('input[name=\"gm_code\"]').value = code;\n\t\t\t\t\t\t\t\t\t\t\tform.submit();\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t</script> <span id=\"game-data-gm-player\" data-id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -359,7 +359,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			return templ_7745c5c3_Err
 		}
 		if isGM {
-			templ_7745c5c3_Err = OperatorsModal(game, players, gms).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = OperatorsModal(game, players, gms, currentUserID).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
