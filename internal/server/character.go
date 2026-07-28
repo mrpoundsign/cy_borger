@@ -113,7 +113,7 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 		}
 		return
 	}
-	if isHTMX && r.Header.Get("HX-Target") == "character-sheet-container" {
+	if isHTMX {
 		if err := templates.CharacterSheet(c, canEdit, isGM, game, activeGame, isModal, isHTMX).Render(r.Context(), w); err != nil {
 			log.Printf("Template error (character_sheet.templ): %v", err)
 		}
@@ -518,7 +518,7 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
+	if r.Header.Get("HX-Target") == "character-sheet-container" {
 		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}

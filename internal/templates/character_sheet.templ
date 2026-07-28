@@ -267,7 +267,7 @@ document.addEventListener("input", function(e) {
 						<div class="flex items-center justify-between gap-sm text-accent bg-black p-xs border-accent" style="border-width:1px; border-style:solid;">
 							<span class="font-bold text-uppercase text-md">{ name }:</span>
 							if canEdit {
-								<form id={ "stat-form-" + name } class="inline-flex items-center gap-xs m-0">
+								<form id={ "stat-form-" + name } class="inline-flex items-center gap-xs m-0" onsubmit="event.preventDefault();">
 									<input type="hidden" name="stat_name" value={ name }/>
 									<input
 										type="number"
@@ -278,7 +278,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
 										hx-include={ "#stat-form-" + name }
 										hx-trigger="change, input delay:300ms"
-										hx-target="#character-sheet-container" hx-swap="outerHTML"
+										hx-swap="none"
 									/>
 								</form>
 							} else {
@@ -307,7 +307,7 @@ document.addEventListener("input", function(e) {
 						<div class="flex items-center justify-between gap-sm">
 							<span class="text-accent text-xs font-bold text-uppercase font-spacing-sm">❤️ HP:</span>
 							if canEdit {
-								<form id="hp-current-form" class="inline-flex items-center gap-xs m-0">
+								<form id="hp-current-form" class="inline-flex items-center gap-xs m-0" onsubmit="event.preventDefault();">
 									<input
 										type="number"
 										name="hp_current"
@@ -317,7 +317,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
 										hx-include="#hp-current-form, #hp-max-hidden"
 										hx-trigger="change, input delay:300ms"
-										hx-target="#character-sheet-container" hx-swap="outerHTML"
+										hx-swap="none"
 									/>
 									<input type="hidden" id="hp-max-hidden" name="hp_max" value={ fmt.Sprint(character.HP.Max) }/>
 									<span class="text-white font-bold text-md">/ { fmt.Sprint(character.HP.Max) }</span>
@@ -329,7 +329,7 @@ document.addEventListener("input", function(e) {
 						<div class="flex items-center justify-between gap-sm">
 							<span class="text-accent text-xs font-bold text-uppercase font-spacing-sm">⚡ GLITCHES:</span>
 							if canEdit {
-								<form id="glitches-current-form" class="inline-flex items-center gap-xs m-0">
+								<form id="glitches-current-form" class="inline-flex items-center gap-xs m-0" onsubmit="event.preventDefault();">
 									<input
 										type="number"
 										name="glitches_current"
@@ -339,7 +339,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
 										hx-include="#glitches-current-form, #glitches-max-hidden"
 										hx-trigger="change, input delay:300ms"
-										hx-target="#character-sheet-container" hx-swap="outerHTML"
+										hx-swap="none"
 									/>
 									<input type="hidden" id="glitches-max-hidden" name="glitches_max" value={ fmt.Sprint(character.Glitches.Max) }/>
 									<span class="text-white font-bold text-md">/ { fmt.Sprint(character.Glitches.Max) } <span class="text-xs text-muted font-normal">({ character.GlitchDie })</span></span>
@@ -351,7 +351,7 @@ document.addEventListener("input", function(e) {
 						<div class="flex items-center justify-between gap-sm">
 							<span class="text-accent text-xs font-bold text-uppercase font-spacing-sm">💰 CREDITS:</span>
 							if canEdit {
-								<form id="creds-form" class="inline-flex items-center gap-xs m-0">
+								<form id="creds-form" class="inline-flex items-center gap-xs m-0" onsubmit="event.preventDefault();">
 									<input
 										type="number"
 										name="value"
@@ -362,7 +362,7 @@ document.addEventListener("input", function(e) {
 										hx-include="#creds-form"
 										hx-trigger="change, input delay:300ms"
 										hx-vals='{"field": "creds"}'
-										hx-target="#character-sheet-container" hx-swap="outerHTML"
+										hx-swap="none"
 									/> <span class="text-md text-accent">¤</span>
 								</form>
 							} else {
@@ -380,7 +380,7 @@ document.addEventListener("input", function(e) {
 							<div class="flex flex-col gap-sm">
 								<div class="flex items-center justify-between gap-sm">
 									<span class="text-accent text-xs font-bold text-uppercase">HP MAX:</span>
-									<form id="hp-form" class="inline-flex items-center gap-xs m-0">
+									<form id="hp-form" class="inline-flex items-center gap-xs m-0" onsubmit="event.preventDefault();">
 										<input type="hidden" name="hp_current" value={ fmt.Sprint(character.HP.Current) }/>
 										<input
 											type="number"
@@ -391,13 +391,13 @@ document.addEventListener("input", function(e) {
 											hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
 											hx-include="#hp-form"
 											hx-trigger="change, input delay:300ms"
-											hx-target="#character-sheet-container" hx-swap="outerHTML"
+											hx-swap="none"
 										/>
 									</form>
 								</div>
 								<div class="flex items-center justify-between gap-sm">
 									<span class="text-accent text-xs font-bold text-uppercase">GLITCHES MAX:</span>
-									<form id="glitches-form" class="inline-flex items-center gap-xs m-0">
+									<form id="glitches-form" class="inline-flex items-center gap-xs m-0" onsubmit="event.preventDefault();">
 										<input type="hidden" name="glitches_current" value={ fmt.Sprint(character.Glitches.Current) }/>
 										<input
 											type="number"
@@ -408,7 +408,7 @@ document.addEventListener("input", function(e) {
 											hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
 											hx-include="#glitches-form"
 											hx-trigger="change, input delay:300ms"
-											hx-target="#character-sheet-container" hx-swap="outerHTML"
+											hx-swap="none"
 										/>
 										<span class="text-muted text-xs">({ character.GlitchDie })</span>
 									</form>

@@ -952,7 +952,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"stat_name\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"hidden\" name=\"stat_name\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1004,7 +1004,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1076,7 +1076,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			return templ_7745c5c3_Err
 		}
 		if canEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<form id=\"hp-current-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"number\" name=\"hp_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<form id=\"hp-current-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"number\" name=\"hp_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1102,7 +1102,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-include=\"#hp-current-form, #hp-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <input type=\"hidden\" id=\"hp-max-hidden\" name=\"hp_max\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-include=\"#hp-current-form, #hp-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"> <input type=\"hidden\" id=\"hp-max-hidden\" name=\"hp_max\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1169,7 +1169,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			return templ_7745c5c3_Err
 		}
 		if canEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<form id=\"glitches-current-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"number\" name=\"glitches_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<form id=\"glitches-current-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"number\" name=\"glitches_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1195,7 +1195,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" hx-include=\"#glitches-current-form, #glitches-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <input type=\"hidden\" id=\"glitches-max-hidden\" name=\"glitches_max\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" hx-include=\"#glitches-current-form, #glitches-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"> <input type=\"hidden\" id=\"glitches-max-hidden\" name=\"glitches_max\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1288,7 +1288,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			return templ_7745c5c3_Err
 		}
 		if canEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "<form id=\"creds-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"number\" name=\"value\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "<form id=\"creds-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"number\" name=\"value\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1314,7 +1314,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\" hx-include=\"#creds-form\" hx-trigger=\"change, input delay:300ms\" hx-vals='{\"field\": \"creds\"}' hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <span class=\"text-md text-accent\">¤</span></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\" hx-include=\"#creds-form\" hx-trigger=\"change, input delay:300ms\" hx-vals='{\"field\": \"creds\"}' hx-swap=\"none\"> <span class=\"text-md text-accent\">¤</span></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1355,7 +1355,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" onclick=\"toggleEditSection('vitals')\" class=\"btn-outline-small p-xs text-xs\">Done</button></div><div class=\"flex flex-col gap-sm\"><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">HP MAX:</span><form id=\"hp-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"hp_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" onclick=\"toggleEditSection('vitals')\" class=\"btn-outline-small p-xs text-xs\">Done</button></div><div class=\"flex flex-col gap-sm\"><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">HP MAX:</span><form id=\"hp-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"hidden\" name=\"hp_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1394,7 +1394,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\" hx-include=\"#hp-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"></form></div><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">GLITCHES MAX:</span><form id=\"glitches-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"glitches_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\" hx-include=\"#hp-form\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"></form></div><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">GLITCHES MAX:</span><form id=\"glitches-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"hidden\" name=\"glitches_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1433,7 +1433,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\" hx-include=\"#glitches-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <span class=\"text-muted text-xs\">(")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\" hx-include=\"#glitches-form\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"> <span class=\"text-muted text-xs\">(")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
