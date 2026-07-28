@@ -3,14 +3,13 @@ module github.com/mrpoundsign/cy_borger
 go 1.26.5
 
 require (
+	github.com/a-h/templ v0.3.1020
 	github.com/golang-migrate/migrate/v4 v4.19.1
-	github.com/mattn/go-sqlite3 v1.14.48
-	golang.org/x/crypto v0.54.0
+	golang.org/x/term v0.45.0
 	modernc.org/sqlite v1.54.0
 )
 
 require (
-	github.com/a-h/templ v0.3.1020 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect

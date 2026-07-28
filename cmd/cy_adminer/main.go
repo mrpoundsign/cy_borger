@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"syscall"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
+	"golang.org/x/term"
 	_ "modernc.org/sqlite"
 )
 
@@ -20,12 +22,27 @@ func main() {
 
 	switch command {
 	case "set-password":
-		if len(os.Args) < 4 {
-			fmt.Println("Usage: cy_adminer set-password <username> <password>")
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: cy_adminer set-password <username> [password]")
 			return
 		}
 		username := os.Args[2]
-		password := os.Args[3]
+		var password string
+		if len(os.Args) >= 4 {
+			password = os.Args[3]
+		} else {
+			fmt.Print("Enter password: ")
+			bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+			if err != nil {
+				log.Fatalf("Failed to read password: %v", err)
+			}
+			fmt.Println()
+			password = string(bytePassword)
+		}
+
+		if password == "" {
+			log.Fatalf("Password cannot be empty")
+		}
 
 		dbConn, err := sql.Open("sqlite", "./cy_borger.db")
 		if err != nil {
@@ -82,5 +99,5 @@ func setPassword(dbConn *sql.DB, username, password string) error {
 func printUsage() {
 	fmt.Println("CY_BORGER Admin Tool (cy_adminer)")
 	fmt.Println("Commands:")
-	fmt.Println("  set-password <username> <password>   Set a user's password")
+	fmt.Println("  set-password <username> [password]   Set a user's password (prompts if omitted)")
 }
