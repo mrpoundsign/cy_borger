@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/internal/templates"
 	"github.com/mrpoundsign/cy_borger/internal/ws"
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
-	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 func (s *Server) logAndBroadcastGameEvent(c *chargen.Character, eventType, message string) {

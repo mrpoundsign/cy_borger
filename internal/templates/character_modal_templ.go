@@ -41,7 +41,7 @@ func CharacterModal(character *chargen.Character, canEdit bool, isGM bool, game 
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/character_modal.templ`, Line: 9, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_modal.templ`, Line: 9, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {

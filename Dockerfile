@@ -23,8 +23,6 @@ RUN apk add --no-cache tzdata
 
 # Copy the binary from the builder stage
 COPY --from=builder /app/cy_borger .
-# Copy static files
-COPY --from=builder /app/static ./static
 
 # Create a directory for the database to enable volume mounting
 RUN mkdir -p /app/data

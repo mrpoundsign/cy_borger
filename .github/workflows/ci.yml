@@ -24,11 +24,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 25
           cache: 'npm'
-
-      - name: Install templ
-        run: go install github.com/a-h/templ/cmd/templ@latest
 
       - name: Install Node Dependencies
         run: npm ci
@@ -39,8 +36,8 @@ jobs:
       - name: Run Go Tests
         run: go test -v ./...
 
-      - name: Build Application
-        run: ./build.sh -o ./tmp/cy_borger
+      - name: Vet application
+        run: go vet ./...
 
       - name: Start Server & Wait for Ready
         run: |

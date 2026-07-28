@@ -70,7 +70,7 @@ func GameHead(game *db.Game) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 13, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 13, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -112,7 +112,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(game.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 93, Col: 190}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 93, Col: 190}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(game.CreatedAt.Format("Jan 02, 2006 15:04 MST"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 96, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 96, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -143,7 +143,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-copy-gmlink-" + game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 99, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 99, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 			if templ_7745c5c3_Err != nil {
@@ -156,7 +156,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-copy-gmcode-" + game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 100, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 100, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
@@ -169,7 +169,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 107, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 107, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
@@ -182,7 +182,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.GMCode)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 107, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 107, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 			if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 107, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 107, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
@@ -213,7 +213,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 126, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 126, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 			if templ_7745c5c3_Err != nil {
@@ -231,7 +231,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-random-color-" + game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 128, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 128, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -244,7 +244,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(game.InviteCode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 131, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 131, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -257,7 +257,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-copy-invite-" + game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 132, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 132, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
@@ -270,7 +270,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.InviteCode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 133, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 133, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -288,7 +288,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/game/" + game.ID + "/auth")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 140, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 140, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 			if templ_7745c5c3_Err != nil {
@@ -301,7 +301,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-unlock-gm-" + game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 142, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 142, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 			if templ_7745c5c3_Err != nil {
@@ -323,7 +323,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/game/" + game.ID + "/logs")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 152, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 152, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 		if templ_7745c5c3_Err != nil {

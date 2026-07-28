@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
-	"github.com/mrpoundsign/cy_borger/templates"
+	"github.com/mrpoundsign/cy_borger/internal/templates"
 )
 
 type Server struct {

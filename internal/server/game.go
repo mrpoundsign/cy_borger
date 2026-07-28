@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/mrpoundsign/cy_borger/templates"
+	"github.com/mrpoundsign/cy_borger/internal/templates"
 )
 
 func (s *Server) handleCreateGame(w http.ResponseWriter, r *http.Request) {

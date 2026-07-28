@@ -9,7 +9,7 @@ import (
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
 	"github.com/mrpoundsign/cy_borger/internal/server"
-	"github.com/mrpoundsign/cy_borger/static"
+	"github.com/mrpoundsign/cy_borger/internal/static"
 )
 
 func main() {
