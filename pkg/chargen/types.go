@@ -133,5 +133,6 @@ type Character struct {
 	Creds         int       `json:"creds"`
 	GameID        string    `json:"game_id,omitempty"`
 	GameName      string    `json:"game_name,omitempty"`
+	SystemID      string    `json:"system_id,omitempty"`
 	UpdatedAt     time.Time `json:"updated_at,omitempty"`
 }

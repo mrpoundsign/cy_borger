@@ -4,6 +4,7 @@
 - **Go Tooling**:
   - Always run `goimports` and `golangci-lint` when saving Go files, and fix any reported issues (note: a pre-commit hook enforces this).
   - Prefer the Go standard library (`net/http`, `html/template`, `database/sql`) over heavy third-party frameworks when possible.
+  - Use `go vet` and not `go build` for testing compiling. Users should be running the server under `air` and `go vet` will show you any build errors.
 - **Data & Aesthetics**:
   - Maintain CY_BORG visual theme (neon yellow `#ffe600` on dark background `#050505`).
 - **Testing & Playwright**:

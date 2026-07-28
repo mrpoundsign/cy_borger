@@ -184,6 +184,17 @@ func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if g.IsLocked {
+		http.Redirect(w, r, "/character/"+id+"?error=game_locked", http.StatusSeeOther)
+		return
+	}
+
+	isBanned, _ := s.DB.IsUserBanned(g.OwnerID, c.OwnerID)
+	if isBanned {
+		http.Redirect(w, r, "/character/"+id+"?error=banned", http.StatusSeeOther)
+		return
+	}
+
 	c.GameID = g.ID
 	if err := s.DB.SaveCharacter(c, c.OwnerID); err != nil {
 		log.Printf("Failed to save character %s: %v", c.ID, err)

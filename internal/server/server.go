@@ -51,6 +51,14 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	// WebSockets
 	mux.HandleFunc("GET /ws/game/{id}", s.handleWSGame)
+
+	// GM Controls
+	mux.HandleFunc("POST /game/{id}/rename", s.handleRenameGame)
+	mux.HandleFunc("POST /game/{id}/toggle_lock", s.handleToggleLock)
+	mux.HandleFunc("POST /game/{id}/kick", s.handleKickUser)
+	mux.HandleFunc("POST /game/{id}/ban", s.handleBanUser)
+	mux.HandleFunc("POST /game/{id}/promote_gm", s.handlePromoteGM)
+	mux.HandleFunc("POST /game/{id}/demote_gm", s.handleDemoteGM)
 }
 
 // Helpers for Session Cookies

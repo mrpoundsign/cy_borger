@@ -1,0 +1,105 @@
+package templates
+
+import (
+	"github.com/mrpoundsign/cy_borger/internal/db"
+)
+
+templ OperatorsModal(game *db.Game, players []db.User, gms []db.User) {
+	<div id="operators-modal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.8);">
+		<div class="modal-content bg-dark border-accent p-lg" style="margin:5% auto; width:90%; max-width:800px; border-style:solid; border-width:2px;">
+			<div class="flex justify-between items-center mb-md border-muted pb-sm" style="border-bottom:1px solid;">
+				<h2 class="text-accent m-0 text-uppercase">⚙️ OPERATORS (Game Management)</h2>
+				<span class="close-btn text-accent font-bold" style="cursor:pointer; font-size:1.5rem;" onclick="document.getElementById('operators-modal').style.display='none'">&times;</span>
+			</div>
+			
+			<div class="flex flex-wrap gap-lg">
+				<div style="flex:1; min-width:300px;">
+					<h3 class="text-white text-uppercase">Game Settings</h3>
+					
+					<form hx-post={ string(templ.URL("/game/" + game.ID + "/rename")) } hx-target="body" class="mb-md">
+						<label class="text-muted text-sm block mb-xs">Rename Campaign</label>
+						<div class="flex gap-sm">
+							<input type="text" name="name" value={ game.Name } class="bg-black border-accent text-white p-xs w-full" />
+							<button type="submit" class="btn-outline m-0">RENAME</button>
+						</div>
+					</form>
+					
+					<form hx-post={ string(templ.URL("/game/" + game.ID + "/toggle_lock")) } hx-target="body" class="mb-md">
+						<input type="hidden" name="is_locked" value={ ternary(game.IsLocked, "false", "true") } />
+						if game.IsLocked {
+							<button type="submit" class="btn-outline m-0 w-full p-sm text-danger border-danger">🔒 GAME LOCKED (Unlock to allow new players)</button>
+						} else {
+							<button type="submit" class="btn-outline m-0 w-full p-sm text-success border-success">🔓 GAME OPEN (Lock to block new players)</button>
+						}
+					</form>
+					
+					<h3 class="text-white text-uppercase mt-lg">Game Masters</h3>
+					<div class="bg-black border-muted p-sm mb-md" style="border-width:1px; border-style:solid;">
+						<div class="flex justify-between items-center mb-xs">
+							<span class="text-accent">Primary GM (Owner)</span>
+						</div>
+						
+						if len(gms) > 0 {
+							<div class="mt-sm">
+								<span class="text-muted text-sm">Additional GMs:</span>
+								for _, gm := range gms {
+									<div class="flex justify-between items-center mt-xs">
+										<span class="text-white">{ gm.Username }</span>
+										<form hx-post={ string(templ.URL("/game/" + game.ID + "/demote_gm")) } hx-target="body" class="m-0">
+											<input type="hidden" name="user_id" value={ gm.ID } />
+											<button type="submit" class="btn-outline-small text-danger border-danger m-0">Demote</button>
+										</form>
+									</div>
+								}
+							</div>
+						} else {
+							<div class="mt-sm text-muted text-sm italic">No additional GMs.</div>
+						}
+					</div>
+				</div>
+				
+				<div style="flex:1; min-width:300px;">
+					<h3 class="text-white text-uppercase">Players</h3>
+					if len(players) > 0 {
+						<div class="bg-black border-muted p-sm" style="border-width:1px; border-style:solid;">
+							for _, p := range players {
+								<div class="flex justify-between items-center mb-sm p-xs" style="border-bottom:1px dashed #333;">
+									<span class="text-white font-bold">{ p.Username }</span>
+									
+									<div class="flex gap-xs">
+										// Don't show controls for the owner
+										if p.ID != game.OwnerID {
+											<form hx-post={ string(templ.URL("/game/" + game.ID + "/promote_gm")) } hx-target="body" class="m-0">
+												<input type="hidden" name="user_id" value={ p.ID } />
+												<button type="submit" class="btn-outline-small m-0" title="Promote to Additional GM">GM</button>
+											</form>
+											
+											<form hx-post={ string(templ.URL("/game/" + game.ID + "/kick")) } hx-target="body" class="m-0">
+												<input type="hidden" name="user_id" value={ p.ID } />
+												<button type="submit" class="btn-outline-small text-warning border-warning m-0" title="Remove characters from this game" onclick="return confirm('Kick this player? Their characters will be removed from this game.')">Kick</button>
+											</form>
+											
+											<form hx-post={ string(templ.URL("/game/" + game.ID + "/ban")) } hx-target="body" class="m-0">
+												<input type="hidden" name="user_id" value={ p.ID } />
+												<button type="submit" class="btn-outline-small text-danger border-danger m-0" title="Ban from all your games" onclick="return confirm('BAN this player? Their characters will be kicked from ALL your games, and they will not be able to join again.')">BAN</button>
+											</form>
+										}
+									</div>
+								</div>
+							}
+						</div>
+					} else {
+						<p class="text-muted italic">No players in this game yet.</p>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+func ternary(cond bool, t, f string) string {
+	if cond {
+		return t
+	}
+	return f
+}
