@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 # Build the application (modernc.org/sqlite is CGO free, so CGO_ENABLED=0 works perfectly)
-RUN CGO_ENABLED=0 GOOS=linux go build -o cy_borger ./cmd/cy_borger
+RUN CGO_ENABLED=0 GOOS=linux go build -o /tmp/cy_borger ./cmd/cy_borger
 
 # Run stage
 FROM alpine:latest
@@ -22,7 +22,7 @@ WORKDIR /app
 RUN apk add --no-cache tzdata
 
 # Copy the binary from the builder stage
-COPY --from=builder /app/cy_borger .
+COPY --from=builder /tmp/cy_borger .
 
 # Create a directory for the database to enable volume mounting
 RUN mkdir -p /app/data
