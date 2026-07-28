@@ -1086,7 +1086,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" hx-include=\"#hp-current-form, #hp-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <input type=\"hidden\" id=\"hp-max-hidden\" name=\"hp_max\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" hx-include=\"#hp-current-form, #hp-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"none\"> <input type=\"hidden\" id=\"hp-max-hidden\" name=\"hp_max\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1179,7 +1179,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\" hx-include=\"#glitches-current-form, #glitches-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <input type=\"hidden\" id=\"glitches-max-hidden\" name=\"glitches_max\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\" hx-include=\"#glitches-current-form, #glitches-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"none\"> <input type=\"hidden\" id=\"glitches-max-hidden\" name=\"glitches_max\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1298,7 +1298,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "\" hx-include=\"#creds-form\" hx-trigger=\"change, input delay:300ms\" hx-vals='{\"field\": \"creds\"}' hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <span class=\"text-md text-accent\">¤</span></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "\" hx-include=\"#creds-form\" hx-trigger=\"change, input delay:300ms\" hx-vals='{\"field\": \"creds\"}' hx-target=\"#character-sheet-container\" hx-swap=\"none\"> <span class=\"text-md text-accent\">¤</span></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1378,7 +1378,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "\" hx-include=\"#hp-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"></form></div><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">GLITCHES MAX:</span><form id=\"glitches-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"glitches_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "\" hx-include=\"#hp-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"none\"></form></div><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">GLITCHES MAX:</span><form id=\"glitches-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"glitches_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1417,7 +1417,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\" hx-include=\"#glitches-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <span class=\"text-muted text-xs\">(")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\" hx-include=\"#glitches-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"none\"> <span class=\"text-muted text-xs\">(")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2316,7 +2316,43 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 227, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 227, "</div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !isModal && character.GameID != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 228, "<script id=\"char-ws-data\" data-game-id=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var144 string
+			templ_7745c5c3_Var144, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.GameID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 653, Col: 60}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var144)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 229, "\" data-char-id=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var145 string
+			templ_7745c5c3_Var145, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.ID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 653, Col: 90}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var145)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 230, "\">\n\t\t\t\t(function() {\n\t\t\t\t\tconst el = document.getElementById('char-ws-data');\n\t\t\t\t\tif (!el || !el.dataset) return;\n\t\t\t\t\tconst charId = el.dataset.charId;\n\t\t\t\t\tconst gameId = el.dataset.gameId;\n\n\t\t\t\t\tif (window.cyGameSocket && window.cyGameId === gameId) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tlet socket = null;\n\t\t\t\t\tlet reconnectTimer = null;\n\t\t\t\t\tlet delay = 1000;\n\n\t\t\t\t\tfunction connectCharSocket() {\n\t\t\t\t\t\tconst protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';\n\t\t\t\t\t\tconst wsUrl = protocol + '//' + window.location.host + '/ws/game/' + gameId;\n\n\t\t\t\t\t\tsocket = new WebSocket(wsUrl);\n\n\t\t\t\t\t\tsocket.onopen = function () {\n\t\t\t\t\t\t\tdelay = 1000;\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\tsocket.onmessage = function (e) {\n\t\t\t\t\t\t\tconst parts = e.data.split(\":\");\n\t\t\t\t\t\t\tconst type = parts[0];\n\t\t\t\t\t\t\tconst targetCharId = parts[1];\n\n\t\t\t\t\t\t\tif (type === \"char_update\" && (targetCharId === charId || targetCharId === \"all\")) {\n\t\t\t\t\t\t\t\tconst activeEl = document.activeElement;\n\t\t\t\t\t\t\t\tif (activeEl && activeEl.closest && activeEl.closest('#character-sheet-container form')) {\n\t\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\tif (window.charRefreshTimer) clearTimeout(window.charRefreshTimer);\n\t\t\t\t\t\t\t\twindow.charRefreshTimer = setTimeout(function() {\n\t\t\t\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\t\t\t\thtmx.ajax('GET', '/character/' + charId, {\n\t\t\t\t\t\t\t\t\t\t\ttarget: '#character-sheet-container',\n\t\t\t\t\t\t\t\t\t\t\tswap: 'outerHTML'\n\t\t\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}, 100);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\tsocket.onclose = function () {\n\t\t\t\t\t\t\tif (reconnectTimer) clearTimeout(reconnectTimer);\n\t\t\t\t\t\t\treconnectTimer = setTimeout(function () {\n\t\t\t\t\t\t\t\tdelay = Math.min(delay * 1.5, 5000);\n\t\t\t\t\t\t\t\tconnectCharSocket();\n\t\t\t\t\t\t\t}, delay);\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\tsocket.onerror = function () {\n\t\t\t\t\t\t\tsocket.close();\n\t\t\t\t\t\t};\n\t\t\t\t\t}\n\n\t\t\t\t\tif (document.readyState === 'loading') {\n\t\t\t\t\t\tdocument.addEventListener('DOMContentLoaded', connectCharSocket);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tconnectCharSocket();\n\t\t\t\t\t}\n\t\t\t\t})();\n\t\t\t</script>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 231, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

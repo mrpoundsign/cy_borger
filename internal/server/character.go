@@ -113,7 +113,8 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 		}
 		return
 	}
-	if isHTMX && r.Header.Get("HX-Target") == "character-sheet-container" {
+	target := strings.TrimPrefix(r.Header.Get("HX-Target"), "#")
+	if isHTMX && (target == "character-sheet-container" || target == "character-sheet" || target == "") {
 		if err := templates.CharacterSheet(c, canEdit, isGM, game, activeGame, isModal, isHTMX).Render(r.Context(), w); err != nil {
 			log.Printf("Template error (character_sheet.templ): %v", err)
 		}
@@ -141,21 +142,8 @@ func (s *Server) handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// HTTP Caching Headers
-	w.Header().Set("Cache-Control", "no-cache, must-revalidate")
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Vary", "HX-Request, Accept")
-	w.Header().Set("Last-Modified", c.UpdatedAt.UTC().Format(http.TimeFormat))
-
-	// Check If-Modified-Since header (HTTP Caching)
-	if r.Header.Get("HX-Request") != "true" && r.URL.Query().Get("modal") != "true" {
-		if ifModSince := r.Header.Get("If-Modified-Since"); ifModSince != "" {
-			if t, err := time.Parse(http.TimeFormat, ifModSince); err == nil {
-				if !c.UpdatedAt.Truncate(time.Second).After(t) {
-					w.WriteHeader(http.StatusNotModified)
-					return
-				}
-			}
-		}
-	}
 
 	s.renderCharacterViewWithChar(w, r, c)
 }
@@ -197,22 +185,22 @@ func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.GameID = g.ID
-	ownerID := getCookie(r, "cy_user_id")
-
-	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
-
+	if err := s.DB.SaveCharacter(c, c.OwnerID); err != nil {
 		log.Printf("Failed to save character %s: %v", c.ID, err)
-
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-
 		return
-
 	}
 
 	setCookie(w, "last_game_invite", g.InviteCode)
 
 	// Broadcast update to real-time clients!
 	ws.GlobalHub.Broadcast("game_"+g.ID, "char_update:"+c.ID)
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/game/"+g.ID)
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
 }
@@ -745,7 +733,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	isGM := false
 	if c.GameID != "" {
 		if g, err := s.DB.GetGame(c.GameID); err == nil && g != nil {
-			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
+			isGM = (g.GMCode != "" && getCookie(r, "game_gm_"+g.ID) == g.GMCode) || (user != nil && user.ID != "" && g.OwnerID == user.ID)
 		} else if err != nil {
 			log.Printf("Failed to get game %s: %v", c.GameID, err)
 		}
@@ -766,8 +754,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 
 	s.logAndBroadcastGameEvent(c, "death", "has flatlined. "+deathNote)
 
-	ownerID := getCookie(r, "cy_user_id")
-	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(c, c.OwnerID); err != nil {
 		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
@@ -777,11 +764,14 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		if r.Header.Get("HX-Target") == "character-sheet-container" {
-			s.renderCharacterViewWithChar(w, r, c)
+		target := strings.TrimPrefix(r.Header.Get("HX-Target"), "#")
+		if target == "character-sheet-container" || target == "character-sheet" {
+			if err := templates.CharacterSheet(c, isOwner, isGM, nil, nil, false, true).Render(r.Context(), w); err != nil {
+				log.Printf("Template error (character_sheet.templ): %v", err)
+			}
 			return
 		}
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -807,7 +797,7 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	isGM := false
 	if c.GameID != "" {
 		if g, err := s.DB.GetGame(c.GameID); err == nil && g != nil {
-			isGM = getCookie(r, "game_gm_"+g.ID) == g.GMCode
+			isGM = (g.GMCode != "" && getCookie(r, "game_gm_"+g.ID) == g.GMCode) || (user != nil && user.ID != "" && g.OwnerID == user.ID)
 		} else if err != nil {
 			log.Printf("Failed to get game %s: %v", c.GameID, err)
 		}
@@ -824,8 +814,7 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 
 	s.logAndBroadcastGameEvent(c, "death", "was revived from the dead.")
 
-	ownerID := getCookie(r, "cy_user_id")
-	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
+	if err := s.DB.SaveCharacter(c, c.OwnerID); err != nil {
 		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
@@ -835,7 +824,8 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		if r.Header.Get("HX-Target") == "character-sheet-container" {
+		target := strings.TrimPrefix(r.Header.Get("HX-Target"), "#")
+		if target == "character-sheet-container" || target == "character-sheet" {
 			s.renderCharacterViewWithChar(w, r, c)
 			return
 		}

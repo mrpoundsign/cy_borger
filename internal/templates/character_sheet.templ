@@ -312,7 +312,7 @@ document.addEventListener("input", function(e) {
 										hx-include="#hp-current-form, #hp-max-hidden"
 										hx-trigger="change, input delay:300ms"
 										hx-target="#character-sheet-container"
-										hx-swap="outerHTML"
+										hx-swap="none"
 									/>
 									<input type="hidden" id="hp-max-hidden" name="hp_max" value={ fmt.Sprint(character.HP.Max) }/>
 									<span class="text-white font-bold text-md">/ { fmt.Sprint(character.HP.Max) }</span>
@@ -335,7 +335,7 @@ document.addEventListener("input", function(e) {
 										hx-include="#glitches-current-form, #glitches-max-hidden"
 										hx-trigger="change, input delay:300ms"
 										hx-target="#character-sheet-container"
-										hx-swap="outerHTML"
+										hx-swap="none"
 									/>
 									<input type="hidden" id="glitches-max-hidden" name="glitches_max" value={ fmt.Sprint(character.Glitches.Max) }/>
 									<span class="text-white font-bold text-md">/ { fmt.Sprint(character.Glitches.Max) } <span class="text-xs text-muted font-normal">({ character.GlitchDie })</span></span>
@@ -359,7 +359,7 @@ document.addEventListener("input", function(e) {
 										hx-trigger="change, input delay:300ms"
 										hx-vals='{"field": "creds"}'
 										hx-target="#character-sheet-container"
-										hx-swap="outerHTML"
+										hx-swap="none"
 									/> <span class="text-md text-accent">¤</span>
 								</form>
 							} else {
@@ -389,7 +389,7 @@ document.addEventListener("input", function(e) {
 											hx-include="#hp-form"
 											hx-trigger="change, input delay:300ms"
 											hx-target="#character-sheet-container"
-											hx-swap="outerHTML"
+											hx-swap="none"
 										/>
 									</form>
 								</div>
@@ -407,7 +407,7 @@ document.addEventListener("input", function(e) {
 											hx-include="#glitches-form"
 											hx-trigger="change, input delay:300ms"
 											hx-target="#character-sheet-container"
-											hx-swap="outerHTML"
+											hx-swap="none"
 										/>
 										<span class="text-muted text-xs">({ character.GlitchDie })</span>
 									</form>
@@ -649,5 +649,76 @@ document.addEventListener("input", function(e) {
 				}
 			</div>
 		</div>
+		if !isModal && character.GameID != "" {
+			<script id="char-ws-data" data-game-id={ character.GameID } data-char-id={ character.ID }>
+				(function() {
+					const el = document.getElementById('char-ws-data');
+					if (!el || !el.dataset) return;
+					const charId = el.dataset.charId;
+					const gameId = el.dataset.gameId;
+
+					if (window.cyGameSocket && window.cyGameId === gameId) {
+						return;
+					}
+
+					let socket = null;
+					let reconnectTimer = null;
+					let delay = 1000;
+
+					function connectCharSocket() {
+						const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+						const wsUrl = protocol + '//' + window.location.host + '/ws/game/' + gameId;
+
+						socket = new WebSocket(wsUrl);
+
+						socket.onopen = function () {
+							delay = 1000;
+						};
+
+						socket.onmessage = function (e) {
+							const parts = e.data.split(":");
+							const type = parts[0];
+							const targetCharId = parts[1];
+
+							if (type === "char_update" && (targetCharId === charId || targetCharId === "all")) {
+								const activeEl = document.activeElement;
+								if (activeEl && activeEl.closest && activeEl.closest('#character-sheet-container form')) {
+									return;
+								}
+								if (window.charRefreshTimer) clearTimeout(window.charRefreshTimer);
+								window.charRefreshTimer = setTimeout(function() {
+									if (typeof htmx !== 'undefined') {
+										htmx.ajax('GET', '/character/' + charId, {
+											target: '#character-sheet-container',
+											swap: 'outerHTML'
+										});
+									} else {
+										window.location.reload();
+									}
+								}, 100);
+							}
+						};
+
+						socket.onclose = function () {
+							if (reconnectTimer) clearTimeout(reconnectTimer);
+							reconnectTimer = setTimeout(function () {
+								delay = Math.min(delay * 1.5, 5000);
+								connectCharSocket();
+							}, delay);
+						};
+
+						socket.onerror = function () {
+							socket.close();
+						};
+					}
+
+					if (document.readyState === 'loading') {
+						document.addEventListener('DOMContentLoaded', connectCharSocket);
+					} else {
+						connectCharSocket();
+					}
+				})();
+			</script>
+		}
 	</div>
 }

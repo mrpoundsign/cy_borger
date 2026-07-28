@@ -25,6 +25,8 @@ templ GameHead(game *db.Game) {
 				const wsUrl = protocol + '//' + window.location.host + '/ws/game/' + gameId;
 
 				socket = new WebSocket(wsUrl);
+				window.cyGameSocket = socket;
+				window.cyGameId = gameId;
 
 				socket.onopen = function () {
 					delay = 1000;
