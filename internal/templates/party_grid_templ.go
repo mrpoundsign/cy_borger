@@ -48,7 +48,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-trigger=\"party-update from:body\"><div class=\"bg-dark p-lg mb-xl border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">ACTIVE PARTY MEMBERS</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\" class=\"flex gap-sm items-center\"><form hx-post=\"/character/generate\" class=\"m-0\"><input type=\"hidden\" name=\"game_id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-trigger=\"party-update from:body\"><div class=\"bg-dark p-lg mb-xl border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">ACTIVE PARTY MEMBERS</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\" class=\"flex gap-sm items-center\"><form hx-post=\"/character/generate\" class=\"m-0\"><input type=\"hidden\" name=\"game_id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -493,7 +493,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</div></div><div class=\"bg-dark p-lg mb-lg border-danger\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"text-danger text-uppercase m-0 px-sm flex items-center gap-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">🪦 GRAVEYARD / FLATLINED OPERATORS</h2><div class=\"party-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</div></div><div class=\"bg-dark p-lg mb-lg border-danger\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-danger text-uppercase m-0 px-sm flex items-center gap-sm\">🪦 GRAVEYARD / FLATLINED OPERATORS</h2><div class=\"party-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -128,7 +128,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 					<button id={ "btn-delete-sheet-" + character.ID } class="btn-danger-small ml-xs bg-danger-light p-xs text-xs" style="border-color:#ff3366; color:#ff3366;" onclick="toggleEditSection('delete-char', 'flex')">💣 DELETE</button>
 					<div id="delete-char-edit" class="modal-overlay" style="display:none;">
 						<div class="modal-content" style="border-color:#ff3366; box-shadow:0 0 20px rgba(255,51,102,0.4);">
-							<h2 class="mb-sm" style="color:#ff3366;">⚠️ PERMANENT DELETION</h2>
+							<h2 class="text-danger mb-sm">⚠️ PERMANENT DELETION</h2>
 							<p class="text-muted text-sm mb-md" style="line-height:1.4;">
 								This action cannot be undone. To delete <strong>{ character.Name }</strong>, type the character name below:
 							</p>
@@ -180,7 +180,7 @@ document.addEventListener("input", function(e) {
 				}
 				<!-- Clean Text View (Default) -->
 				<div id="identity-view">
-					<h1 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">YOU ARE { character.Name }</h1>
+					<h1 class="box-header-title text-accent text-uppercase m-0 px-sm">YOU ARE { character.Name }</h1>
 					<div class="text-muted text-sm mb-md">
 						if character.Handle != "" {
 							{ "@" + character.Handle }
@@ -259,7 +259,7 @@ document.addEventListener("input", function(e) {
 			</div>
 			<!-- Top Center: Vertical Stats & Vitals Block -->
 			<div class="bg-dark p-lg border-muted flex flex-col" style="border-width:1px; border-style:solid; min-width:260px; max-width:100%; position:relative; padding-top: 30px;">
-				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">STATS</h2>
+				<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">STATS</h2>
 				<div class="flex flex-col gap-sm justify-around py-xs">
 					for _, item := range character.Stats.List() {
 						<div class="flex items-center justify-between gap-sm text-accent bg-black p-xs border-accent" style="border-width:1px; border-style:solid;">
@@ -424,7 +424,7 @@ document.addEventListener("input", function(e) {
 				}
 				<!-- Clean Text View (Default) -->
 				<div id="class-view">
-					<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">{ character.Class.Name }</h2>
+					<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">{ character.Class.Name }</h2>
 					<div class="text-accent font-bold text-sm mb-md">{ character.Class.Glitch }</div>
 					<p class="font-italic mb-md" style="line-height: 1.7;">
 						{ character.Class.Description }
@@ -494,7 +494,7 @@ document.addEventListener("input", function(e) {
 		<div class="flex flex-wrap gap-lg">
 			<!-- Bottom Left: Gear -->
 			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:320px; flex:1 1 480px; max-width:100%; position:relative; padding-top: 30px;">
-				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">GEAR & ARSENAL</h2>
+				<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">GEAR & ARSENAL</h2>
 				<div style="overflow-x:auto; width:100%; mb-md;">
 					<table class="w-full text-left" style="border-collapse: collapse; min-width: 440px;">
 						<thead>
@@ -602,7 +602,7 @@ document.addEventListener("input", function(e) {
 			</div>
 			<!-- Bottom Right: Cybertech & Apps -->
 			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:320px; flex:1 1 450px; max-width:100%; position:relative; padding-top: 30px;">
-				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">CYBERTECH & APPS</h2>
+				<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">CYBERTECH & APPS</h2>
 				<h3 class="text-accent text-lg mb-sm">CYBERWARE</h3>
 				<ul style="list-style-type: square; padding-left: 20px; line-height: 1.8;">
 					for i, item := range character.Cybertech {

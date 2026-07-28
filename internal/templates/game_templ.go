@@ -105,14 +105,14 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"w-full\" style=\"max-width:1200px; margin:0 auto;\"><div class=\"flex justify-between items-center mb-lg pb-sm\" style=\"border-bottom: 1px solid #222;\"><a href=\"/\" class=\"text-accent no-decoration font-bold text-sm text-uppercase\">⬅️ Back to Home</a> <span class=\"text-sm text-muted text-uppercase flex items-center gap-sm\"><img src=\"/favicon.svg\" alt=\"logo\" class=\"border-accent\" style=\"height:20px; width:20px; border-radius:3px;\"> CY_BORGER Game Terminal</span></div><div id=\"char-modal-container\"></div><div class=\"bg-dark p-lg mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h1 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">GAME: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"w-full\" style=\"max-width:1200px; margin:0 auto;\"><div class=\"flex justify-between items-center mb-lg pb-sm\" style=\"border-bottom: 1px solid #222;\"><a href=\"/\" class=\"text-accent no-decoration font-bold text-sm text-uppercase\">⬅️ Back to Home</a> <span class=\"text-sm text-muted text-uppercase flex items-center gap-sm\"><img src=\"/favicon.svg\" alt=\"logo\" class=\"border-accent\" style=\"height:20px; width:20px; border-radius:3px;\"> CY_BORGER Game Terminal</span></div><div id=\"char-modal-container\"></div><div class=\"bg-dark p-lg mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h1 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">GAME: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(game.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 156, Col: 190}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 156, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -316,7 +316,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"bg-dark p-lg mt-xl mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"text-accent text-uppercase m-0 px-sm flex items-center gap-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">📡 ACTIVITY LOG</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\"><form id=\"log-filter-form\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"bg-dark p-lg mt-xl mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm flex items-center gap-sm\">📡 ACTIVITY LOG</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\"><form id=\"log-filter-form\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

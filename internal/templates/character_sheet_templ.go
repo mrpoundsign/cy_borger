@@ -477,7 +477,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" class=\"btn-danger-small ml-xs bg-danger-light p-xs text-xs\" style=\"border-color:#ff3366; color:#ff3366;\" onclick=\"toggleEditSection('delete-char', 'flex')\">💣 DELETE</button><div id=\"delete-char-edit\" class=\"modal-overlay\" style=\"display:none;\"><div class=\"modal-content\" style=\"border-color:#ff3366; box-shadow:0 0 20px rgba(255,51,102,0.4);\"><h2 class=\"mb-sm\" style=\"color:#ff3366;\">⚠️ PERMANENT DELETION</h2><p class=\"text-muted text-sm mb-md\" style=\"line-height:1.4;\">This action cannot be undone. To delete <strong>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" class=\"btn-danger-small ml-xs bg-danger-light p-xs text-xs\" style=\"border-color:#ff3366; color:#ff3366;\" onclick=\"toggleEditSection('delete-char', 'flex')\">💣 DELETE</button><div id=\"delete-char-edit\" class=\"modal-overlay\" style=\"display:none;\"><div class=\"modal-content\" style=\"border-color:#ff3366; box-shadow:0 0 20px rgba(255,51,102,0.4);\"><h2 class=\"text-danger mb-sm\">⚠️ PERMANENT DELETION</h2><p class=\"text-muted text-sm mb-md\" style=\"line-height:1.4;\">This action cannot be undone. To delete <strong>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -592,14 +592,14 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<!-- Clean Text View (Default) --><div id=\"identity-view\"><h1 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">YOU ARE ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<!-- Clean Text View (Default) --><div id=\"identity-view\"><h1 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">YOU ARE ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(character.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 183, Col: 199}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 183, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -916,7 +916,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "</div><!-- Top Center: Vertical Stats & Vitals Block --><div class=\"bg-dark p-lg border-muted flex flex-col\" style=\"border-width:1px; border-style:solid; min-width:260px; max-width:100%; position:relative; padding-top: 30px;\"><h2 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">STATS</h2><div class=\"flex flex-col gap-sm justify-around py-xs\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "</div><!-- Top Center: Vertical Stats & Vitals Block --><div class=\"bg-dark p-lg border-muted flex flex-col\" style=\"border-width:1px; border-style:solid; min-width:260px; max-width:100%; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">STATS</h2><div class=\"flex flex-col gap-sm justify-around py-xs\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1458,14 +1458,14 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "<!-- Clean Text View (Default) --><div id=\"class-view\"><h2 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "<!-- Clean Text View (Default) --><div id=\"class-view\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var92 string
 		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 427, Col: 197}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 427, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var92))
 		if templ_7745c5c3_Err != nil {
@@ -1692,7 +1692,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "</div></div><!-- Bottom Row: Gear & Arsenal, Cybertech & Apps --><div class=\"flex flex-wrap gap-lg\"><!-- Bottom Left: Gear --><div class=\"bg-dark p-lg border-muted flex-1\" style=\"border-width:1px; border-style:solid; min-width:320px; flex:1 1 480px; max-width:100%; position:relative; padding-top: 30px;\"><h2 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">GEAR & ARSENAL</h2><div style=\"overflow-x:auto; width:100%; mb-md;\"><table class=\"w-full text-left\" style=\"border-collapse: collapse; min-width: 440px;\"><thead><tr><th colspan=\"2\" class=\"text-accent p-sm text-sm border-accent\" style=\"border-bottom-width:2px; border-bottom-style:solid; min-width:130px;\">ITEM / WEAPON</th><th class=\"text-accent p-sm text-sm border-accent\" style=\"border-bottom-width:2px; border-bottom-style:solid; min-width:90px;\">DAMAGE / TIER</th><th class=\"text-accent p-sm text-sm border-accent\" style=\"border-bottom-width:2px; border-bottom-style:solid; min-width:160px;\">NOTES & EFFECT</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "</div></div><!-- Bottom Row: Gear & Arsenal, Cybertech & Apps --><div class=\"flex flex-wrap gap-lg\"><!-- Bottom Left: Gear --><div class=\"bg-dark p-lg border-muted flex-1\" style=\"border-width:1px; border-style:solid; min-width:320px; flex:1 1 480px; max-width:100%; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">GEAR & ARSENAL</h2><div style=\"overflow-x:auto; width:100%; mb-md;\"><table class=\"w-full text-left\" style=\"border-collapse: collapse; min-width: 440px;\"><thead><tr><th colspan=\"2\" class=\"text-accent p-sm text-sm border-accent\" style=\"border-bottom-width:2px; border-bottom-style:solid; min-width:130px;\">ITEM / WEAPON</th><th class=\"text-accent p-sm text-sm border-accent\" style=\"border-bottom-width:2px; border-bottom-style:solid; min-width:90px;\">DAMAGE / TIER</th><th class=\"text-accent p-sm text-sm border-accent\" style=\"border-bottom-width:2px; border-bottom-style:solid; min-width:160px;\">NOTES & EFFECT</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2100,7 +2100,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 203, "</div><!-- Bottom Right: Cybertech & Apps --><div class=\"bg-dark p-lg border-muted flex-1\" style=\"border-width:1px; border-style:solid; min-width:320px; flex:1 1 450px; max-width:100%; position:relative; padding-top: 30px;\"><h2 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">CYBERTECH & APPS</h2><h3 class=\"text-accent text-lg mb-sm\">CYBERWARE</h3><ul style=\"list-style-type: square; padding-left: 20px; line-height: 1.8;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 203, "</div><!-- Bottom Right: Cybertech & Apps --><div class=\"bg-dark p-lg border-muted flex-1\" style=\"border-width:1px; border-style:solid; min-width:320px; flex:1 1 450px; max-width:100%; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">CYBERTECH & APPS</h2><h3 class=\"text-accent text-lg mb-sm\">CYBERWARE</h3><ul style=\"list-style-type: square; padding-left: 20px; line-height: 1.8;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -153,7 +153,7 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 		<div id="char-modal-container"></div>
 
 		<div class="bg-dark p-lg mb-lg border-muted" style="border-width:1px; border-style:solid; position:relative; padding-top: 30px;">
-			<h1 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">GAME: { game.Name }</h1>
+			<h1 class="box-header-title text-accent text-uppercase m-0 px-sm">GAME: { game.Name }</h1>
 			<div class="flex justify-between items-center flex-wrap gap-md">
 				<div>
 					<div class="text-muted text-sm mb-sm">Created: { game.CreatedAt.Format("Jan 02, 2006 15:04 MST") }</div>
@@ -210,7 +210,7 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 		@PartyGrid(game, characters, isGM, currentUserID)
 
 		<div class="bg-dark p-lg mt-xl mb-lg border-muted" style="border-width:1px; border-style:solid; position:relative; padding-top: 30px;">
-			<h2 class="text-accent text-uppercase m-0 px-sm flex items-center gap-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">📡 ACTIVITY LOG</h2>
+			<h2 class="box-header-title text-accent text-uppercase m-0 px-sm flex items-center gap-sm">📡 ACTIVITY LOG</h2>
 			<div style="position:absolute; top:15px; right:15px; z-index:10;">
 				<form id="log-filter-form" hx-get={ string(templ.URL("/game/" + game.ID + "/logs")) } hx-target="#activity-log-box" hx-swap="outerHTML" hx-trigger="change" class="flex gap-sm items-center">
 					<label class="text-accent text-sm" style="cursor:pointer;"><input type="checkbox" name="type" value="stats" checked/> STATS & HP</label>
