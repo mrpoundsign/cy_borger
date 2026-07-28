@@ -261,32 +261,28 @@ document.addEventListener("input", function(e) {
 			<div class="bg-dark p-lg border-muted flex flex-col" style="border-width:1px; border-style:solid; min-width:260px; max-width:100%; position:relative; padding-top: 30px;">
 				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">STATS</h2>
 				<div class="flex flex-col gap-sm justify-around py-xs">
-					for name, stat := range character.Abilities {
+					for _, item := range character.Stats.List() {
 						<div class="flex items-center justify-between gap-sm text-accent bg-black p-xs border-accent" style="border-width:1px; border-style:solid;">
-							<span class="font-bold text-uppercase text-md">{ name }:</span>
+							<span class="font-bold text-uppercase text-md">{ item.Name }:</span>
 							if canEdit {
-								<form id={ "stat-form-" + name } class="inline-flex items-center gap-xs m-0">
-									<input type="hidden" name="stat_name" value={ name }/>
+								<form id={ "stat-form-" + item.Name } class="inline-flex items-center gap-xs m-0">
+									<input type="hidden" name="stat_name" value={ item.Name }/>
 									<input
 										type="number"
 										name="stat_current"
-										value={ fmt.Sprint(stat.Current) }
+										value={ fmt.Sprint(item.Value) }
 										class="bg-black border-accent text-accent text-center text-md p-xs"
 										style="width: 58px;"
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
-										hx-include={ "#stat-form-" + name }
+										hx-include={ "#stat-form-" + item.Name }
 										hx-trigger="change, input delay:300ms"
 										hx-target="#character-sheet-container"
-										hx-swap="outerHTML"
+										hx-swap="none"
 									/>
 								</form>
 							} else {
 								<span class="text-white font-bold text-md">
-									if stat.Current > 0 {
-										+{ fmt.Sprint(stat.Current) }
-									} else {
-										{ fmt.Sprint(stat.Current) }
-									}
+									{ fmt.Sprintf("%+d", item.Value) }
 								</span>
 							}
 						</div>

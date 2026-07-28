@@ -23,13 +23,14 @@ func TestGenerateCharacter(t *testing.T) {
 		t.Errorf("Expected non-empty Class Name")
 	}
 
-	if len(c.Abilities) != 5 {
-		t.Errorf("Expected 5 abilities, got %d", len(c.Abilities))
+	statsList := c.Stats.List()
+	if len(statsList) != 5 {
+		t.Errorf("Expected 5 stats, got %d", len(statsList))
 	}
 
-	for name, stat := range c.Abilities {
-		if stat.Max < -3 || stat.Max > 3 {
-			t.Errorf("Stat %s out of expected bounds (-3 to +3): %d", name, stat.Max)
+	for _, item := range statsList {
+		if item.Value < -3 || item.Value > 3 {
+			t.Errorf("Stat %s out of expected bounds (-3 to +3): %d", item.Name, item.Value)
 		}
 	}
 

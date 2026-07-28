@@ -303,7 +303,6 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	statName := r.FormValue("stat_name")
 	currStr := r.FormValue("stat_current")
-	maxStr := r.FormValue("stat_max")
 
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
@@ -311,14 +310,10 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if stat, exists := c.Abilities[statName]; exists {
+	if _, exists := c.Stats.Get(statName); exists {
 		if val, err := strconv.Atoi(currStr); err == nil {
-			stat.Current = val
+			c.Stats.Set(statName, val)
 		}
-		if val, err := strconv.Atoi(maxStr); err == nil {
-			stat.Max = val
-		}
-		c.Abilities[statName] = stat
 
 		ownerID := getCookie(r, "cy_user_id")
 		if err := s.DB.SaveCharacter(c, ownerID); err != nil {
