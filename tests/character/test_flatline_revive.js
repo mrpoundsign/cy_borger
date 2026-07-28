@@ -1,5 +1,6 @@
 const { chromium } = require('@playwright/test');
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
 (async () => {
   console.log("Starting Playwright test: Authenticated Kill/Revive flow...");
   const browser = await chromium.launch();
@@ -19,8 +20,8 @@ const { chromium } = require('@playwright/test');
   });
 
   try {
-    console.log("Navigating to http://localhost:8080/");
-    await page.goto('http://localhost:8080/');
+    console.log("Navigating to " + BASE_URL + '/');
+    await page.goto(BASE_URL + '/');
     
     // 1. Register a new user
     console.log("Registering a new account...");
@@ -34,20 +35,16 @@ const { chromium } = require('@playwright/test');
     // 2. Create a Game
     console.log("Creating a game...");
     await page.fill('input[name="name"]', 'Test Game');
-    await Promise.all([
-        page.waitForNavigation(),
-        page.click('#btn-create-game-index')
-    ]);
+    await page.click('#btn-create-game-index');
+    await page.waitForLoadState('networkidle');
     const gameUrl = page.url();
     console.log(`Game created: ${gameUrl}`);
     
     // 3. Create a Character
     console.log("Creating a character...");
-    await page.goto('http://localhost:8080/');
-    await Promise.all([
-        page.waitForNavigation(),
-        page.locator('text=Create Blank Character').click()
-    ]);
+    await page.goto(BASE_URL + '/');
+    await page.locator('text=Create Blank Character').click();
+    await page.waitForLoadState('networkidle');
     const charUrl = page.url();
     console.log(`Character created: ${charUrl}`);
     
@@ -63,11 +60,12 @@ const { chromium } = require('@playwright/test');
     }
     await page.waitForTimeout(1000);
     
-    // 5. Kill the character FROM THE GAME PAGE
-    console.log("Clicking FLATLINE button on the game page...");
-    await page.click('button:has-text("💀 FLATLINE")');
-    await page.waitForTimeout(500); // Wait for modal
-    await page.click('button:has-text("💀 FLATLINE")'); // Submit the kill form
+    // 5. Flatline the character
+    console.log("Flatlining the character...");
+    await page.locator('button[id^="btn-flatline-sheet-"]').click();
+    await page.waitForTimeout(500);
+    await page.locator('#kill-char-edit textarea[name="death_note"]').fill('TEST DEATH');
+    await page.locator('#kill-char-edit button[type="submit"]:has-text("💀 FLATLINE")').click(); // Submit the kill form
     await page.waitForTimeout(2000); // Wait for HTMX and WebSockets to process
     
     // 6. Revive the character

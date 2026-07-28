@@ -18,12 +18,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 			</div>
 		}
 		<!-- Banners for Dead/Draft state -->
-		<div
-			id="character-banners"
-			if isHTMX {
-				hx-swap-oob="true"
-			}
-		>
+		<div id="character-banners">
 			if character.IsDead {
 				<div class="bg-danger-light border-danger p-md mb-lg flex justify-between items-center flex-wrap gap-md" style="box-shadow: 0 0 18px rgba(255,0,85,0.35); border-style: solid; border-width: 2px;">
 					<div>
@@ -38,7 +33,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 						</div>
 					</div>
 					if canEdit || isGM {
-						<form hx-post={ string(templ.URL("/character/" + character.ID + "/revive")) } hx-swap="none" class="m-0">
+						<form hx-post={ string(templ.URL("/character/" + character.ID + "/revive")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="m-0">
 							<button type="submit" id={ "btn-revive-sheet-" + character.ID } class="btn-outline text-sm border-danger text-danger">⚡ REVIVE OPERATOR</button>
 						</form>
 					}
@@ -50,7 +45,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 						<div class="text-success font-bold text-lg text-uppercase">⚡ DRAFT CHARACTER PREVIEW</div>
 						<div class="text-muted text-sm mt-xs">Reroll as many times as you like. Click "KEEP THIS CHARACTER" to save it permanently!</div>
 					</div>
-					<form hx-post={ string(templ.URL("/character/" + character.ID + "/keep")) } hx-swap="none" class="m-0">
+					<form hx-post={ string(templ.URL("/character/" + character.ID + "/keep")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="m-0">
 						<button type="submit" id={ "btn-keep-sheet-" + character.ID } class="btn bg-success text-black text-md p-sm">💾 KEEP THIS CHARACTER</button>
 					</form>
 				</div>
@@ -59,9 +54,6 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 		<div
 			id="character-toolbar"
 			class="bg-dark border-accent p-md mb-lg flex justify-between items-center flex-wrap gap-md"
-			if isHTMX {
-				hx-swap-oob="true"
-			}
 		>
 			<div>
 				<span>CHARACTER ID: <strong class="text-accent">{ character.ID }</strong></span>
@@ -121,7 +113,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 								<p class="text-muted text-sm mb-md" style="line-height:1.4;">
 									Mark <strong>{ character.Name }</strong> as deceased in the GRAVEYARD. Add cause of death or final words:
 								</p>
-								<form hx-post={ string(templ.URL("/character/" + character.ID + "/kill")) } hx-swap="none" class="flex flex-col gap-md" onsubmit="toggleEditSection('kill-char')">
+								<form hx-post={ string(templ.URL("/character/" + character.ID + "/kill")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex flex-col gap-md" onsubmit="toggleEditSection('kill-char')">
 									<textarea name="death_note" placeholder="e.g. Flatlined by Cy-Spider in Sector 4" class="w-full bg-dark text-white p-sm border-danger text-sm" style="min-height:60px; font-family:inherit;"></textarea>
 									<div class="flex gap-sm justify-center mt-sm">
 										<button type="button" id={ "btn-cancel-flatline-sheet-" + character.ID } class="btn-outline" onclick="toggleEditSection('kill-char')">Cancel</button>
@@ -286,7 +278,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
 										hx-include={ "#stat-form-" + name }
 										hx-trigger="change, input delay:300ms"
-										hx-swap="none"
+										hx-target="#character-sheet-container" hx-swap="outerHTML"
 									/>
 								</form>
 							} else {
@@ -325,7 +317,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
 										hx-include="#hp-current-form, #hp-max-hidden"
 										hx-trigger="change, input delay:300ms"
-										hx-swap="none"
+										hx-target="#character-sheet-container" hx-swap="outerHTML"
 									/>
 									<input type="hidden" id="hp-max-hidden" name="hp_max" value={ fmt.Sprint(character.HP.Max) }/>
 									<span class="text-white font-bold text-md">/ { fmt.Sprint(character.HP.Max) }</span>
@@ -347,7 +339,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
 										hx-include="#glitches-current-form, #glitches-max-hidden"
 										hx-trigger="change, input delay:300ms"
-										hx-swap="none"
+										hx-target="#character-sheet-container" hx-swap="outerHTML"
 									/>
 									<input type="hidden" id="glitches-max-hidden" name="glitches_max" value={ fmt.Sprint(character.Glitches.Max) }/>
 									<span class="text-white font-bold text-md">/ { fmt.Sprint(character.Glitches.Max) } <span class="text-xs text-muted font-normal">({ character.GlitchDie })</span></span>
@@ -370,7 +362,7 @@ document.addEventListener("input", function(e) {
 										hx-include="#creds-form"
 										hx-trigger="change, input delay:300ms"
 										hx-vals='{"field": "creds"}'
-										hx-swap="none"
+										hx-target="#character-sheet-container" hx-swap="outerHTML"
 									/> <span class="text-md text-accent">¤</span>
 								</form>
 							} else {
@@ -399,7 +391,7 @@ document.addEventListener("input", function(e) {
 											hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
 											hx-include="#hp-form"
 											hx-trigger="change, input delay:300ms"
-											hx-swap="none"
+											hx-target="#character-sheet-container" hx-swap="outerHTML"
 										/>
 									</form>
 								</div>
@@ -416,7 +408,7 @@ document.addEventListener("input", function(e) {
 											hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
 											hx-include="#glitches-form"
 											hx-trigger="change, input delay:300ms"
-											hx-swap="none"
+											hx-target="#character-sheet-container" hx-swap="outerHTML"
 										/>
 										<span class="text-muted text-xs">({ character.GlitchDie })</span>
 									</form>

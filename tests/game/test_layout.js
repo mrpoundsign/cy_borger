@@ -27,7 +27,8 @@ test('Verify modal layout and flex classes', async ({ page }) => {
     
     await page.fill('input[name="name"]', 'Test Game');
     await page.click('#btn-create-game-index');
-    await page.waitForURL(/\/game\//);
+    await page.waitForSelector('#game-data', { state: 'attached', timeout: 10000 });
+    const gameUrl = page.url();
     
     // Give time for WebSocket to connect and logs to load
     await page.waitForTimeout(1000);
@@ -35,21 +36,14 @@ test('Verify modal layout and flex classes', async ({ page }) => {
     // Create a blank character in the game
     await page.locator('button:has-text("Create Blank")').first().click();
     await page.waitForURL(/\/character\//);
-
-    // Go back to the game page
-    await Promise.all([
-        page.waitForNavigation(),
-        page.locator('text=⬅️ Back to Home').click()
-    ]);
     
-    // Click into the game we just created
-    await Promise.all([
-        page.waitForNavigation(),
-        page.locator('text=[GM Mode]').first().click()
-    ]);
+    // Go back to the game page directly using the saved URL
+    await page.goto(gameUrl);
+    await page.waitForLoadState('networkidle');
 
     // Wait for the character card to appear
-    await page.waitForSelector('.char-card');
+    await page.waitForTimeout(1500);
+    await page.waitForSelector('.char-card', { timeout: 10000 });
     
     // Click 'INSPECT SHEET' on the first character
     await page.locator('button:has-text("⚡ INSPECT SHEET")').first().click();

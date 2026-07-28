@@ -8,6 +8,10 @@ import (
 )
 
 func (s *Server) handleCreateGame(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	user := s.getUserFromSession(r)
 	if user == nil {
 		s.renderError(w, r, "Authentication required. Please log in or register an account.", http.StatusUnauthorized)
@@ -31,7 +35,7 @@ func (s *Server) handleCreateGame(w http.ResponseWriter, r *http.Request) {
 	setCookie(w, "last_game_invite", g.InviteCode)
 
 	w.Header().Set("HX-Redirect", "/game/"+g.ID)
-	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleViewGame(w http.ResponseWriter, r *http.Request) {
@@ -106,6 +110,10 @@ func (s *Server) handleGameParty(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAuthGame(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	gmCode := r.FormValue("gm_code")
 
@@ -116,7 +124,7 @@ func (s *Server) handleAuthGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("HX-Redirect", "/game/"+id)
-	http.Redirect(w, r, "/game/"+id, http.StatusSeeOther)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleGetGameLogs(w http.ResponseWriter, r *http.Request) {

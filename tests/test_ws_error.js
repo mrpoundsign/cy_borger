@@ -1,5 +1,6 @@
 const { chromium } = require('@playwright/test');
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
 (async () => {
   console.log("Starting Playwright test to trigger WebSocket HTMX error...");
   const browser = await chromium.launch();
@@ -19,7 +20,7 @@ const { chromium } = require('@playwright/test');
   });
 
   try {
-    await page.goto('http://localhost:8080/');
+    await page.goto(BASE_URL + '/');
     
     // Register
     await page.click('text=REGISTER ACCOUNT');
@@ -29,8 +30,9 @@ const { chromium } = require('@playwright/test');
     await page.locator('#auth-register-form button:has-text("REGISTER ACCOUNT")').click();
     await page.waitForTimeout(1000);
     
-    // Create Character
-    await page.goto('http://localhost:8080/');
+    // Try to login if auth is enabled
+    console.log("Navigating to " + BASE_URL + '/');
+    await page.goto(BASE_URL + '/');
     await page.click('text=Create Blank Character');
     await page.waitForTimeout(1000);
     const charUrl = page.url();

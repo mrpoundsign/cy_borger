@@ -1,5 +1,7 @@
 const { chromium } = require('@playwright/test');
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
+
 (async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext();
@@ -16,7 +18,7 @@ const { chromium } = require('@playwright/test');
   });
 
   try {
-    await page.goto('http://localhost:8081/');
+    await page.goto(BASE_URL + '/');
     // Login or register
     await page.click('text=REGISTER ACCOUNT');
     await page.locator('#auth-register-form input[name="username"]').fill('testuser123');

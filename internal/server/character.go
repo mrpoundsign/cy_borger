@@ -47,7 +47,7 @@ func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request)
 
 		log.Printf("Failed to parse form: %v", err)
 
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
 
 		return
 
@@ -64,14 +64,8 @@ func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request)
 	// Set edit session cookie automatically for creator
 	setCookie(w, "char_edit_"+c.ID, c.EditCode)
 
-	// If HTMX request, render the character template directly with HX-Redirect header!
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/character/"+c.ID)
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/character/"+c.ID)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Request, c *chargen.Character) {
@@ -119,6 +113,12 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 		}
 		return
 	}
+	if isHTMX && r.Header.Get("HX-Target") == "character-sheet-container" {
+		if err := templates.CharacterSheet(c, canEdit, isGM, game, activeGame, isModal, isHTMX).Render(r.Context(), w); err != nil {
+			log.Printf("Template error (character_sheet.templ): %v", err)
+		}
+		return
+	}
 
 	if err := templates.Base("CY_BORGER - "+c.Name, nil, templates.Character(c, canEdit, isGM, game, activeGame, isModal, isHTMX)).Render(r.Context(), w); err != nil {
 		log.Printf("Template error (character.templ): %v", err)
@@ -161,6 +161,10 @@ func (s *Server) handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAuthCharacter(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	editCode := r.FormValue("edit_code")
 
@@ -173,6 +177,10 @@ func (s *Server) handleAuthCharacter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	inviteCode := r.FormValue("invite_code")
 
@@ -205,12 +213,16 @@ func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
 
 	// Broadcast update to real-time clients!
 	ws.GlobalHub.Broadcast("game_"+g.ID, "char_update:"+c.ID)
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 
 	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
 }
 
 func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	currStr := r.FormValue("hp_current")
 	maxStr := r.FormValue("hp_max")
@@ -236,7 +248,7 @@ func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Broadcast real-time update to connected WebSockets
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "stats", "HP updated to "+strconv.Itoa(c.HP.Current)+"/"+strconv.Itoa(c.HP.Max))
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -246,6 +258,10 @@ func (s *Server) handleUpdateHP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	currStr := r.FormValue("glitches_current")
 	maxStr := r.FormValue("glitches_max")
@@ -271,7 +287,7 @@ func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Broadcast real-time update to connected WebSockets
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "stats", "Glitches updated to "+strconv.Itoa(c.Glitches.Current)+"/"+strconv.Itoa(c.Glitches.Max))
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -281,6 +297,10 @@ func (s *Server) handleUpdateGlitches(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	statName := r.FormValue("stat_name")
 	currStr := r.FormValue("stat_current")
@@ -308,7 +328,7 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 		if c.GameID != "" {
 			s.logAndBroadcastGameEvent(c, "stats", "Stat "+statName+" updated to "+r.FormValue("value"))
 			ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -336,7 +356,7 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 
 		log.Printf("Failed to parse form: %v", err)
 
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
 
 		return
 
@@ -352,13 +372,8 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 
 	setCookie(w, "char_edit_"+c.ID, c.EditCode)
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/character/"+c.ID)
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/character/"+c.ID, http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/character/"+c.ID)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
@@ -377,7 +392,7 @@ func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
@@ -402,7 +417,7 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Failed to parse form: %v", err)
 
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
 
 		return
 
@@ -497,7 +512,7 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "stats", "Updated character details")
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -512,6 +527,10 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	listType := r.FormValue("type")
 
@@ -568,7 +587,7 @@ func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "inventory", "Added to "+listType)
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -649,7 +668,7 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "inventory", "Deleted item from "+listType)
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -707,21 +726,20 @@ func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_deleted:"+c.ID)
+
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	id := r.PathValue("id")
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
@@ -762,7 +780,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
@@ -821,7 +839,7 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ws.GlobalHub.Broadcast("char_"+c.ID, "char_update:"+c.ID)
+
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}

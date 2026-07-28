@@ -51,7 +51,6 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	// WebSockets
 	mux.HandleFunc("GET /ws/game/{id}", s.handleWSGame)
-	mux.HandleFunc("GET /ws/character/{id}", s.handleWSCharacter)
 }
 
 // Helpers for Session Cookies
