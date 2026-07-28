@@ -70,13 +70,13 @@ func GameHead(game *db.Game) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 13, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 13, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" style=\"display:none;\"></span><script>\n\t\tconst protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';\n\t\tlet gameId = document.getElementById('game-data').dataset.id;\n\t\tconst socket = new WebSocket(protocol + '//' + window.location.host + '/ws/game/' + gameId);\n\t\tsocket.onmessage = function (e) {\n\t\t\tconst parts = e.data.split(\":\");\n\t\t\tconst type = parts[0];\n\t\t\tconst charId = parts[1];\n\n\t\t\tif (type === \"log_entry\") {\n\t\t\t\tconst eventType = parts[1];\n\t\t\t\tconst charName = parts[2];\n\t\t\t\tconst msg = atob(parts[3]);\n\t\t\t\t\n\t\t\t\tconst timeString = new Date().toLocaleTimeString('en-US', { hour12: false });\n\t\t\t\tconst html = `\n\t\t\t\t<div class=\"log-entry flex gap-sm mb-sm p-sm\" data-type=\"${eventType}\" style=\"border-bottom:1px solid #222;\">\n\t\t\t\t\t<div class=\"text-muted\" style=\"white-space:nowrap;\">[${timeString}]</div>\n\t\t\t\t\t<div class=\"text-white\">\n\t\t\t\t\t\t<strong class=\"text-accent\">${charName}</strong>\n\t\t\t\t\t\t<span style=\"color:#aaa;\">${msg}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>`;\n\t\t\t\t\n\t\t\t\tconst logBox = document.getElementById(\"activity-log-box\");\n\t\t\t\tif (logBox) {\n\t\t\t\t\tconst filterCheckbox = document.querySelector(`input[name=\"type\"][value=\"${eventType}\"]`);\n\t\t\t\t\tif (!filterCheckbox || filterCheckbox.checked) {\n\t\t\t\t\t\tconst noLogs = logBox.querySelector('.no-logs');\n\t\t\t\t\t\tif (noLogs) noLogs.remove();\n\t\t\t\t\t\tlogBox.insertAdjacentHTML(\"afterbegin\", html);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\tdocument.body.dispatchEvent(new Event('party-update'));\n\n\t\t\tconst modal = document.getElementById(\"char-modal\");\n\t\t\tif (modal && modal.dataset.charId === charId) {\n\t\t\t\tif (document.activeElement && document.activeElement.closest('.modal-content')) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.ajax('GET', '/character/' + charId + '?modal=true', {\n\t\t\t\t\t\ttarget: '#char-modal-container',\n\t\t\t\t\t\tswap: 'innerHTML'\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\n\t\tfunction toggleEditSection(sectionId, displayStyle = 'block') {\n\t\t\tconst editEl = document.getElementById(sectionId + '-edit');\n\t\t\tconst viewEl = document.getElementById(sectionId + '-view');\n\t\t\tif (editEl) {\n\t\t\t\tconst isHidden = editEl.style.display === 'none' || editEl.style.display === '';\n\t\t\t\teditEl.style.display = isHidden ? displayStyle : 'none';\n\t\t\t\tif (viewEl) {\n\t\t\t\t\tviewEl.style.display = isHidden ? 'none' : 'block';\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" style=\"display:none;\"></span><script>\n\t\t(function() {\n\t\t\tlet socket = null;\n\t\t\tlet reconnectTimer = null;\n\t\t\tlet delay = 1000;\n\n\t\t\tfunction connect() {\n\t\t\t\tconst gameData = document.getElementById('game-data');\n\t\t\t\tif (!gameData) return;\n\t\t\t\tconst gameId = gameData.dataset.id;\n\t\t\t\tconst protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';\n\t\t\t\tconst wsUrl = protocol + '//' + window.location.host + '/ws/game/' + gameId;\n\n\t\t\t\tsocket = new WebSocket(wsUrl);\n\t\t\t\twindow.cyGameSocket = socket;\n\t\t\t\twindow.cyGameId = gameId;\n\n\t\t\t\tsocket.onopen = function () {\n\t\t\t\t\tdelay = 1000;\n\t\t\t\t\thideDisconnectBanner();\n\t\t\t\t\tdocument.body.dispatchEvent(new Event('party-update'));\n\t\t\t\t};\n\n\t\t\t\tsocket.onmessage = function (e) {\n\t\t\t\t\tconst parts = e.data.split(\":\");\n\t\t\t\t\tconst type = parts[0];\n\t\t\t\t\tconst charId = parts[1];\n\n\t\t\t\t\tif (type === \"log_entry\") {\n\t\t\t\t\t\tconst eventType = parts[1];\n\t\t\t\t\t\tconst charName = parts[2];\n\t\t\t\t\t\tconst msg = atob(parts[3]);\n\t\t\t\t\t\t\n\t\t\t\t\t\tconst timeString = new Date().toLocaleTimeString('en-US', { hour12: false });\n\t\t\t\t\t\tconst html = `\n\t\t\t\t\t\t<div class=\"log-entry flex gap-sm mb-sm p-sm\" data-type=\"${eventType}\" style=\"border-bottom:1px solid #222;\">\n\t\t\t\t\t\t\t<div class=\"text-muted\" style=\"white-space:nowrap;\">[${timeString}]</div>\n\t\t\t\t\t\t\t<div class=\"text-white\">\n\t\t\t\t\t\t\t\t<strong class=\"text-accent\">${charName}</strong>\n\t\t\t\t\t\t\t\t<span style=\"color:#aaa;\">${msg}</span>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>`;\n\t\t\t\t\t\t\n\t\t\t\t\t\tconst logBox = document.getElementById(\"activity-log-box\");\n\t\t\t\t\t\tif (logBox) {\n\t\t\t\t\t\t\tconst filterCheckbox = document.querySelector(`input[name=\"type\"][value=\"${eventType}\"]`);\n\t\t\t\t\t\t\tif (!filterCheckbox || filterCheckbox.checked) {\n\t\t\t\t\t\t\t\tconst noLogs = logBox.querySelector('.no-logs');\n\t\t\t\t\t\t\t\tif (noLogs) noLogs.remove();\n\t\t\t\t\t\t\t\tlogBox.insertAdjacentHTML(\"afterbegin\", html);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tdocument.body.dispatchEvent(new Event('party-update'));\n\n\t\t\t\t\tconst modal = document.getElementById(\"char-modal\");\n\t\t\t\t\tif (modal && modal.dataset.charId === charId) {\n\t\t\t\t\t\tif (document.activeElement && document.activeElement.closest('.modal-content')) {\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.ajax('GET', '/character/' + charId + '?modal=true', {\n\t\t\t\t\t\t\t\ttarget: '#char-modal-container',\n\t\t\t\t\t\t\t\tswap: 'innerHTML'\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t};\n\n\t\t\t\tsocket.onclose = function () {\n\t\t\t\t\tshowDisconnectBanner();\n\t\t\t\t\tscheduleReconnect();\n\t\t\t\t};\n\n\t\t\t\tsocket.onerror = function () {\n\t\t\t\t\tsocket.close();\n\t\t\t\t};\n\t\t\t}\n\n\t\t\tfunction scheduleReconnect() {\n\t\t\t\tif (reconnectTimer) clearTimeout(reconnectTimer);\n\t\t\t\treconnectTimer = setTimeout(function () {\n\t\t\t\t\tdelay = Math.min(delay * 1.5, 5000);\n\t\t\t\t\tconnect();\n\t\t\t\t}, delay);\n\t\t\t}\n\n\t\t\tfunction showDisconnectBanner() {\n\t\t\t\tlet banner = document.getElementById('ws-disconnect-banner');\n\t\t\t\tif (!banner) {\n\t\t\t\t\tbanner = document.createElement('div');\n\t\t\t\t\tbanner.id = 'ws-disconnect-banner';\n\t\t\t\t\tbanner.className = 'bg-danger-dark border-danger text-danger font-bold text-center p-sm text-sm';\n\t\t\t\t\tbanner.style.cssText = 'position:fixed; bottom:15px; right:15px; z-index:9999; box-shadow:0 0 15px rgba(255,0,85,0.4); border-style:solid; border-width:1px; border-radius:4px;';\n\t\t\t\t\tbanner.innerHTML = '⚡ DISCONNECTED - RECONNECTING TO TERMINAL...';\n\t\t\t\t\tdocument.body.appendChild(banner);\n\t\t\t\t} else {\n\t\t\t\t\tbanner.style.display = 'block';\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction hideDisconnectBanner() {\n\t\t\t\tconst banner = document.getElementById('ws-disconnect-banner');\n\t\t\t\tif (banner) {\n\t\t\t\t\tbanner.style.display = 'none';\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (document.readyState === 'loading') {\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', connect);\n\t\t\t} else {\n\t\t\t\tconnect();\n\t\t\t}\n\t\t})();\n\n\t\tfunction toggleEditSection(sectionId, displayStyle = 'block') {\n\t\t\tconst editEl = document.getElementById(sectionId + '-edit');\n\t\t\tconst viewEl = document.getElementById(sectionId + '-view');\n\t\t\tif (editEl) {\n\t\t\t\tconst isHidden = editEl.style.display === 'none' || editEl.style.display === '';\n\t\t\t\teditEl.style.display = isHidden ? displayStyle : 'none';\n\t\t\t\tif (viewEl) {\n\t\t\t\t\tviewEl.style.display = isHidden ? 'none' : 'block';\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,14 +105,14 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"w-full\" style=\"max-width:1200px; margin:0 auto;\"><div class=\"flex justify-between items-center mb-lg pb-sm\" style=\"border-bottom: 1px solid #222;\"><a href=\"/\" class=\"text-accent no-decoration font-bold text-sm text-uppercase\">⬅️ Back to Home</a> <span class=\"text-sm text-muted text-uppercase flex items-center gap-sm\"><img src=\"/favicon.svg\" alt=\"logo\" class=\"border-accent\" style=\"height:20px; width:20px; border-radius:3px;\"> CY_BORGER Game Terminal</span></div><div id=\"char-modal-container\"></div><div class=\"bg-dark p-lg mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h1 class=\"text-accent text-uppercase m-0 px-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">GAME: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"w-full\" style=\"max-width:1200px; margin:0 auto;\"><div class=\"flex justify-between items-center mb-lg pb-sm\" style=\"border-bottom: 1px solid #222;\"><a href=\"/\" class=\"text-accent no-decoration font-bold text-sm text-uppercase\">⬅️ Back to Home</a> <span class=\"text-sm text-muted text-uppercase flex items-center gap-sm\"><img src=\"/favicon.svg\" alt=\"logo\" class=\"border-accent\" style=\"height:20px; width:20px; border-radius:3px;\"> CY_BORGER Game Terminal</span></div><div id=\"char-modal-container\"></div><div class=\"bg-dark p-lg mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h1 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">GAME: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(game.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 93, Col: 190}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 158, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(game.CreatedAt.Format("Jan 02, 2006 15:04 MST"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 96, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 161, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -143,7 +143,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-copy-gmlink-" + game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 99, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 164, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 			if templ_7745c5c3_Err != nil {
@@ -156,7 +156,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-copy-gmcode-" + game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 100, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 165, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
@@ -169,7 +169,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 107, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 172, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
@@ -182,7 +182,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.GMCode)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 107, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 172, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 			if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 107, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 172, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
@@ -213,7 +213,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 126, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 191, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 			if templ_7745c5c3_Err != nil {
@@ -231,7 +231,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-random-color-" + game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 128, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 193, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -244,7 +244,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(game.InviteCode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 131, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 196, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -257,7 +257,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-copy-invite-" + game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 132, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 197, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
@@ -270,7 +270,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.InviteCode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 133, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 198, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -288,7 +288,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/game/" + game.ID + "/auth")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 140, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 205, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 			if templ_7745c5c3_Err != nil {
@@ -301,7 +301,7 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-unlock-gm-" + game.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 142, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 207, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 			if templ_7745c5c3_Err != nil {
@@ -316,14 +316,14 @@ func GameContent(game *db.Game, characters []chargen.Character, isGM bool, curre
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"bg-dark p-lg mt-xl mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"text-accent text-uppercase m-0 px-sm flex items-center gap-sm\" style=\"position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;\">📡 ACTIVITY LOG</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\"><form id=\"log-filter-form\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"bg-dark p-lg mt-xl mb-lg border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm flex items-center gap-sm\">📡 ACTIVITY LOG</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\"><form id=\"log-filter-form\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/game/" + game.ID + "/logs")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/game.templ`, Line: 152, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/game.templ`, Line: 217, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 		if templ_7745c5c3_Err != nil {

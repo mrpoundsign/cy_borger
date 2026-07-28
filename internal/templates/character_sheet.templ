@@ -18,12 +18,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 			</div>
 		}
 		<!-- Banners for Dead/Draft state -->
-		<div
-			id="character-banners"
-			if isHTMX {
-				hx-swap-oob="true"
-			}
-		>
+		<div id="character-banners">
 			if character.IsDead {
 				<div class="bg-danger-light border-danger p-md mb-lg flex justify-between items-center flex-wrap gap-md" style="box-shadow: 0 0 18px rgba(255,0,85,0.35); border-style: solid; border-width: 2px;">
 					<div>
@@ -38,7 +33,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 						</div>
 					</div>
 					if canEdit || isGM {
-						<form hx-post={ string(templ.URL("/character/" + character.ID + "/revive")) } hx-swap="none" class="m-0">
+						<form hx-post={ string(templ.URL("/character/" + character.ID + "/revive")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="m-0">
 							<button type="submit" id={ "btn-revive-sheet-" + character.ID } class="btn-outline text-sm border-danger text-danger">⚡ REVIVE OPERATOR</button>
 						</form>
 					}
@@ -50,7 +45,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 						<div class="text-success font-bold text-lg text-uppercase">⚡ DRAFT CHARACTER PREVIEW</div>
 						<div class="text-muted text-sm mt-xs">Reroll as many times as you like. Click "KEEP THIS CHARACTER" to save it permanently!</div>
 					</div>
-					<form hx-post={ string(templ.URL("/character/" + character.ID + "/keep")) } hx-swap="none" class="m-0">
+					<form hx-post={ string(templ.URL("/character/" + character.ID + "/keep")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="m-0">
 						<button type="submit" id={ "btn-keep-sheet-" + character.ID } class="btn bg-success text-black text-md p-sm">💾 KEEP THIS CHARACTER</button>
 					</form>
 				</div>
@@ -59,9 +54,6 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 		<div
 			id="character-toolbar"
 			class="bg-dark border-accent p-md mb-lg flex justify-between items-center flex-wrap gap-md"
-			if isHTMX {
-				hx-swap-oob="true"
-			}
 		>
 			<div>
 				<span>CHARACTER ID: <strong class="text-accent">{ character.ID }</strong></span>
@@ -121,7 +113,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 								<p class="text-muted text-sm mb-md" style="line-height:1.4;">
 									Mark <strong>{ character.Name }</strong> as deceased in the GRAVEYARD. Add cause of death or final words:
 								</p>
-								<form hx-post={ string(templ.URL("/character/" + character.ID + "/kill")) } hx-swap="none" class="flex flex-col gap-md" onsubmit="toggleEditSection('kill-char')">
+								<form hx-post={ string(templ.URL("/character/" + character.ID + "/kill")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="flex flex-col gap-md" onsubmit="toggleEditSection('kill-char')">
 									<textarea name="death_note" placeholder="e.g. Flatlined by Cy-Spider in Sector 4" class="w-full bg-dark text-white p-sm border-danger text-sm" style="min-height:60px; font-family:inherit;"></textarea>
 									<div class="flex gap-sm justify-center mt-sm">
 										<button type="button" id={ "btn-cancel-flatline-sheet-" + character.ID } class="btn-outline" onclick="toggleEditSection('kill-char')">Cancel</button>
@@ -136,7 +128,7 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 					<button id={ "btn-delete-sheet-" + character.ID } class="btn-danger-small ml-xs bg-danger-light p-xs text-xs" style="border-color:#ff3366; color:#ff3366;" onclick="toggleEditSection('delete-char', 'flex')">💣 DELETE</button>
 					<div id="delete-char-edit" class="modal-overlay" style="display:none;">
 						<div class="modal-content" style="border-color:#ff3366; box-shadow:0 0 20px rgba(255,51,102,0.4);">
-							<h2 class="mb-sm" style="color:#ff3366;">⚠️ PERMANENT DELETION</h2>
+							<h2 class="text-danger mb-sm">⚠️ PERMANENT DELETION</h2>
 							<p class="text-muted text-sm mb-md" style="line-height:1.4;">
 								This action cannot be undone. To delete <strong>{ character.Name }</strong>, type the character name below:
 							</p>
@@ -188,7 +180,7 @@ document.addEventListener("input", function(e) {
 				}
 				<!-- Clean Text View (Default) -->
 				<div id="identity-view">
-					<h1 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">YOU ARE { character.Name }</h1>
+					<h1 class="box-header-title text-accent text-uppercase m-0 px-sm">YOU ARE { character.Name }</h1>
 					<div class="text-muted text-sm mb-md">
 						if character.Handle != "" {
 							{ "@" + character.Handle }
@@ -196,7 +188,6 @@ document.addEventListener("input", function(e) {
 							<span class="text-muted">[No Handle]</span>
 						}
 					</div>
-
 					<p class="mb-md" style="line-height: 1.7;">
 						if character.Style != "" || character.Feature != "" || character.Want != "" || character.Quirk != "" || character.Obsession != "" {
 							A <span class="font-bold text-white">{ character.Style }</span> <span class="font-bold text-white">{ character.Class.Name }</span>; 
@@ -266,42 +257,37 @@ document.addEventListener("input", function(e) {
 					</div>
 				}
 			</div>
-
 			<!-- Top Center: Vertical Stats & Vitals Block -->
 			<div class="bg-dark p-lg border-muted flex flex-col" style="border-width:1px; border-style:solid; min-width:260px; max-width:100%; position:relative; padding-top: 30px;">
-				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">STATS</h2>
+				<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">STATS</h2>
 				<div class="flex flex-col gap-sm justify-around py-xs">
-					for name, stat := range character.Abilities {
+					for _, item := range character.Stats.List() {
 						<div class="flex items-center justify-between gap-sm text-accent bg-black p-xs border-accent" style="border-width:1px; border-style:solid;">
-							<span class="font-bold text-uppercase text-md">{ name }:</span>
+							<span class="font-bold text-uppercase text-md">{ item.Name }:</span>
 							if canEdit {
-								<form id={ "stat-form-" + name } class="inline-flex items-center gap-xs m-0">
-									<input type="hidden" name="stat_name" value={ name }/>
+								<form id={ "stat-form-" + item.Name } class="inline-flex items-center gap-xs m-0">
+									<input type="hidden" name="stat_name" value={ item.Name }/>
 									<input
 										type="number"
 										name="stat_current"
-										value={ fmt.Sprint(stat.Current) }
+										value={ fmt.Sprint(item.Value) }
 										class="bg-black border-accent text-accent text-center text-md p-xs"
 										style="width: 58px;"
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_stat")) }
-										hx-include={ "#stat-form-" + name }
+										hx-include={ "#stat-form-" + item.Name }
 										hx-trigger="change, input delay:300ms"
+										hx-target="#character-sheet-container"
 										hx-swap="none"
 									/>
 								</form>
 							} else {
 								<span class="text-white font-bold text-md">
-									if stat.Current > 0 {
-										+{ fmt.Sprint(stat.Current) }
-									} else {
-										{ fmt.Sprint(stat.Current) }
-									}
+									{ fmt.Sprintf("%+d", item.Value) }
 								</span>
 							}
 						</div>
 					}
 				</div>
-
 				<!-- Dedicated Vitals & Glitches Box Below Stats -->
 				<div class="bg-black border-accent p-md mt-md flex flex-col gap-sm" style="box-shadow: 0 0 10px rgba(255, 230, 0, 0.15); position:relative;">
 					if canEdit {
@@ -325,6 +311,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
 										hx-include="#hp-current-form, #hp-max-hidden"
 										hx-trigger="change, input delay:300ms"
+										hx-target="#character-sheet-container"
 										hx-swap="none"
 									/>
 									<input type="hidden" id="hp-max-hidden" name="hp_max" value={ fmt.Sprint(character.HP.Max) }/>
@@ -347,6 +334,7 @@ document.addEventListener("input", function(e) {
 										hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
 										hx-include="#glitches-current-form, #glitches-max-hidden"
 										hx-trigger="change, input delay:300ms"
+										hx-target="#character-sheet-container"
 										hx-swap="none"
 									/>
 									<input type="hidden" id="glitches-max-hidden" name="glitches_max" value={ fmt.Sprint(character.Glitches.Max) }/>
@@ -370,6 +358,7 @@ document.addEventListener("input", function(e) {
 										hx-include="#creds-form"
 										hx-trigger="change, input delay:300ms"
 										hx-vals='{"field": "creds"}'
+										hx-target="#character-sheet-container"
 										hx-swap="none"
 									/> <span class="text-md text-accent">¤</span>
 								</form>
@@ -399,6 +388,7 @@ document.addEventListener("input", function(e) {
 											hx-put={ string(templ.URL("/character/" + character.ID + "/update_hp")) }
 											hx-include="#hp-form"
 											hx-trigger="change, input delay:300ms"
+											hx-target="#character-sheet-container"
 											hx-swap="none"
 										/>
 									</form>
@@ -416,6 +406,7 @@ document.addEventListener("input", function(e) {
 											hx-put={ string(templ.URL("/character/" + character.ID + "/update_glitches")) }
 											hx-include="#glitches-form"
 											hx-trigger="change, input delay:300ms"
+											hx-target="#character-sheet-container"
 											hx-swap="none"
 										/>
 										<span class="text-muted text-xs">({ character.GlitchDie })</span>
@@ -426,7 +417,6 @@ document.addEventListener("input", function(e) {
 					}
 				</div>
 			</div>
-
 			<!-- Top Right: Class -->
 			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:260px; max-width:100%; position:relative; padding-top: 30px;">
 				if canEdit {
@@ -434,7 +424,7 @@ document.addEventListener("input", function(e) {
 				}
 				<!-- Clean Text View (Default) -->
 				<div id="class-view">
-					<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">{ character.Class.Name }</h2>
+					<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">{ character.Class.Name }</h2>
 					<div class="text-accent font-bold text-sm mb-md">{ character.Class.Glitch }</div>
 					<p class="font-italic mb-md" style="line-height: 1.7;">
 						{ character.Class.Description }
@@ -500,12 +490,11 @@ document.addEventListener("input", function(e) {
 				}
 			</div>
 		</div>
-
 		<!-- Bottom Row: Gear & Arsenal, Cybertech & Apps -->
 		<div class="flex flex-wrap gap-lg">
 			<!-- Bottom Left: Gear -->
 			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:320px; flex:1 1 480px; max-width:100%; position:relative; padding-top: 30px;">
-				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">GEAR & ARSENAL</h2>
+				<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">GEAR & ARSENAL</h2>
 				<div style="overflow-x:auto; width:100%; mb-md;">
 					<table class="w-full text-left" style="border-collapse: collapse; min-width: 440px;">
 						<thead>
@@ -611,10 +600,9 @@ document.addEventListener("input", function(e) {
 					</form>
 				}
 			</div>
-
 			<!-- Bottom Right: Cybertech & Apps -->
 			<div class="bg-dark p-lg border-muted flex-1" style="border-width:1px; border-style:solid; min-width:320px; flex:1 1 450px; max-width:100%; position:relative; padding-top: 30px;">
-				<h2 class="text-accent text-uppercase m-0 px-sm" style="position:absolute; top:-18px; left:15px; font-size:2.0rem; background-color:var(--bg-color); letter-spacing:1px;">CYBERTECH & APPS</h2>
+				<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">CYBERTECH & APPS</h2>
 				<h3 class="text-accent text-lg mb-sm">CYBERWARE</h3>
 				<ul style="list-style-type: square; padding-left: 20px; line-height: 1.8;">
 					for i, item := range character.Cybertech {
@@ -661,5 +649,76 @@ document.addEventListener("input", function(e) {
 				}
 			</div>
 		</div>
+		if !isModal && character.GameID != "" {
+			<script id="char-ws-data" data-game-id={ character.GameID } data-char-id={ character.ID }>
+				(function() {
+					const el = document.getElementById('char-ws-data');
+					if (!el || !el.dataset) return;
+					const charId = el.dataset.charId;
+					const gameId = el.dataset.gameId;
+
+					if (window.cyGameSocket && window.cyGameId === gameId) {
+						return;
+					}
+
+					let socket = null;
+					let reconnectTimer = null;
+					let delay = 1000;
+
+					function connectCharSocket() {
+						const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+						const wsUrl = protocol + '//' + window.location.host + '/ws/game/' + gameId;
+
+						socket = new WebSocket(wsUrl);
+
+						socket.onopen = function () {
+							delay = 1000;
+						};
+
+						socket.onmessage = function (e) {
+							const parts = e.data.split(":");
+							const type = parts[0];
+							const targetCharId = parts[1];
+
+							if (type === "char_update" && (targetCharId === charId || targetCharId === "all")) {
+								const activeEl = document.activeElement;
+								if (activeEl && activeEl.closest && activeEl.closest('#character-sheet-container form')) {
+									return;
+								}
+								if (window.charRefreshTimer) clearTimeout(window.charRefreshTimer);
+								window.charRefreshTimer = setTimeout(function() {
+									if (typeof htmx !== 'undefined') {
+										htmx.ajax('GET', '/character/' + charId, {
+											target: '#character-sheet-container',
+											swap: 'outerHTML'
+										});
+									} else {
+										window.location.reload();
+									}
+								}, 100);
+							}
+						};
+
+						socket.onclose = function () {
+							if (reconnectTimer) clearTimeout(reconnectTimer);
+							reconnectTimer = setTimeout(function () {
+								delay = Math.min(delay * 1.5, 5000);
+								connectCharSocket();
+							}, delay);
+						};
+
+						socket.onerror = function () {
+							socket.close();
+						};
+					}
+
+					if (document.readyState === 'loading') {
+						document.addEventListener('DOMContentLoaded', connectCharSocket);
+					} else {
+						connectCharSocket();
+					}
+				})();
+			</script>
+		}
 	</div>
 }

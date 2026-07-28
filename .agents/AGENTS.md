@@ -9,7 +9,6 @@
 - **Testing & Playwright**:
   - All Playwright tests must be placed in the `tests/` directory to keep the project root clean.
   - Prefer running individual test files (e.g., `npx playwright test tests/test_inject.js`) instead of the full suite unless specifically requested, to save time.
-  - When modifying Go files and running tests outside of a watcher like Air, always manually rebuild the application before running Playwright tests to ensure the test environment runs the latest code.
   - Be precise with Playwright selectors and text assertions, especially regarding UI elements with emojis (e.g., `💀 FLATLINE`).
 - **Go Handlers & Forms**:
   - Always call `r.ParseForm()` before accessing values via `r.FormValue()` in POST requests.
@@ -21,4 +20,6 @@
   - **Micro-updates**: Favor swapping specific, minimal DOM elements or using `hx-swap-oob` for targeted updates rather than replacing entire containers (e.g. don't redraw an entire character sheet just to change a status badge).
   - **CSS Consolidation**: Avoid inline `style="..."` attributes. Use utility classes from the central stylesheet (`style.css`) and rely on predefined CSS variables for colors (e.g., `var(--color-danger)`).
   - **Unique Element IDs**: Ensure interactive elements have unique, descriptive IDs containing entity IDs (e.g., `btn-flatline-{{.ID}}-modal`) to differentiate clicks between contexts (like cards vs modals) for Playwright testing.
-  - **Consistent Terminology**: Use uniform terminology across the UI for actions (e.g., always use "FLATLINE", do not mix "Kill" and "Flatline").
+- **Consistent Terminology**: Use uniform terminology across the UI for actions (e.g., always use "FLATLINE", do not mix "Kill" and "Flatline").
+
+- **Temporary Files & Cleanup**: Always place temporary files (like scratch scripts or data files) in the `tmp/` directory. Delete these files as soon as they are no longer needed to keep the repository clean.

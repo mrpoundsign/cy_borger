@@ -1,12 +1,13 @@
 root = "."
 testdata_dir = "testdata"
-tmp_dir = "tmp"
+tmp_dir = "tmp/air"
 
 [build]
-  cmd = "./build.sh -o ./tmp/cy_borger"
+  cmd = "./tools/build.sh -o ./tmp/cy_borger"
   bin = "./tmp/cy_borger"
-  exclude_file = ["static/css/style.min.css","playwright.config.js", "package.json", "package-lock.json" ]
-  exclude_regex = ["_test.go"]
+  exclude_file = ["playwright.config.js" ]
+  exclude_regex = ["_test.go", ".min.css"]
+  exclude_dir = ["tests", "tmp"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""

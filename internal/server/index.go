@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
+	"github.com/mrpoundsign/cy_borger/internal/templates"
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
-	"github.com/mrpoundsign/cy_borger/templates"
 )
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {

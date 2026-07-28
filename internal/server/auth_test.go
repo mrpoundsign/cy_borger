@@ -22,8 +22,8 @@ func TestAuthRegisterLogin(t *testing.T) {
 
 	mux.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusSeeOther {
-		t.Errorf("expected redirect after register, got %v", status)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("expected 200 OK with HX-Redirect after register, got %v", status)
 	}
 
 	// Verify user exists
@@ -42,7 +42,7 @@ func TestAuthRegisterLogin(t *testing.T) {
 
 	mux.ServeHTTP(rrLogin, reqLogin)
 
-	if status := rrLogin.Code; status != http.StatusSeeOther {
-		t.Errorf("expected redirect after login, got %v", status)
+	if status := rrLogin.Code; status != http.StatusOK {
+		t.Errorf("expected 200 OK with HX-Redirect after login, got %v", status)
 	}
 }

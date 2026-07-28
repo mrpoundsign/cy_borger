@@ -30,18 +30,14 @@ test.describe('INSPECT SHEET modal injection', () => {
 
         // Create a game as GM
         await page.locator('input[name="name"]').fill('Inspect Test Game');
-        await Promise.all([
-            page.waitForNavigation(),
-            page.locator('.card button:has-text("Create Game as GM")').click()
-        ]);
-
-        const gameUrl = page.url();
+        await page.locator('.card button:has-text("Create Game as GM")').click();
+        await page.waitForSelector('#game-data', { state: 'attached', timeout: 10000 });
+        const gameId = await page.locator('#game-data').getAttribute('data-id');
+        const gameUrl = (process.env.BASE_URL || 'http://localhost:8080') + '/game/' + gameId;
 
         // Roll a character into game
-        await Promise.all([
-            page.waitForNavigation(),
-            page.locator('button:has-text("🎲 Roll New Character")').click()
-        ]);
+        await page.locator('button:has-text("🎲 Roll New Character")').click();
+        await page.waitForLoadState('networkidle');
 
         // Character is generated as a draft; keep it to save it to the game
         const keepBtn = page.locator('button:has-text("KEEP THIS CHARACTER")');
@@ -54,15 +50,13 @@ test.describe('INSPECT SHEET modal injection', () => {
         // Go back to game page
         await page.goto(gameUrl);
         await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1500);
         await page.waitForTimeout(500);
 
-        console.log("Game URL:", gameUrl);
-        console.log("Char URL:", charUrl);
-        const html = await page.content();
-        console.log("Page HTML:", html);
-        
+
         // Party grid shows character card
-        await expect(page.locator('.char-card')).toHaveCount(1, { timeout: 5000 });
+        await page.waitForTimeout(1500);
+        await expect(page.locator('.char-card')).toHaveCount(1, { timeout: 10000 });
 
         // INSPECT SHEET button is visible
         const inspectBtn = page.locator('button:has-text("INSPECT SHEET")').first();

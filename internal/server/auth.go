@@ -9,6 +9,10 @@ import (
 )
 
 func (s *Server) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	user := s.getUserFromSession(r)
 	if user == nil {
 		s.renderError(w, r, "Authentication required.", http.StatusUnauthorized)
@@ -51,6 +55,10 @@ func (s *Server) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
 
@@ -73,16 +81,15 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	setCookie(w, "cy_user_id", u.ID)
 	setCookie(w, "cy_username", u.Handle)
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		s.renderError(w, r, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
 
@@ -100,13 +107,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	setCookie(w, "cy_user_id", u.ID)
 	setCookie(w, "cy_username", u.Handle)
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -125,11 +127,6 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", "/")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.Header().Set("HX-Redirect", "/")
+	w.WriteHeader(http.StatusOK)
 }

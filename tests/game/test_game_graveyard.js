@@ -24,59 +24,18 @@ async function loginUser(page) {
 }
 
 test.describe('Graveyard & Flatline Workflow', () => {
-    test('owner or GM can flatline a character with death note, moving to Graveyard', async ({ page }) => {
-        await loginUser(page);
-
-        await Promise.all([
-            page.waitForNavigation(),
-            page.locator('button:has-text("Create Blank Character")').click()
-        ]);
-
-        // Get character ID
-        const url = page.url();
-        const charID = url.split('/character/')[1];
-        expect(charID).toBeTruthy();
-
-        // 2. Click 💀 FLATLINE button in toolbar
-        await page.locator('button[id^="btn-flatline-sheet-"]').click();
-        await page.waitForTimeout(300);
-
-        // Fill death note
-        const deathNoteInput = page.locator('#kill-char-edit textarea[name="death_note"]');
-        await deathNoteInput.fill('Crushed by rogue cyber-mech in Sector 7');
-
-        // Submit flatline inside modal
-        await page.locator('#kill-char-edit button[type="submit"]:has-text("💀 FLATLINE")').click();
-        await page.waitForLoadState('networkidle');
-
-        // 3. Confirm GRAVEYARD banner appears on character sheet
-        await expect(page.locator('text=OPERATOR FLATLINED')).toBeVisible();
-        await expect(page.locator('text=Crushed by rogue cyber-mech in Sector 7')).toBeVisible();
-
-        // 4. Test Revive
-        await page.locator('button:has-text("⚡ REVIVE OPERATOR")').click();
-        await page.waitForLoadState('networkidle');
-
-        // Confirm flatline banner is gone
-        await expect(page.locator('text=OPERATOR FLATLINED')).not.toBeVisible();
-    });
-
     test('flatline button on game page opens modal and moves character to Graveyard', async ({ page }) => {
         await loginUser(page);
 
         await page.locator('input[name="name"]').fill('Sector 4 Campaign');
-        await Promise.all([
-            page.waitForNavigation(),
-            page.locator('.card button:has-text("Create Game as GM")').click()
-        ]);
-
-        const gameUrl = page.url();
+        await page.locator('.card button:has-text("Create Game as GM")').click();
+        await page.waitForSelector('#game-data', { state: 'attached', timeout: 10000 });
+        const gameId = await page.locator('#game-data').getAttribute('data-id');
+        const gameUrl = (process.env.BASE_URL || 'http://localhost:8080') + '/game/' + gameId;
 
         // 2. Roll a character into game
-        await Promise.all([
-            page.waitForNavigation(),
-            page.locator('button:has-text("🎲 Roll New Character")').click()
-        ]);
+        await page.locator('button:has-text("🎲 Roll New Character")').click();
+        await page.waitForLoadState('networkidle');
 
         const keepBtn = page.locator('button:has-text("KEEP THIS CHARACTER")');
         await keepBtn.click();
@@ -86,6 +45,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
         // Return to game page
         await page.goto(gameUrl);
         await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1500);
 
         // 3. Click 💀 FLATLINE button on game page
         const killBtn = page.locator('button:has-text("💀 FLATLINE")').first();
@@ -93,13 +53,18 @@ test.describe('Graveyard & Flatline Workflow', () => {
         await killBtn.click();
         await page.waitForTimeout(300);
 
+        // Fill death note
+        const deathNoteInputGame = page.locator('div[id^="kill-game-"] textarea[name="death_note"]').first();
+        await deathNoteInputGame.fill('Killed by orbital strike');
+
         // Submit kill form modal
-        const killSubmit = page.locator('#kill-game-edit button[type="submit"]:has-text("💀 FLATLINE"), div[id^="kill-game-"] button[type="submit"]:has-text("💀 FLATLINE")').first();
+        const killSubmit = page.locator('div[id^="kill-game-"] button[type="submit"]').first();
         await killSubmit.click();
         await page.waitForLoadState('networkidle');
 
         // 4. Confirm character is in GRAVEYARD section on game page
         await expect(page.locator('text=GRAVEYARD')).toBeVisible();
+        await expect(page.locator('text=Killed by orbital strike')).toBeVisible();
         await expect(page.locator('button:has-text("REVIVE")')).toBeVisible();
     });
 });

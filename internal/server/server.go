@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
-	"github.com/mrpoundsign/cy_borger/templates"
+	"github.com/mrpoundsign/cy_borger/internal/templates"
 )
 
 type Server struct {
@@ -51,7 +51,6 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	// WebSockets
 	mux.HandleFunc("GET /ws/game/{id}", s.handleWSGame)
-	mux.HandleFunc("GET /ws/character/{id}", s.handleWSCharacter)
 }
 
 // Helpers for Session Cookies
