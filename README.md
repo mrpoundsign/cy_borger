@@ -2,10 +2,12 @@
 
 A lightning-fast, cyberpunk-themed character generator and campaign manager built with Go, HTMX, and SQLite.
 
-CY_BORGER is designed for the [CY_BORG](https://cy-borg.com/) tabletop roleplaying game. 
+CY_BORGER is designed for the [CY_BORG](https://freeleaguepublishing.com/games/cy_borg/) tabletop roleplaying game. 
 
-## Demo
-**[🔗 Try the Live Demo!](https://cy-borger.poundsigndesign.com/game/cedf07b275d9)**
+## Check it out!
+**🔗 It's alive! at [https://cy-borger.poundsigndesign.com/game/cedf07b275d9](https://cy-borger.poundsigndesign.com/game/cedf07b275d9)**
+
+`user: demo, pass: demo`
 
 ## Features
 
