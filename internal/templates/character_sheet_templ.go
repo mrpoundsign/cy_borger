@@ -637,7 +637,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(character.Style)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 194, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 193, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
@@ -650,7 +650,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var39 string
 			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 194, Col: 128}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 193, Col: 128}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 			if templ_7745c5c3_Err != nil {
@@ -663,7 +663,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(character.Feature)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 195, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 194, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {
@@ -676,7 +676,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var41 string
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(character.Want)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 195, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 194, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
@@ -689,7 +689,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var42 string
 			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(character.Quirk)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 195, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 194, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 			if templ_7745c5c3_Err != nil {
@@ -702,7 +702,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(character.Obsession)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 195, Col: 90}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 194, Col: 90}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 			if templ_7745c5c3_Err != nil {
@@ -726,7 +726,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var44 string
 			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(character.Debt)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 202, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 201, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 			if templ_7745c5c3_Err != nil {
@@ -749,7 +749,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var45 string
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_field")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 209, Col: 87}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 208, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 			if templ_7745c5c3_Err != nil {
@@ -762,7 +762,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var46 string
 			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-cancel-identity-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 213, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 212, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
 			if templ_7745c5c3_Err != nil {
@@ -775,7 +775,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var47 string
 			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-save-identity-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 214, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 213, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 			if templ_7745c5c3_Err != nil {
@@ -788,7 +788,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var48 string
 			templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 219, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 218, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 			if templ_7745c5c3_Err != nil {
@@ -801,7 +801,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var49 string
 			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.Handle)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 223, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 222, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 			if templ_7745c5c3_Err != nil {
@@ -814,7 +814,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var50 string
 			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(character.Style)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 228, Col: 151}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 227, Col: 151}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 			if templ_7745c5c3_Err != nil {
@@ -827,7 +827,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var51 string
 			templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(character.Feature)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 232, Col: 155}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 231, Col: 155}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 			if templ_7745c5c3_Err != nil {
@@ -840,7 +840,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var52 string
 			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(character.Want)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 238, Col: 149}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 237, Col: 149}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 			if templ_7745c5c3_Err != nil {
@@ -853,7 +853,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var53 string
 			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(character.Quirk)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 242, Col: 151}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 241, Col: 151}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 			if templ_7745c5c3_Err != nil {
@@ -866,7 +866,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var54 string
 			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(character.Obsession)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 247, Col: 158}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 246, Col: 158}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 			if templ_7745c5c3_Err != nil {
@@ -879,7 +879,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var55 string
 			templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(character.Debt)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 251, Col: 149}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 250, Col: 149}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 			if templ_7745c5c3_Err != nil {
@@ -892,7 +892,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var56 string
 			templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-cancel-identity-bottom-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 254, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 253, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 			if templ_7745c5c3_Err != nil {
@@ -905,7 +905,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var57 string
 			templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-save-identity-bottom-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 255, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 254, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 			if templ_7745c5c3_Err != nil {
@@ -928,7 +928,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var58 string
 			templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 268, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 266, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var58))
 			if templ_7745c5c3_Err != nil {
@@ -946,20 +946,20 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var59 string
 				templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue("stat-form-" + name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 270, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 268, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"hidden\" name=\"stat_name\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"stat_name\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var60 string
 				templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 271, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 269, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
 				if templ_7745c5c3_Err != nil {
@@ -972,7 +972,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var61 string
 				templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(stat.Current))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 275, Col: 42}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 273, Col: 42}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
 				if templ_7745c5c3_Err != nil {
@@ -985,7 +985,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var62 string
 				templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_stat")))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 278, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 276, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
 				if templ_7745c5c3_Err != nil {
@@ -998,13 +998,13 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var63 string
 				templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue("#stat-form-" + name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 279, Col: 43}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 277, Col: 43}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1021,7 +1021,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 					var templ_7745c5c3_Var64 string
 					templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(stat.Current))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 287, Col: 37}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 286, Col: 37}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 					if templ_7745c5c3_Err != nil {
@@ -1031,7 +1031,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 					var templ_7745c5c3_Var65 string
 					templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(stat.Current))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 289, Col: 36}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 288, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 					if templ_7745c5c3_Err != nil {
@@ -1060,7 +1060,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var66 string
 			templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-toggle-vitals-edit-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 302, Col: 74}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 300, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var66)
 			if templ_7745c5c3_Err != nil {
@@ -1076,14 +1076,14 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			return templ_7745c5c3_Err
 		}
 		if canEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<form id=\"hp-current-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"number\" name=\"hp_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<form id=\"hp-current-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"number\" name=\"hp_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var67 string
 			templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.HP.Current))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 314, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 312, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
 			if templ_7745c5c3_Err != nil {
@@ -1096,20 +1096,20 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var68 string
 			templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_hp")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 317, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 315, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-include=\"#hp-current-form, #hp-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"> <input type=\"hidden\" id=\"hp-max-hidden\" name=\"hp_max\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-include=\"#hp-current-form, #hp-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <input type=\"hidden\" id=\"hp-max-hidden\" name=\"hp_max\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var69 string
 			templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.HP.Max))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 322, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 321, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var69)
 			if templ_7745c5c3_Err != nil {
@@ -1122,7 +1122,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var70 string
 			templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(character.HP.Max))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 323, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 322, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var70))
 			if templ_7745c5c3_Err != nil {
@@ -1140,7 +1140,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var71 string
 			templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(character.HP.Current))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 326, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 325, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
 			if templ_7745c5c3_Err != nil {
@@ -1153,7 +1153,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var72 string
 			templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(character.HP.Max))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 326, Col: 120}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 325, Col: 120}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
 			if templ_7745c5c3_Err != nil {
@@ -1169,14 +1169,14 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			return templ_7745c5c3_Err
 		}
 		if canEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<form id=\"glitches-current-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"number\" name=\"glitches_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<form id=\"glitches-current-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"number\" name=\"glitches_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var73 string
 			templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.Glitches.Current))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 336, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 335, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var73)
 			if templ_7745c5c3_Err != nil {
@@ -1189,13 +1189,13 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var74 string
 			templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_glitches")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 339, Col: 87}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 338, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var74)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" hx-include=\"#glitches-current-form, #glitches-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"> <input type=\"hidden\" id=\"glitches-max-hidden\" name=\"glitches_max\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" hx-include=\"#glitches-current-form, #glitches-max-hidden\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <input type=\"hidden\" id=\"glitches-max-hidden\" name=\"glitches_max\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1288,7 +1288,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			return templ_7745c5c3_Err
 		}
 		if canEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "<form id=\"creds-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"number\" name=\"value\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "<form id=\"creds-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"number\" name=\"value\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1314,7 +1314,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\" hx-include=\"#creds-form\" hx-trigger=\"change, input delay:300ms\" hx-vals='{\"field\": \"creds\"}' hx-swap=\"none\"> <span class=\"text-md text-accent\">¤</span></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\" hx-include=\"#creds-form\" hx-trigger=\"change, input delay:300ms\" hx-vals='{\"field\": \"creds\"}' hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <span class=\"text-md text-accent\">¤</span></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1326,7 +1326,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var83 string
 			templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(character.Creds))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 369, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 370, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var83))
 			if templ_7745c5c3_Err != nil {
@@ -1349,20 +1349,20 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var84 string
 			templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-cancel-vitals-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 378, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 379, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var84)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" onclick=\"toggleEditSection('vitals')\" class=\"btn-outline-small p-xs text-xs\">Done</button></div><div class=\"flex flex-col gap-sm\"><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">HP MAX:</span><form id=\"hp-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"hidden\" name=\"hp_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" onclick=\"toggleEditSection('vitals')\" class=\"btn-outline-small p-xs text-xs\">Done</button></div><div class=\"flex flex-col gap-sm\"><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">HP MAX:</span><form id=\"hp-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"hp_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var85 string
 			templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.HP.Current))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 384, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 385, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var85)
 			if templ_7745c5c3_Err != nil {
@@ -1375,7 +1375,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var86 string
 			templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.HP.Max))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 388, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 389, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var86)
 			if templ_7745c5c3_Err != nil {
@@ -1388,20 +1388,20 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var87 string
 			templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_hp")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 391, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 392, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var87)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\" hx-include=\"#hp-form\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"></form></div><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">GLITCHES MAX:</span><form id=\"glitches-form\" class=\"inline-flex items-center gap-xs m-0\" onsubmit=\"event.preventDefault();\"><input type=\"hidden\" name=\"glitches_current\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\" hx-include=\"#hp-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"></form></div><div class=\"flex items-center justify-between gap-sm\"><span class=\"text-accent text-xs font-bold text-uppercase\">GLITCHES MAX:</span><form id=\"glitches-form\" class=\"inline-flex items-center gap-xs m-0\"><input type=\"hidden\" name=\"glitches_current\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var88 string
 			templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.Glitches.Current))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 401, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 403, Col: 101}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var88)
 			if templ_7745c5c3_Err != nil {
@@ -1414,7 +1414,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var89 string
 			templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(character.Glitches.Max))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 405, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 407, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var89)
 			if templ_7745c5c3_Err != nil {
@@ -1427,20 +1427,20 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var90 string
 			templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_glitches")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 408, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 410, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var90)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\" hx-include=\"#glitches-form\" hx-trigger=\"change, input delay:300ms\" hx-swap=\"none\"> <span class=\"text-muted text-xs\">(")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\" hx-include=\"#glitches-form\" hx-trigger=\"change, input delay:300ms\" hx-target=\"#character-sheet-container\" hx-swap=\"outerHTML\"> <span class=\"text-muted text-xs\">(")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var91 string
 			templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(character.GlitchDie)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 413, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 416, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var91))
 			if templ_7745c5c3_Err != nil {
@@ -1463,7 +1463,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var92 string
 			templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-toggle-class-edit-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 425, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 427, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var92)
 			if templ_7745c5c3_Err != nil {
@@ -1481,7 +1481,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 		var templ_7745c5c3_Var93 string
 		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 429, Col: 197}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 431, Col: 197}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var93))
 		if templ_7745c5c3_Err != nil {
@@ -1494,7 +1494,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 		var templ_7745c5c3_Var94 string
 		templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Glitch)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 430, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 432, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var94))
 		if templ_7745c5c3_Err != nil {
@@ -1507,7 +1507,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 		var templ_7745c5c3_Var95 string
 		templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 432, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 434, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var95))
 		if templ_7745c5c3_Err != nil {
@@ -1525,7 +1525,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var96 string
 			templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Origin)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 435, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 437, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var96))
 			if templ_7745c5c3_Err != nil {
@@ -1544,7 +1544,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var97 string
 			templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Gift)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 438, Col: 106}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 440, Col: 106}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var97))
 			if templ_7745c5c3_Err != nil {
@@ -1567,7 +1567,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var98 string
 			templ_7745c5c3_Var98, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-cancel-class-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 447, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 449, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var98)
 			if templ_7745c5c3_Err != nil {
@@ -1580,7 +1580,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var99 string
 			templ_7745c5c3_Var99, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-save-class-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 450, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 452, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var99)
 			if templ_7745c5c3_Err != nil {
@@ -1593,7 +1593,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var100 string
 			templ_7745c5c3_Var100, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_field")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 452, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 454, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var100)
 			if templ_7745c5c3_Err != nil {
@@ -1606,7 +1606,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var101 string
 			templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.Class.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 461, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 463, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var101)
 			if templ_7745c5c3_Err != nil {
@@ -1619,7 +1619,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var102 string
 			templ_7745c5c3_Var102, templ_7745c5c3_Err = templ.ResolveAttributeValue(character.Class.Glitch)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 465, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 467, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var102)
 			if templ_7745c5c3_Err != nil {
@@ -1632,7 +1632,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var103 string
 			templ_7745c5c3_Var103, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 469, Col: 173}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 471, Col: 173}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var103))
 			if templ_7745c5c3_Err != nil {
@@ -1645,7 +1645,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var104 string
 			templ_7745c5c3_Var104, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Origin)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 473, Col: 163}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 475, Col: 163}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var104))
 			if templ_7745c5c3_Err != nil {
@@ -1658,7 +1658,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var105 string
 			templ_7745c5c3_Var105, templ_7745c5c3_Err = templ.JoinStringErrs(character.Class.Gift)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 477, Col: 159}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 479, Col: 159}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var105))
 			if templ_7745c5c3_Err != nil {
@@ -1671,7 +1671,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var106 string
 			templ_7745c5c3_Var106, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-cancel-class-bottom-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 480, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 482, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var106)
 			if templ_7745c5c3_Err != nil {
@@ -1684,7 +1684,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var107 string
 			templ_7745c5c3_Var107, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-save-class-bottom-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 483, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 485, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var107)
 			if templ_7745c5c3_Err != nil {
@@ -1697,7 +1697,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var108 string
 			templ_7745c5c3_Var108, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/update_field")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 485, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 487, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var108)
 			if templ_7745c5c3_Err != nil {
@@ -1730,7 +1730,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var109 string
 			templ_7745c5c3_Var109, templ_7745c5c3_Err = templ.JoinStringErrs(w.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 517, Col: 109}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 518, Col: 109}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var109))
 			if templ_7745c5c3_Err != nil {
@@ -1743,7 +1743,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var110 string
 			templ_7745c5c3_Var110, templ_7745c5c3_Err = templ.JoinStringErrs(w.Damage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 519, Col: 144}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 520, Col: 144}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var110))
 			if templ_7745c5c3_Err != nil {
@@ -1761,7 +1761,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var111 string
 				templ_7745c5c3_Var111, templ_7745c5c3_Err = templ.JoinStringErrs(w.Hands)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 521, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 522, Col: 60}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var111))
 				if templ_7745c5c3_Err != nil {
@@ -1779,7 +1779,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var112 string
 			templ_7745c5c3_Var112, templ_7745c5c3_Err = templ.JoinStringErrs(w.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 524, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 525, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var112))
 			if templ_7745c5c3_Err != nil {
@@ -1797,7 +1797,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var113 string
 				templ_7745c5c3_Var113, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/delete_item")))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 527, Col: 91}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 528, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var113)
 				if templ_7745c5c3_Err != nil {
@@ -1810,7 +1810,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var114 string
 				templ_7745c5c3_Var114, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(i))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 529, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 530, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var114)
 				if templ_7745c5c3_Err != nil {
@@ -1823,7 +1823,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var115 string
 				templ_7745c5c3_Var115, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-delete-weapon-" + character.ID + "-" + fmt.Sprint(i))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 530, Col: 96}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 531, Col: 96}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var115)
 				if templ_7745c5c3_Err != nil {
@@ -1847,7 +1847,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var116 string
 			templ_7745c5c3_Var116, templ_7745c5c3_Err = templ.JoinStringErrs(a.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 539, Col: 109}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 540, Col: 109}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var116))
 			if templ_7745c5c3_Err != nil {
@@ -1860,7 +1860,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var117 string
 			templ_7745c5c3_Var117, templ_7745c5c3_Err = templ.JoinStringErrs(a.Tier)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 540, Col: 196}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 541, Col: 196}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var117))
 			if templ_7745c5c3_Err != nil {
@@ -1873,7 +1873,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var118 string
 			templ_7745c5c3_Var118, templ_7745c5c3_Err = templ.JoinStringErrs(a.Reduction)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 541, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 542, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var118))
 			if templ_7745c5c3_Err != nil {
@@ -1891,7 +1891,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var119 string
 				templ_7745c5c3_Var119, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/delete_item")))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 544, Col: 91}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 545, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var119)
 				if templ_7745c5c3_Err != nil {
@@ -1904,7 +1904,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var120 string
 				templ_7745c5c3_Var120, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(i))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 546, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 547, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var120)
 				if templ_7745c5c3_Err != nil {
@@ -1917,7 +1917,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var121 string
 				templ_7745c5c3_Var121, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-delete-armor-" + character.ID + "-" + fmt.Sprint(i))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 547, Col: 95}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 548, Col: 95}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var121)
 				if templ_7745c5c3_Err != nil {
@@ -1945,7 +1945,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var122 string
 			templ_7745c5c3_Var122, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-toggle-gear-add-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 558, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 559, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var122)
 			if templ_7745c5c3_Err != nil {
@@ -1958,7 +1958,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var123 string
 			templ_7745c5c3_Var123, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/add_item")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 562, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 563, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var123)
 			if templ_7745c5c3_Err != nil {
@@ -1971,7 +1971,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var124 string
 			templ_7745c5c3_Var124, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-add-weapon-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 567, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 568, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var124)
 			if templ_7745c5c3_Err != nil {
@@ -1984,7 +1984,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var125 string
 			templ_7745c5c3_Var125, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/add_item")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 572, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 573, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var125)
 			if templ_7745c5c3_Err != nil {
@@ -1997,7 +1997,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var126 string
 			templ_7745c5c3_Var126, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-add-armor-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 577, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 578, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var126)
 			if templ_7745c5c3_Err != nil {
@@ -2020,7 +2020,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var127 string
 			templ_7745c5c3_Var127, templ_7745c5c3_Err = templ.JoinStringErrs(item)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 587, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 588, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var127))
 			if templ_7745c5c3_Err != nil {
@@ -2038,7 +2038,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var128 string
 				templ_7745c5c3_Var128, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/delete_item")))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 589, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 590, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var128)
 				if templ_7745c5c3_Err != nil {
@@ -2051,7 +2051,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var129 string
 				templ_7745c5c3_Var129, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(i))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 591, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 592, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var129)
 				if templ_7745c5c3_Err != nil {
@@ -2064,7 +2064,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 				var templ_7745c5c3_Var130 string
 				templ_7745c5c3_Var130, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-delete-gear-" + character.ID + "-" + fmt.Sprint(i))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 592, Col: 91}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 593, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var130)
 				if templ_7745c5c3_Err != nil {
@@ -2092,7 +2092,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var131 string
 			templ_7745c5c3_Var131, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + character.ID + "/add_item")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 599, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 600, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var131)
 			if templ_7745c5c3_Err != nil {
@@ -2105,7 +2105,7 @@ func CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game 
 			var templ_7745c5c3_Var132 string
 			templ_7745c5c3_Var132, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-add-gear-" + character.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 602, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/character_sheet.templ`, Line: 603, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var132)
 			if templ_7745c5c3_Err != nil {

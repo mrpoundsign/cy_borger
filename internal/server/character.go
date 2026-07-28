@@ -113,7 +113,7 @@ func (s *Server) renderCharacterViewWithChar(w http.ResponseWriter, r *http.Requ
 		}
 		return
 	}
-	if isHTMX {
+	if isHTMX && r.Header.Get("HX-Target") == "character-sheet-container" {
 		if err := templates.CharacterSheet(c, canEdit, isGM, game, activeGame, isModal, isHTMX).Render(r.Context(), w); err != nil {
 			log.Printf("Template error (character_sheet.templ): %v", err)
 		}
@@ -213,7 +213,6 @@ func (s *Server) handleJoinGame(w http.ResponseWriter, r *http.Request) {
 
 	// Broadcast update to real-time clients!
 	ws.GlobalHub.Broadcast("game_"+g.ID, "char_update:"+c.ID)
-
 
 	http.Redirect(w, r, "/game/"+g.ID, http.StatusSeeOther)
 }
@@ -328,7 +327,6 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-
 		if c.GameID != "" {
 			s.logAndBroadcastGameEvent(c, "stats", "Stat "+statName+" updated to "+r.FormValue("value"))
 			ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -391,7 +389,6 @@ func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
 
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -512,13 +509,12 @@ func (s *Server) handleUpdateField(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "stats", "Updated character details")
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
 
-	if r.Header.Get("HX-Target") == "character-sheet-container" {
+	if r.Header.Get("HX-Request") == "true" {
 		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
@@ -586,7 +582,6 @@ func (s *Server) handleAddListItem(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
 
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "inventory", "Added to "+listType)
@@ -668,7 +663,6 @@ func (s *Server) handleDeleteListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	if c.GameID != "" {
 		s.logAndBroadcastGameEvent(c, "inventory", "Deleted item from "+listType)
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -726,7 +720,6 @@ func (s *Server) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 	}
@@ -779,7 +772,6 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
-
 
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
@@ -838,7 +830,6 @@ func (s *Server) handleReviveCharacter(w http.ResponseWriter, r *http.Request) {
 		s.renderError(w, r, "Failed to update character", http.StatusInternalServerError)
 		return
 	}
-
 
 	if c.GameID != "" {
 		ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
