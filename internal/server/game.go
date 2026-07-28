@@ -49,7 +49,10 @@ func (s *Server) handleViewGame(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.DB.GetGame(id)
 	if err != nil || g == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		if err := templates.GameNotFound(id).Render(r.Context(), w); err != nil {
+			log.Printf("Template execution error (game_not_found.templ): %v", err)
+		}
 		return
 	}
 

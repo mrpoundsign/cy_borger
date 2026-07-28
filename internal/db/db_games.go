@@ -127,8 +127,14 @@ func (d *DB) GetGamesForUser(userID string) ([]Game, error) {
 }
 
 func (d *DB) GetGamesByOwner(ownerID string) ([]Game, error) {
-	query := `SELECT id, gm_code, invite_code, name, owner_id, system_id, is_locked, created_at, updated_at FROM games WHERE owner_id = ?`
-	rows, err := d.conn.Query(query, ownerID)
+	query := `
+		SELECT DISTINCT g.id, g.gm_code, g.invite_code, g.name, g.owner_id, g.system_id, g.is_locked, g.created_at, g.updated_at
+		FROM games g
+		LEFT JOIN game_gms gm ON g.id = gm.game_id
+		WHERE g.owner_id = ? OR gm.user_id = ?
+		ORDER BY g.created_at DESC
+	`
+	rows, err := d.conn.Query(query, ownerID, ownerID)
 	if err != nil {
 		return nil, err
 	}

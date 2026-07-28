@@ -160,7 +160,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span><script>\n\t\t\t\t\tif (window.cyStore) {\n\t\t\t\t\t\tlet handle = document.getElementById('user-handle-data').innerText;\n\t\t\t\t\t\tcyStore.setUserName(handle);\n\t\t\t\t\t\tcyStore.setEditedName();\n\t\t\t\t\t}\n\t\t\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span><script>\n\t\t\t\t\tlet handle = document.getElementById('user-handle-data').innerText;\n\t\t\t\t\tdocument.cookie = \"cy_user_name=\" + encodeURIComponent(handle) + \"; path=/; max-age=31536000\";\n\t\t\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -177,7 +177,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(errMsg)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 70, Col: 19}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 67, Col: 19}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -226,7 +226,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var10 string
 					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(g.ID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 142, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 139, Col: 31}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 					if templ_7745c5c3_Err != nil {
@@ -239,7 +239,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var11 templ.SafeURL
 					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/game/" + g.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 142, Col: 70}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 139, Col: 70}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 					if templ_7745c5c3_Err != nil {
@@ -252,7 +252,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var12 string
 					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(g.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 142, Col: 128}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 139, Col: 128}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 					if templ_7745c5c3_Err != nil {
@@ -265,7 +265,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var13 string
 					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(g.CreatedAt.Format("Jan 02, 2006"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 142, Col: 232}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 139, Col: 232}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 					if templ_7745c5c3_Err != nil {
@@ -299,7 +299,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(c.ID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 154, Col: 30}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 151, Col: 30}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 					if templ_7745c5c3_Err != nil {
@@ -317,7 +317,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 						var templ_7745c5c3_Var15 templ.SafeURL
 						templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/character/" + c.ID))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 156, Col: 50}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 153, Col: 50}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 						if templ_7745c5c3_Err != nil {
@@ -331,7 +331,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 							var templ_7745c5c3_Var16 string
 							templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 159, Col: 19}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 156, Col: 19}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 							if templ_7745c5c3_Err != nil {
@@ -350,7 +350,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 						var templ_7745c5c3_Var17 string
 						templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(c.Class.Name)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 163, Col: 38}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 160, Col: 38}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 						if templ_7745c5c3_Err != nil {
@@ -368,7 +368,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 							var templ_7745c5c3_Var18 string
 							templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(c.GameName)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 165, Col: 24}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 162, Col: 24}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 							if templ_7745c5c3_Err != nil {
@@ -391,7 +391,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 						var templ_7745c5c3_Var19 templ.SafeURL
 						templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/character/" + c.ID))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 170, Col: 50}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 167, Col: 50}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 						if templ_7745c5c3_Err != nil {
@@ -405,7 +405,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 							var templ_7745c5c3_Var20 string
 							templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 173, Col: 19}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 170, Col: 19}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 							if templ_7745c5c3_Err != nil {
@@ -424,7 +424,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 						var templ_7745c5c3_Var21 string
 						templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(c.Class.Name)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 177, Col: 38}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 174, Col: 38}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 						if templ_7745c5c3_Err != nil {
@@ -442,7 +442,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 							var templ_7745c5c3_Var22 string
 							templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(c.GameName)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 179, Col: 24}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 176, Col: 24}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 							if templ_7745c5c3_Err != nil {
@@ -481,7 +481,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var23 string
 					templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(c.ID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 192, Col: 30}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 189, Col: 30}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 					if templ_7745c5c3_Err != nil {
@@ -494,7 +494,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var24 templ.SafeURL
 					templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/character/" + c.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 192, Col: 74}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 189, Col: 74}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 					if templ_7745c5c3_Err != nil {
@@ -507,7 +507,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var25 string
 					templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 193, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 190, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 					if templ_7745c5c3_Err != nil {
@@ -520,7 +520,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 					var templ_7745c5c3_Var26 string
 					templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(c.Class.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 193, Col: 55}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 190, Col: 55}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 					if templ_7745c5c3_Err != nil {
@@ -538,7 +538,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 						var templ_7745c5c3_Var27 string
 						templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(c.GameName)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 195, Col: 23}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 192, Col: 23}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 						if templ_7745c5c3_Err != nil {
@@ -569,7 +569,7 @@ func IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character,
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</div><script>\n\t\tfunction randomizeInputName() {\n\t\t\tconst randomName = generateRandomUsername();\n\t\t\tdocument.getElementById(\"user-handle-input\").value = randomName;\n\t\t}\n\n\t\tfunction saveHandle() {\n\t\t\tlet input = document.getElementById(\"user-handle-input\").value.trim();\n\t\t\tif (input) {\n\t\t\t\tif (/\\s/.test(input)) {\n\t\t\t\t\talert(\"No spaces or whitespace allowed in handles.\");\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst regex = /^[^\\s#]+#\\d{4}$/;\n\t\t\t\tif (!regex.test(input)) {\n\t\t\t\t\tconst hashIndex = input.indexOf('#');\n\t\t\t\t\tlet baseName = input;\n\t\t\t\t\tif (hashIndex !== -1) {\n\t\t\t\t\t\tbaseName = input.substring(0, hashIndex).trim();\n\t\t\t\t\t}\n\t\t\t\t\tif (!baseName) {\n\t\t\t\t\t\talert(\"Invalid handle. Name cannot be empty.\");\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tconst num = Math.floor(1000 + Math.random() * 9000);\n\t\t\t\t\tinput = baseName + \"#\" + num;\n\t\t\t\t}\n\n\t\t\t\tcyStore.setUserName(input);\n\t\t\t\tcyStore.setEditedName();\n\t\t\t\tdocument.getElementById(\"user-handle-display\").innerText = input;\n\t\t\t\tdocument.getElementById(\"handle-editor-area\").style.display = \"none\";\n\t\t\t\tdocument.getElementById(\"user-handle-input\").value = input;\n\t\t\t}\n\t\t}\n\n\t\tdocument.addEventListener(\"DOMContentLoaded\", function () {\n\t\t\tif (!window.cyStore) return;\n\n\t\t\t// Sync client-side localStorage GM games so they are ALWAYS visible\n\t\t\tconst localGames = cyStore.getGMGames();\n\t\t\tconst listEl = document.getElementById(\"my-gm-games-list\");\n\t\t\tconst sectionEl = document.getElementById(\"my-gm-games-section\");\n\t\t\tconst containerEl = document.getElementById(\"my-stuff-card\");\n\n\t\t\tif (localGames && Object.keys(localGames).length > 0) {\n\t\t\t\tif (sectionEl) sectionEl.style.display = \"block\";\n\t\t\t\tif (containerEl) containerEl.style.display = \"block\";\n\n\t\t\t\tfor (const [id, game] of Object.entries(localGames)) {\n\t\t\t\t\tif (listEl && !listEl.querySelector(`[data-game-id=\"${id}\"]`)) {\n\t\t\t\t\t\tconst li = document.createElement(\"li\");\n\t\t\t\t\t\tli.setAttribute(\"data-game-id\", id);\n\t\t\t\t\t\tli.innerHTML = `<a href=\"/game/${id}\" class=\"text-success no-decoration\">⚡ <strong>${game.name || 'Campaign'}</strong> [GM Mode]</a>`;\n\t\t\t\t\t\tlistEl.appendChild(li);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</div><script>\n\t\tfunction randomizeInputName() {\n\t\t\tconst randomName = generateRandomUsername();\n\t\t\tdocument.getElementById(\"user-handle-input\").value = randomName;\n\t\t}\n\n\t\tfunction saveHandle() {\n\t\t\tlet input = document.getElementById(\"user-handle-input\").value.trim();\n\t\t\tif (input) {\n\t\t\t\tif (/\\s/.test(input)) {\n\t\t\t\t\talert(\"No spaces or whitespace allowed in handles.\");\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst regex = /^[^\\s#]+#\\d{4}$/;\n\t\t\t\tif (!regex.test(input)) {\n\t\t\t\t\tconst hashIndex = input.indexOf('#');\n\t\t\t\t\tlet baseName = input;\n\t\t\t\t\tif (hashIndex !== -1) {\n\t\t\t\t\t\tbaseName = input.substring(0, hashIndex).trim();\n\t\t\t\t\t}\n\t\t\t\t\tif (!baseName) {\n\t\t\t\t\t\talert(\"Invalid handle. Name cannot be empty.\");\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tconst num = Math.floor(1000 + Math.random() * 9000);\n\t\t\t\t\tinput = baseName + \"#\" + num;\n\t\t\t\t}\n\n\t\t\t\tdocument.cookie = \"cy_user_name=\" + encodeURIComponent(input) + \"; path=/; max-age=31536000\";\n\t\t\t\tdocument.getElementById(\"user-handle-display\").innerText = input;\n\t\t\t\tdocument.getElementById(\"handle-editor-area\").style.display = \"none\";\n\t\t\t\tdocument.getElementById(\"user-handle-input\").value = input;\n\t\t\t}\n\t\t}\n\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

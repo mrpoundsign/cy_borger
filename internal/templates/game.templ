@@ -9,6 +9,19 @@ templ Game(game *db.Game, characters []chargen.Character, isGM bool, currentUser
 	@Base("Game: " + game.Name + " - 🍔 CY_BORGER", GameHead(game), GameContent(game, characters, isGM, currentUserID, logs, players, gms))
 }
 
+templ GameNotFound(id string) {
+	@Base("Game Not Found - 🍔 CY_BORGER", nil, gameNotFoundContent(id))
+}
+
+templ gameNotFoundContent(id string) {
+	<div class="container p-md" id="game-not-found-container" data-id={ id }>
+		<h1 class="text-danger mb-sm">💀 CAMPAIGN FLATLINED</h1>
+		<p class="text-muted mb-md">This game has been permanently deleted or does not exist.</p>
+		<p class="mb-lg">It will be automatically removed from your dashboard.</p>
+		<a href="/" class="btn bg-success text-black">RETURN TO BASE</a>
+	</div>
+}
+
 templ GameHead(game *db.Game) {
 	<span id="game-data" data-id={ game.ID } style="display:none;"></span>
 	<script>
@@ -169,31 +182,9 @@ templ GameContent(game *db.Game, characters []chargen.Character, isGM bool, curr
 						
 						<button id={ "btn-copy-gmlink-" + game.ID } class="btn-outline-small ml-sm" onclick="copyText(window.location.origin + '/game/' + document.getElementById('game-data-gm').dataset.id + '?gm_code=' + document.getElementById('game-data-gm').dataset.code, this)">Copy GM Link</button>
 						
-						<script>
-							if (window.cyStore) {
-								let gmEl = document.getElementById('game-data-gm');
-								cyStore.saveGMGame(gmEl.dataset.id, gmEl.dataset.code, gmEl.dataset.name);
-							}
-						</script>
 						<span id="game-data-gm" data-id={ game.ID } data-code={ game.GMCode } data-name={ game.Name } style="display:none;"></span>
 					} else {
 						<span class="text-muted">[PLAYER PARTY VIEW]</span>
-						<script>
-							document.addEventListener("DOMContentLoaded", function () {
-								if (window.cyStore) {
-									let gmEl = document.getElementById('game-data-gm-player');
-									const games = cyStore.getGMGames();
-									if (gmEl && games[gmEl.dataset.id] && games[gmEl.dataset.id].gmCode) {
-										const code = games[gmEl.dataset.id].gmCode;
-										const form = document.querySelector('form[action="/game/' + gmEl.dataset.id + '/auth"]');
-										if (form) {
-											form.querySelector('input[name="gm_code"]').value = code;
-											form.submit();
-										}
-									}
-								}
-							});
-						</script>
 						<span id="game-data-gm-player" data-id={ game.ID } style="display:none;"></span>
 					}
 					<button id={ "btn-random-color-" + game.ID } onclick="randomizeThemeColor()" class="btn-outline-small ml-sm">🌈 Color</button>

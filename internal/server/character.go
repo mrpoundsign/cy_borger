@@ -137,7 +137,10 @@ func (s *Server) handleViewCharacter(w http.ResponseWriter, r *http.Request) {
 
 	c, err := s.DB.GetCharacter(id)
 	if err != nil || c == nil {
-		http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		if err := templates.CharacterNotFound(id).Render(r.Context(), w); err != nil {
+			log.Printf("Template execution error (character_not_found.templ): %v", err)
+		}
 		return
 	}
 

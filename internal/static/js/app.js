@@ -45,41 +45,24 @@ function copyText(text, btn) {
     document.documentElement.style.setProperty('--accent-color', accent);
     document.documentElement.style.setProperty('--border-color', accent);
 
-    let uid = localStorage.getItem('cy_user_id');
-    if (!uid) {
-        const match = document.cookie.match(/(?:^|; )cy_user_id=([^;]*)/);
-        if (match && match[1]) {
-            uid = match[1];
-        } else {
-            uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
-        }
-        localStorage.setItem('cy_user_id', uid);
+    function getCookieValue(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
     }
-    document.cookie = "cy_user_id=" + uid + "; path=/; max-age=31536000";
 
-    let uname = localStorage.getItem('cy_user_name');
+    function setCookieValue(name, value) {
+        document.cookie = name + "=" + value + "; path=/; max-age=31536000";
+    }
+
+    let uid = getCookieValue('cy_user_id');
+    if (!uid) {
+        uid = 'usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+        setCookieValue('cy_user_id', uid);
+    }
+
+    let uname = getCookieValue('cy_user_name');
     if (!uname) {
         uname = generateRandomUsername();
-        localStorage.setItem('cy_user_name', uname);
+        setCookieValue('cy_user_name', uname);
     }
-
-    window.cyStore = {
-        getUserId: function () { return localStorage.getItem('cy_user_id'); },
-        getUserName: function () { return localStorage.getItem('cy_user_name'); },
-        setUserName: function (name) { localStorage.setItem('cy_user_name', name); },
-        hasEditedName: function () { return localStorage.getItem('cy_user_name_edited') === 'true'; },
-        setEditedName: function () { localStorage.setItem('cy_user_name_edited', 'true'); },
-        saveGMGame: function (gameId, gmCode, name) {
-            let games = JSON.parse(localStorage.getItem('cy_gm_games') || '{}');
-            games[gameId] = { id: gameId, gmCode: gmCode, name: name, timestamp: Date.now() };
-            localStorage.setItem('cy_gm_games', JSON.stringify(games));
-        },
-        getGMGames: function () { return JSON.parse(localStorage.getItem('cy_gm_games') || '{}'); },
-        saveCharEdit: function (charId, editCode, name) {
-            let chars = JSON.parse(localStorage.getItem('cy_user_chars') || '{}');
-            chars[charId] = { id: charId, editCode: editCode, name: name, timestamp: Date.now() };
-            localStorage.setItem('cy_user_chars', JSON.stringify(chars));
-        },
-        getCharEdits: function () { return JSON.parse(localStorage.getItem('cy_user_chars') || '{}'); }
-    };
 })();

@@ -57,29 +57,8 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 		>
 			<div>
 				<span>CHARACTER ID: <strong class="text-accent">{ character.ID }</strong></span>
-				if canEdit {
-					@templ.Raw(`<script>
-            if (window.cyStore) {
-                cyStore.saveCharEdit('` + character.ID + `', '` + character.EditCode + `', '` + character.Name + `');
-            }
-        </script>`)
-				} else {
+				if !canEdit {
 					<span class="ml-sm text-danger">[READ-ONLY]</span>
-					<script>
-            document.addEventListener("DOMContentLoaded", function() {
-                if (window.cyStore) {
-                    const chars = cyStore.getCharEdits();
-                    if (chars['{ character.ID }'] && chars['{ character.ID }'].editCode) {
-                        const code = chars['{ character.ID }'].editCode;
-                        const form = document.querySelector('form[action={ "/character/" + character.ID + "/auth" }]');
-                        if (form) {
-                            form.querySelector('input[name="edit_code"]').value = code;
-                            form.submit();
-                        }
-                    }
-                }
-            });
-        </script>
 				}
 				<button id={ "btn-copy-viewlink-" + character.ID } class="btn-outline-small ml-sm" onclick="copyText(window.location.origin + '/character/' + this.dataset.id, this)" data-id={ character.ID }>Copy View Link</button>
 			</div>

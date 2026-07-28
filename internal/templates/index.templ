@@ -51,11 +51,8 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 					}
 				</span>
 				<script>
-					if (window.cyStore) {
-						let handle = document.getElementById('user-handle-data').innerText;
-						cyStore.setUserName(handle);
-						cyStore.setEditedName();
-					}
+					let handle = document.getElementById('user-handle-data').innerText;
+					document.cookie = "cy_user_name=" + encodeURIComponent(handle) + "; path=/; max-age=31536000";
 				</script>
 			} else {
 				<div class="w-full text-center">
@@ -232,36 +229,12 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 					input = baseName + "#" + num;
 				}
 
-				cyStore.setUserName(input);
-				cyStore.setEditedName();
+				document.cookie = "cy_user_name=" + encodeURIComponent(input) + "; path=/; max-age=31536000";
 				document.getElementById("user-handle-display").innerText = input;
 				document.getElementById("handle-editor-area").style.display = "none";
 				document.getElementById("user-handle-input").value = input;
 			}
 		}
 
-		document.addEventListener("DOMContentLoaded", function () {
-			if (!window.cyStore) return;
-
-			// Sync client-side localStorage GM games so they are ALWAYS visible
-			const localGames = cyStore.getGMGames();
-			const listEl = document.getElementById("my-gm-games-list");
-			const sectionEl = document.getElementById("my-gm-games-section");
-			const containerEl = document.getElementById("my-stuff-card");
-
-			if (localGames && Object.keys(localGames).length > 0) {
-				if (sectionEl) sectionEl.style.display = "block";
-				if (containerEl) containerEl.style.display = "block";
-
-				for (const [id, game] of Object.entries(localGames)) {
-					if (listEl && !listEl.querySelector(`[data-game-id="${id}"]`)) {
-						const li = document.createElement("li");
-						li.setAttribute("data-game-id", id);
-						li.innerHTML = `<a href="/game/${id}" class="text-success no-decoration">⚡ <strong>${game.name || 'Campaign'}</strong> [GM Mode]</a>`;
-						listEl.appendChild(li);
-					}
-				}
-			}
-		});
 	</script>
 }

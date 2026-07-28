@@ -18,3 +18,16 @@ templ CharacterContent(character *chargen.Character, canEdit bool, isGM bool, ga
 		@CharacterSheet(character, canEdit, isGM, game, activeGame, isModal, isHTMX)
 	</div>
 }
+
+templ CharacterNotFound(id string) {
+	@Base("Character Not Found - 🍔 CY_BORGER", nil, characterNotFoundContent(id))
+}
+
+templ characterNotFoundContent(id string) {
+	<div class="container p-md" id="char-not-found-container" data-id={ id }>
+		<h1 class="text-danger mb-sm">💀 FLATLINE</h1>
+		<p class="text-muted mb-md">This character has been permanently deleted or does not exist.</p>
+		<p class="mb-lg">It will be automatically removed from your dashboard.</p>
+		<a href="/" class="btn bg-success text-black">RETURN TO BASE</a>
+	</div>
+}
