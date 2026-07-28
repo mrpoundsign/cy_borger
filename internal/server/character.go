@@ -311,8 +311,12 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, exists := c.Stats.Get(statName); exists {
+		var newVal int
 		if val, err := strconv.Atoi(currStr); err == nil {
+			newVal = val
 			c.Stats.Set(statName, val)
+		} else {
+			newVal, _ = c.Stats.Get(statName)
 		}
 
 		ownerID := getCookie(r, "cy_user_id")
@@ -323,7 +327,7 @@ func (s *Server) handleUpdateStat(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if c.GameID != "" {
-			s.logAndBroadcastGameEvent(c, "stats", "Stat "+statName+" updated to "+r.FormValue("value"))
+			s.logAndBroadcastGameEvent(c, "stats", fmt.Sprintf("Stat %s updated to %+d", statName, newVal))
 			ws.GlobalHub.Broadcast("game_"+c.GameID, "char_update:"+c.ID)
 		}
 	}
