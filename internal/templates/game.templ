@@ -12,56 +12,119 @@ templ Game(game *db.Game, characters []chargen.Character, isGM bool, currentUser
 templ GameHead(game *db.Game) {
 	<span id="game-data" data-id={ game.ID } style="display:none;"></span>
 	<script>
-		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-		let gameId = document.getElementById('game-data').dataset.id;
-		const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/game/' + gameId);
-		socket.onmessage = function (e) {
-			const parts = e.data.split(":");
-			const type = parts[0];
-			const charId = parts[1];
+		(function() {
+			let socket = null;
+			let reconnectTimer = null;
+			let delay = 1000;
 
-			if (type === "log_entry") {
-				const eventType = parts[1];
-				const charName = parts[2];
-				const msg = atob(parts[3]);
-				
-				const timeString = new Date().toLocaleTimeString('en-US', { hour12: false });
-				const html = `
-				<div class="log-entry flex gap-sm mb-sm p-sm" data-type="${eventType}" style="border-bottom:1px solid #222;">
-					<div class="text-muted" style="white-space:nowrap;">[${timeString}]</div>
-					<div class="text-white">
-						<strong class="text-accent">${charName}</strong>
-						<span style="color:#aaa;">${msg}</span>
-					</div>
-				</div>`;
-				
-				const logBox = document.getElementById("activity-log-box");
-				if (logBox) {
-					const filterCheckbox = document.querySelector(`input[name="type"][value="${eventType}"]`);
-					if (!filterCheckbox || filterCheckbox.checked) {
-						const noLogs = logBox.querySelector('.no-logs');
-						if (noLogs) noLogs.remove();
-						logBox.insertAdjacentHTML("afterbegin", html);
+			function connect() {
+				const gameData = document.getElementById('game-data');
+				if (!gameData) return;
+				const gameId = gameData.dataset.id;
+				const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+				const wsUrl = protocol + '//' + window.location.host + '/ws/game/' + gameId;
+
+				socket = new WebSocket(wsUrl);
+
+				socket.onopen = function () {
+					delay = 1000;
+					hideDisconnectBanner();
+					document.body.dispatchEvent(new Event('party-update'));
+				};
+
+				socket.onmessage = function (e) {
+					const parts = e.data.split(":");
+					const type = parts[0];
+					const charId = parts[1];
+
+					if (type === "log_entry") {
+						const eventType = parts[1];
+						const charName = parts[2];
+						const msg = atob(parts[3]);
+						
+						const timeString = new Date().toLocaleTimeString('en-US', { hour12: false });
+						const html = `
+						<div class="log-entry flex gap-sm mb-sm p-sm" data-type="${eventType}" style="border-bottom:1px solid #222;">
+							<div class="text-muted" style="white-space:nowrap;">[${timeString}]</div>
+							<div class="text-white">
+								<strong class="text-accent">${charName}</strong>
+								<span style="color:#aaa;">${msg}</span>
+							</div>
+						</div>`;
+						
+						const logBox = document.getElementById("activity-log-box");
+						if (logBox) {
+							const filterCheckbox = document.querySelector(`input[name="type"][value="${eventType}"]`);
+							if (!filterCheckbox || filterCheckbox.checked) {
+								const noLogs = logBox.querySelector('.no-logs');
+								if (noLogs) noLogs.remove();
+								logBox.insertAdjacentHTML("afterbegin", html);
+							}
+						}
+						return;
 					}
-				}
-				return;
+
+					document.body.dispatchEvent(new Event('party-update'));
+
+					const modal = document.getElementById("char-modal");
+					if (modal && modal.dataset.charId === charId) {
+						if (document.activeElement && document.activeElement.closest('.modal-content')) {
+							return;
+						}
+						if (typeof htmx !== 'undefined') {
+							htmx.ajax('GET', '/character/' + charId + '?modal=true', {
+								target: '#char-modal-container',
+								swap: 'innerHTML'
+							});
+						}
+					}
+				};
+
+				socket.onclose = function () {
+					showDisconnectBanner();
+					scheduleReconnect();
+				};
+
+				socket.onerror = function () {
+					socket.close();
+				};
 			}
 
-			document.body.dispatchEvent(new Event('party-update'));
+			function scheduleReconnect() {
+				if (reconnectTimer) clearTimeout(reconnectTimer);
+				reconnectTimer = setTimeout(function () {
+					delay = Math.min(delay * 1.5, 5000);
+					connect();
+				}, delay);
+			}
 
-			const modal = document.getElementById("char-modal");
-			if (modal && modal.dataset.charId === charId) {
-				if (document.activeElement && document.activeElement.closest('.modal-content')) {
-					return;
-				}
-				if (typeof htmx !== 'undefined') {
-					htmx.ajax('GET', '/character/' + charId + '?modal=true', {
-						target: '#char-modal-container',
-						swap: 'innerHTML'
-					});
+			function showDisconnectBanner() {
+				let banner = document.getElementById('ws-disconnect-banner');
+				if (!banner) {
+					banner = document.createElement('div');
+					banner.id = 'ws-disconnect-banner';
+					banner.className = 'bg-danger-dark border-danger text-danger font-bold text-center p-sm text-sm';
+					banner.style.cssText = 'position:fixed; bottom:15px; right:15px; z-index:9999; box-shadow:0 0 15px rgba(255,0,85,0.4); border-style:solid; border-width:1px; border-radius:4px;';
+					banner.innerHTML = '⚡ DISCONNECTED - RECONNECTING TO TERMINAL...';
+					document.body.appendChild(banner);
+				} else {
+					banner.style.display = 'block';
 				}
 			}
-		};
+
+			function hideDisconnectBanner() {
+				const banner = document.getElementById('ws-disconnect-banner');
+				if (banner) {
+					banner.style.display = 'none';
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', connect);
+			} else {
+				connect();
+			}
+		})();
 
 		function toggleEditSection(sectionId, displayStyle = 'block') {
 			const editEl = document.getElementById(sectionId + '-edit');
