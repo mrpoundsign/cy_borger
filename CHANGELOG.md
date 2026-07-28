@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.2] - 2026-07-28
 
+### Added
+- **cy_adminer**: Admin tool for cy_borger
+
 ### Fixed
 - **AUTH LOGIN**: Fixed bug where a failed login would load the login inside the login window. Yo, dawg, I herd you liked logging in.
 

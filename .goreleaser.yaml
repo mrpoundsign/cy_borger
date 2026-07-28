@@ -2,8 +2,20 @@ version: 2
 project_name: cy_borger
 
 builds:
-  - main: ./cmd/cy_borger
+  - id: cy_borger
+    main: ./cmd/cy_borger
     binary: cy_borger
+    env:
+      - CGO_ENABLED=0
+    targets:
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - darwin_arm64
+
+  - id: cy_adminer
+    main: ./cmd/cy_adminer
+    binary: cy_adminer
     env:
       - CGO_ENABLED=0
     targets:
