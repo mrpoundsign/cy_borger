@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -63,26 +64,25 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	password := strings.TrimSpace(r.FormValue("password"))
 
 	if username == "" || password == "" {
-		http.Error(w, "Login username and password required.", http.StatusBadRequest)
+		s.redirect(w, r, "/?error="+url.QueryEscape("Login username and password required."))
 		return
 	}
 
 	if strings.Contains(username, " ") {
-		http.Error(w, "Username cannot contain spaces.", http.StatusBadRequest)
+		s.redirect(w, r, "/?error="+url.QueryEscape("Username cannot contain spaces."))
 		return
 	}
 
 	u, err := s.DB.CreateUserAccount(username, password)
 	if err != nil {
-		http.Redirect(w, r, "/?error="+err.Error(), http.StatusSeeOther)
+		s.redirect(w, r, "/?error="+url.QueryEscape(err.Error()))
 		return
 	}
 
 	setCookie(w, "cy_user_id", u.ID)
 	setCookie(w, "cy_username", u.Handle)
 
-	w.Header().Set("HX-Redirect", "/")
-	w.WriteHeader(http.StatusOK)
+	s.redirect(w, r, "/")
 }
 
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -94,21 +94,20 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	password := strings.TrimSpace(r.FormValue("password"))
 
 	if username == "" || password == "" {
-		http.Error(w, "Username and password required.", http.StatusBadRequest)
+		s.redirect(w, r, "/?error="+url.QueryEscape("Username and password required."))
 		return
 	}
 
 	u, err := s.DB.AuthenticateUser(username, password)
 	if err != nil {
-		http.Redirect(w, r, "/?error="+err.Error(), http.StatusSeeOther)
+		s.redirect(w, r, "/?error="+url.QueryEscape(err.Error()))
 		return
 	}
 
 	setCookie(w, "cy_user_id", u.ID)
 	setCookie(w, "cy_username", u.Handle)
 
-	w.Header().Set("HX-Redirect", "/")
-	w.WriteHeader(http.StatusOK)
+	s.redirect(w, r, "/")
 }
 
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -127,6 +126,5 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	w.Header().Set("HX-Redirect", "/")
-	w.WriteHeader(http.StatusOK)
+	s.redirect(w, r, "/")
 }

@@ -84,6 +84,11 @@ func (s *Server) getUserFromSession(r *http.Request) *db.User {
 	return u
 }
 
+func (s *Server) redirect(w http.ResponseWriter, r *http.Request, target string) {
+	w.Header().Set("HX-Redirect", target)
+	w.WriteHeader(http.StatusOK)
+}
+
 func (s *Server) renderError(w http.ResponseWriter, r *http.Request, message string, statusCode int) {
 	if r.Header.Get("HX-Request") == "true" {
 		http.Error(w, message, statusCode)
