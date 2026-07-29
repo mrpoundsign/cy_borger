@@ -48,7 +48,7 @@ test.describe('Game Management (Operators UI)', () => {
         // Player 1 joins game by rolling a character and joining
         await player1Page.waitForSelector('#btn-generate-character-index', { timeout: 10000 });
         await player1Page.locator('#btn-generate-character-index').click();
-        await expect(player1Page).toHaveURL(/.*\/character\/.*/, { timeout: 10000 });
+        await expect(player1Page).toHaveURL(/.*\/characters\/new/, { timeout: 10000 });
         
         await player1Page.locator('button:has-text("KEEP THIS CHARACTER")').click();
         await expect(player1Page.locator('button:has-text("KEEP THIS CHARACTER")')).toBeHidden({ timeout: 10000 });

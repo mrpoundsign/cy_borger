@@ -45,9 +45,12 @@ templ CharacterSheet(character *chargen.Character, canEdit bool, isGM bool, game
 						<div class="text-success font-bold text-lg text-uppercase">⚡ DRAFT CHARACTER PREVIEW</div>
 						<div class="text-muted text-sm mt-xs">Reroll as many times as you like. Click "KEEP THIS CHARACTER" to save it permanently!</div>
 					</div>
-					<form hx-post={ string(templ.URL("/character/" + character.ID + "/keep")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="m-0">
-						<button type="submit" id={ "btn-keep-sheet-" + character.ID } class="btn bg-success text-black text-md p-sm">💾 KEEP THIS CHARACTER</button>
-					</form>
+					<div class="flex gap-sm items-center">
+						<a href={ templ.URL("/characters/new?game_id=" + character.GameID) } class="btn-outline border-success text-success text-md p-sm no-decoration inline-block" style="display:inline-block;">🎲 ROLL AGAIN</a>
+						<form hx-post={ string(templ.URL("/character/" + character.ID + "/keep")) } hx-target="#character-sheet-container" hx-swap="outerHTML" class="m-0">
+							<button type="submit" id={ "btn-keep-sheet-" + character.ID } class="btn bg-success text-black text-md p-sm">💾 KEEP THIS CHARACTER</button>
+						</form>
+					</div>
 				</div>
 			}
 		</div>

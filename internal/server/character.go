@@ -29,6 +29,43 @@ func (s *Server) logAndBroadcastGameEvent(c *chargen.Character, eventType, messa
 	}
 }
 
+func (s *Server) handleNewCharacter(w http.ResponseWriter, r *http.Request) {
+	user := s.getUserFromSession(r)
+	if user == nil {
+		s.redirect(w, r, "/")
+		return
+	}
+
+	c := chargen.GenerateCharacter()
+	if user.Handle != "" {
+		c.Handle = user.Handle
+	}
+	if gameID := r.URL.Query().Get("game_id"); gameID != "" {
+		c.GameID = gameID
+	}
+	c.OwnerID = user.ID
+	s.Drafts.Store(c.ID, &c)
+
+	var game, activeGame *db.Game
+	if c.GameID != "" {
+		game, _ = s.DB.GetGame(c.GameID)
+	}
+	activeGameID := getCookie(r, "cy_active_game_id")
+	if activeGameID != "" {
+		activeGame, _ = s.DB.GetGame(activeGameID)
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		if err := templates.CharacterContent(&c, true, false, game, activeGame, false, true).Render(r.Context(), w); err != nil {
+			log.Printf("Template error (character_sheet.templ): %v", err)
+		}
+	} else {
+		if err := templates.Character(&c, true, false, game, activeGame, false, false).Render(r.Context(), w); err != nil {
+			log.Printf("Template error (character.templ): %v", err)
+		}
+	}
+}
+
 func (s *Server) handleGenerateCharacter(w http.ResponseWriter, r *http.Request) {
 	user := s.getUserFromSession(r)
 	if user == nil {
@@ -346,6 +383,7 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 
 	c := chargen.CreateBlankCharacter()
 	ownerID := user.ID
+	c.OwnerID = ownerID
 
 	if user.Handle != "" {
 		c.Handle = user.Handle
@@ -377,14 +415,26 @@ func (s *Server) handleCreateBlankCharacter(w http.ResponseWriter, r *http.Reque
 
 func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	c, err := s.DB.GetCharacter(id)
-	if err != nil || c == nil {
-		s.renderError(w, r, "Not found", http.StatusNotFound)
-		return
+	var c *chargen.Character
+	if draft, ok := s.Drafts.Load(id); ok {
+		c = draft.(*chargen.Character)
+		s.Drafts.Delete(id)
+	} else {
+		var err error
+		c, err = s.DB.GetCharacter(id)
+		if err != nil || c == nil {
+			s.renderError(w, r, "Not found", http.StatusNotFound)
+			return
+		}
 	}
 
 	c.IsSaved = true
 	ownerID := getCookie(r, "cy_user_id")
+	if ownerID == "" {
+		s.renderError(w, r, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	c.OwnerID = ownerID
 	if err := s.DB.SaveCharacter(c, ownerID); err != nil {
 		log.Printf("Failed to save character %s: %v", c.ID, err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -396,6 +446,7 @@ func (s *Server) handleKeepCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Push-Url", "/character/"+c.ID)
 		s.renderCharacterViewWithChar(w, r, c)
 		return
 	}
@@ -780,9 +831,7 @@ func (s *Server) handleKillCharacter(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("HX-Request") == "true" {
 		target := strings.TrimPrefix(r.Header.Get("HX-Target"), "#")
 		if target == "character-sheet-container" || target == "character-sheet" {
-			if err := templates.CharacterSheet(c, isOwner, isGM, nil, nil, false, true).Render(r.Context(), w); err != nil {
-				log.Printf("Template error (character_sheet.templ): %v", err)
-			}
+			s.renderCharacterViewWithChar(w, r, c)
 			return
 		}
 		w.WriteHeader(http.StatusOK)

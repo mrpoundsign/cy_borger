@@ -22,7 +22,6 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 	var myGames []db.Game
 	var myChars []chargen.Character
-	var draftChars []chargen.Character
 
 	if user != nil {
 		games, err := s.DB.GetGamesByOwner(user.ID)
@@ -36,18 +35,12 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("Failed to get characters for user %s: %v", user.ID, err)
 		}
-		for _, c := range allChars {
-			if c.IsSaved {
-				myChars = append(myChars, c)
-			} else {
-				draftChars = append(draftChars, c)
-			}
-		}
+		myChars = allChars
 	}
 
 	errMsg := r.URL.Query().Get("error")
 
-	if err := templates.Base("CY_BORGER - Home", nil, templates.Index(user, myGames, myChars, draftChars, errMsg)).Render(r.Context(), w); err != nil {
+	if err := templates.Base("CY_BORGER - Home", nil, templates.Index(user, myGames, myChars, errMsg)).Render(r.Context(), w); err != nil {
 		log.Printf("Template execution error (index.templ): %v", err)
 	}
 }

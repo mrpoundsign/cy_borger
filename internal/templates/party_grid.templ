@@ -11,10 +11,7 @@ templ PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, curren
 		<div class="bg-dark p-lg mb-xl border-muted" style="border-width:1px; border-style:solid; position:relative; padding-top: 30px;">
 			<h2 class="box-header-title text-accent text-uppercase m-0 px-sm">ACTIVE PARTY MEMBERS</h2>
 			<div style="position:absolute; top:15px; right:15px; z-index:10;" class="flex gap-sm items-center">
-				<form hx-post="/character/generate" class="m-0">
-					<input type="hidden" name="game_id" value={ game.ID }/>
-					<button type="submit" id={ "btn-generate-character-party-" + game.ID } class="btn-small p-xs text-xs">🎲 Roll New Character</button>
-				</form>
+				<a href={ templ.URL("/characters/new?game_id=" + game.ID) } id={ "btn-generate-character-party-" + game.ID } class="btn-small p-xs text-xs no-decoration inline-block" style="display:inline-block;">🎲 Roll New Character</a>
 				<form hx-post="/character/create_blank" class="m-0">
 					<input type="hidden" name="game_id" value={ game.ID }/>
 					<button type="submit" id={ "btn-create-blank-party-" + game.ID } class="btn-outline-small p-xs text-xs">📝 Create Blank</button>

@@ -5,8 +5,8 @@ import (
 	"github.com/mrpoundsign/cy_borger/pkg/chargen"
 )
 
-templ Index(user *db.User, myGames []db.Game, myChars []chargen.Character, draftChars []chargen.Character, errMsg string) {
-	@Base("🍔 CY_BORGER Character Generator", IndexHead(), IndexContent(user, myGames, myChars, draftChars, errMsg))
+templ Index(user *db.User, myGames []db.Game, myChars []chargen.Character, errMsg string) {
+	@Base("🍔 CY_BORGER Character Generator", IndexHead(), IndexContent(user, myGames, myChars, errMsg))
 }
 
 templ IndexHead() {
@@ -14,7 +14,7 @@ templ IndexHead() {
 	</script>
 }
 
-templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character, draftChars []chargen.Character, errMsg string) {
+templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character, errMsg string) {
 	<div class="container">
 		<h1 class="flex items-center gap-md text-2xl text-accent">
 			<img src="/favicon.svg" alt="CY_BORGER logo" class="border-accent" style="height:54px; width:54px; border-radius:6px; box-shadow:0 0 12px rgba(255,230,0,0.4);"/>
@@ -107,9 +107,7 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 
 		if user != nil {
 			<div class="flex justify-center gap-sm flex-wrap mb-lg">
-				<form hx-post="/character/generate" style="display:inline;">
-					<button type="submit" id="btn-generate-character-index" class="btn">🎲 Roll Random Character</button>
-				</form>
+				<a href="/characters/new" id="btn-generate-character-index" class="btn no-decoration inline-block" style="display:inline-block;">🎲 Roll Random Character</a>
 				<form hx-post="/character/create_blank" style="display:inline;">
 					<button type="submit" id="btn-create-blank-character-index" class="btn bg-success text-black">📝 Create Blank Character</button>
 				</form>
@@ -129,7 +127,7 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 			</div>
 		}
 
-		if len(myGames) > 0 || len(myChars) > 0 || len(draftChars) > 0 {
+		if len(myGames) > 0 || len(myChars) > 0 {
 			<div class="card text-left" id="my-stuff-card">
 				if len(myGames) > 0 {
 					<div id="my-gm-games-section">
@@ -182,19 +180,7 @@ templ IndexContent(user *db.User, myGames []db.Game, myChars []chargen.Character
 					</ul>
 				}
 
-				if len(draftChars) > 0 {
-					<h3 class="text-warning mb-sm text-lg">DRAFT / UNKEPT CHARACTERS</h3>
-					<ul id="my-drafts-list" style="list-style:none; padding:0; line-height:1.5;">
-						for _, c := range draftChars {
-							<li data-char-id={ c.ID }><a href={ templ.URL("/character/" + c.ID) } class="text-warning no-decoration">⚡
-									<strong>{ c.Name }</strong> — { c.Class.Name }
-									if c.GameName != "" {
-										[{ c.GameName }]
-									}
-									[Draft Preview]</a></li>
-						}
-					</ul>
-				}
+
 			</div>
 		} else {
 			<div class="card text-left" id="my-stuff-card" style="display:none;"></div>

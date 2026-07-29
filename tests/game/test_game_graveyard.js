@@ -34,7 +34,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
         const gameUrl = (process.env.BASE_URL || 'http://localhost:8080') + '/game/' + gameId;
 
         // 2. Roll a character into game
-        await page.locator('button:has-text("🎲 Roll New Character")').click();
+        await page.locator('a:has-text("🎲 Roll New Character")').click();
         await page.waitForLoadState('networkidle');
 
         const keepBtn = page.locator('button:has-text("KEEP THIS CHARACTER")');
@@ -64,7 +64,7 @@ test.describe('Graveyard & Flatline Workflow', () => {
 
         // 4. Confirm character is in GRAVEYARD section on game page
         await expect(page.locator('text=GRAVEYARD')).toBeVisible();
-        await expect(page.locator('text=Killed by orbital strike')).toBeVisible();
+        await expect(page.locator('.bg-danger-light:has-text("Killed by orbital strike")').first()).toBeVisible();
         await expect(page.locator('button:has-text("REVIVE")')).toBeVisible();
     });
 });

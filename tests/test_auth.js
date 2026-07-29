@@ -27,7 +27,7 @@ test.describe('User Authentication & Session Persistence', () => {
         // 2. Verify logged-in state shows login name and operator handle
         await expect(page.locator('text=LOGIN:')).toBeVisible();
         await expect(page.getByText(loginName, { exact: true })).toBeVisible();
-        await expect(page.locator('button:has-text("🎲 Roll Random Character")')).toBeVisible();
+        await expect(page.locator('a:has-text("🎲 Roll Random Character")')).toBeVisible();
 
         // 3. Test Logout
         await page.locator('button:has-text("🚪 LOGOUT")').click();

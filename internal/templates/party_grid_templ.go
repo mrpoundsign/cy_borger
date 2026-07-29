@@ -48,40 +48,40 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-trigger=\"party-update from:body\"><div class=\"bg-dark p-lg mb-xl border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">ACTIVE PARTY MEMBERS</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\" class=\"flex gap-sm items-center\"><form hx-post=\"/character/generate\" class=\"m-0\"><input type=\"hidden\" name=\"game_id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"this\" hx-swap=\"outerHTML\" hx-trigger=\"party-update from:body\"><div class=\"bg-dark p-lg mb-xl border-muted\" style=\"border-width:1px; border-style:solid; position:relative; padding-top: 30px;\"><h2 class=\"box-header-title text-accent text-uppercase m-0 px-sm\">ACTIVE PARTY MEMBERS</h2><div style=\"position:absolute; top:15px; right:15px; z-index:10;\" class=\"flex gap-sm items-center\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
+		var templ_7745c5c3_Var3 templ.SafeURL
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/characters/new?game_id=" + game.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 15, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 14, Col: 61}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button type=\"submit\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-generate-character-party-" + game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 16, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 14, Col: 110}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn-small p-xs text-xs\">🎲 Roll New Character</button></form><form hx-post=\"/character/create_blank\" class=\"m-0\"><input type=\"hidden\" name=\"game_id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn-small p-xs text-xs no-decoration inline-block\" style=\"display:inline-block;\">🎲 Roll New Character</a><form hx-post=\"/character/create_blank\" class=\"m-0\"><input type=\"hidden\" name=\"game_id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 19, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 16, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +94,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-create-blank-party-" + game.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 20, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 17, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -124,7 +124,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 34, Col: 18}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 31, Col: 18}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -158,7 +158,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(c.OwnerUsername)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 46, Col: 54}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 43, Col: 54}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
@@ -172,7 +172,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("@" + c.Handle)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 48, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 45, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(c.Class.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 52, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 49, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -208,7 +208,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(c.HP.Current))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 54, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 51, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -221,7 +221,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(c.HP.Max))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 54, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 51, Col: 84}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -234,7 +234,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(c.Glitches.Current))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 54, Col: 148}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 51, Col: 148}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -247,7 +247,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(c.Glitches.Max))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 54, Col: 179}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 51, Col: 179}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -261,7 +261,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var15 string
 					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(w.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 57, Col: 17}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 54, Col: 17}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
@@ -274,7 +274,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var16 string
 					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(w.Damage)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 57, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 54, Col: 31}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
@@ -292,7 +292,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 						var templ_7745c5c3_Var17 string
 						templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(w.Hands)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 59, Col: 21}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 56, Col: 21}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 						if templ_7745c5c3_Err != nil {
@@ -315,7 +315,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-inspect-" + c.ID + "-card")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 65, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 62, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 				if templ_7745c5c3_Err != nil {
@@ -328,7 +328,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + c.ID + "?modal=true")))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 65, Col: 131}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 62, Col: 131}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 				if templ_7745c5c3_Err != nil {
@@ -341,7 +341,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var20 templ.SafeURL
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/character/" + c.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 68, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 65, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
@@ -354,7 +354,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var21 string
 				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue("link-full-sheet-" + c.ID + "-card")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 68, Col: 92}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 65, Col: 92}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 				if templ_7745c5c3_Err != nil {
@@ -372,7 +372,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var22 string
 					templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-flatline-" + c.ID + "-card")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 71, Col: 54}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 68, Col: 54}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 					if templ_7745c5c3_Err != nil {
@@ -385,7 +385,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var23 string
 					templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(c.ID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 71, Col: 206}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 68, Col: 206}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 					if templ_7745c5c3_Err != nil {
@@ -398,7 +398,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var24 string
 					templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue("kill-game-" + c.ID + "-edit")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 73, Col: 48}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 70, Col: 48}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 					if templ_7745c5c3_Err != nil {
@@ -411,7 +411,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var25 string
 					templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 77, Col: 33}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 74, Col: 33}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 					if templ_7745c5c3_Err != nil {
@@ -424,7 +424,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var26 string
 					templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + c.ID + "/kill")))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 79, Col: 76}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 76, Col: 76}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 					if templ_7745c5c3_Err != nil {
@@ -437,7 +437,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var27 string
 					templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(c.ID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 79, Col: 198}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 76, Col: 198}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 					if templ_7745c5c3_Err != nil {
@@ -450,7 +450,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var28 string
 					templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-cancel-flatline-" + c.ID + "-modal")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 82, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 79, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 					if templ_7745c5c3_Err != nil {
@@ -463,7 +463,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var29 string
 					templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(c.ID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 82, Col: 177}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 79, Col: 177}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 					if templ_7745c5c3_Err != nil {
@@ -476,7 +476,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var30 string
 					templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-submit-flatline-" + c.ID + "-modal")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 83, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 80, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 					if templ_7745c5c3_Err != nil {
@@ -507,7 +507,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var31 string
 					templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 105, Col: 18}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 102, Col: 18}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 					if templ_7745c5c3_Err != nil {
@@ -541,7 +541,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var32 string
 					templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(c.OwnerUsername)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 120, Col: 60}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 117, Col: 60}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 					if templ_7745c5c3_Err != nil {
@@ -555,7 +555,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var33 string
 					templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs("@" + c.Handle)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 122, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 119, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 					if templ_7745c5c3_Err != nil {
@@ -578,7 +578,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var34 string
 				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(c.Class.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 126, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 123, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 				if templ_7745c5c3_Err != nil {
@@ -596,7 +596,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var35 string
 					templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(c.DiedAt.Format("2006-01-02 15:04:05"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 129, Col: 114}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 126, Col: 114}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 					if templ_7745c5c3_Err != nil {
@@ -614,7 +614,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(c.DeathNote)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 132, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 129, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -627,7 +627,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-inspect-" + c.ID + "-card")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 135, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 132, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 				if templ_7745c5c3_Err != nil {
@@ -640,7 +640,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + c.ID + "?modal=true")))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 135, Col: 186}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 132, Col: 186}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 				if templ_7745c5c3_Err != nil {
@@ -658,7 +658,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var39 string
 					templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(templ.URL("/character/" + c.ID + "/revive")))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 139, Col: 76}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 136, Col: 76}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 					if templ_7745c5c3_Err != nil {
@@ -671,7 +671,7 @@ func PartyGrid(game *db.Game, characters []chargen.Character, isGM bool, current
 					var templ_7745c5c3_Var40 string
 					templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue("btn-revive-" + c.ID + "-card")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 140, Col: 67}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/party_grid.templ`, Line: 137, Col: 67}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
 					if templ_7745c5c3_Err != nil {

@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/mrpoundsign/cy_borger/internal/db"
 	"github.com/mrpoundsign/cy_borger/internal/templates"
 )
 
 type Server struct {
-	DB *db.DB
+	DB     *db.DB
+	Drafts sync.Map
 }
 
 func NewServer(database *db.DB) *Server {
@@ -26,6 +28,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /auth/logout", s.handleLogout)
 	mux.HandleFunc("POST /user/update", s.handleUpdateUser)
 
+	mux.HandleFunc("GET /characters/new", s.handleNewCharacter)
 	mux.HandleFunc("POST /character/generate", s.handleGenerateCharacter)
 	mux.HandleFunc("POST /character/create_blank", s.handleCreateBlankCharacter)
 	mux.HandleFunc("GET /character/{id}", s.handleViewCharacter)

@@ -48,10 +48,15 @@ test.describe('Character editing & Draft/Keep workflow', () => {
     test('random character roll creates saved character for logged-in user', async ({ page }) => {
         await loginUser(page);
 
-        await page.locator('button:has-text("Roll Random Character")').first().click();
+        await page.locator('a:has-text("Roll Random Character")').first().click();
         await page.waitForLoadState('networkidle');
 
-        await expect(page).toHaveURL(/\/character\//);
+        await expect(page).toHaveURL(/\/characters\/new/);
+
+        const keepBtn = page.locator('button:has-text("KEEP THIS CHARACTER")');
+        await keepBtn.click();
+        await expect(keepBtn).toBeHidden({ timeout: 10000 });
+        await page.waitForLoadState('networkidle');
         await expect(page.locator('#identity-view h1')).toBeVisible();
     });
 

@@ -36,7 +36,7 @@ test.describe('INSPECT SHEET modal injection', () => {
         const gameUrl = (process.env.BASE_URL || 'http://localhost:8080') + '/game/' + gameId;
 
         // Roll a character into game
-        await page.locator('button:has-text("🎲 Roll New Character")').click();
+        await page.locator('a:has-text("🎲 Roll New Character")').click();
         await page.waitForLoadState('networkidle');
 
         // Character is generated as a draft; keep it to save it to the game
