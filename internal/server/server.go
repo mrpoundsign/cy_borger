@@ -23,6 +23,7 @@ func NewServer(database *db.DB) *Server {
 
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /", s.handleIndex)
+	mux.HandleFunc("GET /about", s.handleAbout)
 	mux.HandleFunc("POST /auth/register", s.handleRegister)
 	mux.HandleFunc("POST /auth/login", s.handleLogin)
 	mux.HandleFunc("POST /auth/logout", s.handleLogout)

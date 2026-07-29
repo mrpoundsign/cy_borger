@@ -68,6 +68,11 @@ docker compose up -d --build
 
 This will run the CY_BORGER server on port `8080` (or `9090` depending on your `docker-compose.yml` config) and mount a local volume to persist the SQLite database.
 
+## Attributions
+
+- Character generation logic and base datasets from **[makedatanotlore](https://linktr.ee/makedatanotlore)**. Full attribution and massive thanks for making this generator possible.
+- **CY_BORG** is a game by Christian Sahlén and Johan Nohr. CY_BORGER is an independent production and is not affiliated with Ockult Örtmästare Games or Stockholm Kartell. Find the official game at [cy-borg.io](https://cy-borg.io/).
+
 ## License
 
 CY_BORGER is released under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE) file for details.
